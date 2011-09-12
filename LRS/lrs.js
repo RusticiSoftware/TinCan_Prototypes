@@ -340,6 +340,7 @@ function handleRequest(request, response, db) {
 		response.setHeader('WWW-Authenticate', 'Basic realm="LRS demo"');
 		response.end();
 	} else if (request.url.toLowerCase().indexOf(methods.statements) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
+		console.log(request.method + ' ' + request.url);
 		handleStatementRequest(request, response, db);
 	} else {
 		console.error('Unexpected request: ' + request.method + " : " + request.url);
@@ -361,7 +362,7 @@ function main() {
 	db = new mongodb.Db('local', mongoserver);
 	db.open(function (err, db) {
 		if (err === null) {
-
+			console.log('DB Initialized');
 			async.map(collectionNames, function (collectionName, callback) {
 				db.collection(collectionName, callback);
 
@@ -384,6 +385,9 @@ function main() {
 				});
 				server.listen(8080, "127.0.0.1");
 			});
+		} else
+		{
+			throw err;
 		}
 	});
 }
