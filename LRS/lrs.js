@@ -1,8 +1,10 @@
 /*jslint node: true, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-var methods, collectionNames;
+var methods, collectionNames, actorUniqueProps;
 methods = {
 	statements: '/tcapi/statements'
 };
+
+actorUniqueProps = ['mbox'];
 collectionNames = ['statements', 'actors', 'activities'];
 
 
@@ -74,7 +76,7 @@ function mergeActivities(source, target) {
 			throw new Error('Activity : "' + source.id + '", conflicting values of: ' + property);
 		}
 	}
-	
+	 
 	return modified;
 }
 
@@ -139,11 +141,23 @@ function storeActivities(activities, collections, callback) {
 // store actors (authority, "object")
 function storeActors(actors, collections, callback) {
 	"use strict";
-	var definedActors, ii;
+	var definedActors, ii, jj, hasUniqueProp;
 	
 	definedActors = [];
 	for (ii = 0; ii < actors.length; ii++) {
 		if (actors[ii] !== undefined) {
+			hasUniqueProp = false;
+			
+			for (jj = 0; jj < actorUniqueProps.length; jj++) {
+				if (actors[ii][actorUniqueProps[jj]] !== undefined) {
+					hasUniqueProp = true;
+					break;
+				}
+			}
+			if (!hasUniqueProp) {
+				callback(new Error('Actor has no members which have the inverse functional property (actor is not uniquely identified): ' + JSON.stringify(actors[ii])));
+				return;
+			}
 			definedActors.push(actors[ii]);
 		}
 	}
@@ -187,7 +201,7 @@ function storeStatements(statements, collections, callback) {
 	async.parallel([
 		function(callback){ collections.statements.insert(statements, { safe: true }, callback); },
 		function(callback){ storeActors(actors, collections, callback); },
-		function(callback){ storeActivities(activities, collections, callback); }
+    	function(callback){ storeActivities(activities, collections, callback); }
 	],callback);
 }
 
@@ -264,6 +278,34 @@ function prepareStatement(statement, request) {
 	}
 }
 
+function handleStatementGetRequest(request, response, collections) {
+	"use strict";
+	var query, ii;
+	
+	query = {};
+	
+	if (request.url.length > (methods.statements.length + 1)) {
+		query._id = request.url.substring(methods.statements.length + 1);
+	}
+
+	collections.statements.find(query).toArray( function(error, results) {
+		if (error !== null) {
+			checkError(error, request, response, 'handleStatementGetRequest_find');
+		} else {
+			// db uses _id for primary key, spec expects id
+			for (ii = 0; ii < results.length; ii++) {
+				results[ii].id = results[ii]._id;
+				delete results[ii]._id;
+			}
+		
+			if (results.length === 1) {
+				results = results[0];
+			}
+			response.end(JSON.stringify(results, null, 4));
+		}
+	});
+}
+
 
 function handleStatementRequest(request, response, collections) {
 	"use strict";
@@ -333,19 +375,26 @@ function handleRequest(request, response, db) {
 	response.setHeader('Access-Control-Allow-Methods', 'PUT');
 	response.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 
-	if (request.method === 'OPTIONS') {
-		response.end();
-	} else if (!isAuthorized(request)) {
-		response.statusCode = 401;
-		response.setHeader('WWW-Authenticate', 'Basic realm="LRS demo"');
-		response.end();
-	} else if (request.url.toLowerCase().indexOf(methods.statements) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
-		console.log(request.method + ' ' + request.url);
-		handleStatementRequest(request, response, db);
-	} else {
-		console.error('Unexpected request: ' + request.method + " : " + request.url);
-		response.statusCode = 405;
-		response.end();
+	try {
+		if (request.method === 'OPTIONS') {
+			response.end();
+		} else if (!isAuthorized(request)) {
+			response.statusCode = 401;
+			response.setHeader('WWW-Authenticate', 'Basic realm="LRS demo"');
+			response.end();
+		} else if (request.url.toLowerCase().indexOf(methods.statements) === 0 && (request.method === 'GET')) {
+			console.log(request.method + ' ' + request.url);
+			handleStatementGetRequest(request, response, db);
+		} else if (request.url.toLowerCase().indexOf(methods.statements) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
+			console.log(request.method + ' ' + request.url);
+			handleStatementRequest(request, response, db);
+		} else {
+			console.error('Unexpected request: ' + request.method + " : " + request.url);
+			response.statusCode = 405;
+			response.end();
+		}
+	} catch (ex) {
+		checkError(ex, request, response, 'handleRequest');
 	}
 }
 
@@ -362,7 +411,7 @@ function main() {
 	db = new mongodb.Db('local', mongoserver);
 	db.open(function (err, db) {
 		if (err === null) {
-			console.log('DB Initialized');
+			console.log("DB 'local' Initialized");
 			async.map(collectionNames, function (collectionName, callback) {
 				db.collection(collectionName, callback);
 
@@ -376,7 +425,7 @@ function main() {
 				}
 
 				for (ii = 0; ii < collectionsArray.length; ii++) {
-					collectionsArray[ii].remove({});
+					//collectionsArray[ii].remove({});
 					collections[collectionsArray[ii].collectionName] = collectionsArray[ii];
 				}
 
