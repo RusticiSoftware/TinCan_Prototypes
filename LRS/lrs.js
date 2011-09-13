@@ -162,8 +162,8 @@ function storeActors(actors, collections, callback) {
 		}
 	}
 	
-	
-	collections.actors.save(definedActors, { safe : true }, callback);
+	callback();
+	//collections.actors.save(definedActors, { safe : true }, callback);
 }
 
 
