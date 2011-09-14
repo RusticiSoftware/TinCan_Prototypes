@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+    <title>Calculating a Score</title>
+    <style type="text/css" media="screen">
+		@import url( ../css/style.css );
+	</style>
+	<script src="../scripts/TCDriver.js" type="text/javascript"></script>
+	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var pageObj = new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/CalculatingScore.html")
+			.SetValue("definition",new TCObject()
+				.SetValue("name","Calculating a Score")
+				.SetValue("description","An overview of how to calculate a score with an applied handicap in golf."));
+		var stmt = new TCStatement(tc_lrs).SetValue("verb","read").SetValue("object",pageObj).Send();
+
+	</script>
+</head>
+<body>
+<h1>Calculating a Score</h1>
+<img src="calcscore.jpg" id="golfimg" alt="golfing image"/>
+<p>The handicap is used to determine on which holes a player (or team) is granted extra strokes. These are then used to calculate a "net" score from the number of strokes actually played ("gross" score).</p>
+
+<p>To find how many strokes a player is given, the procedures differ between in match play and stroke play. In match play, the difference between the players' (or teams') handicaps is distributed among the holes to be played.</p>
+
+<p>For example, if 18 holes are played, player A's handicap is 24, and player B's handicap is 14, then A is granted ten strokes: one on each of the ten holes identified by the handicap numbers 1 through 10 on the scorecard and no strokes on the remaining eight.</p>
+
+<p>If A's handicap is 36 and B's handicap is 14, A is granted 22 strokes: one on each of the 18 holes to be played, and an additional one on each of the four holes identified by the handicap numbers 1 through 4 on the scorecard.</p>
+
+<p>The procedure in stroke play is similar, but each player's individual handicap (rather than the difference between two players' handicaps) is used to calculate extra strokes. Therefore, a player with handicap 10 is granted one stroke on each of the ten holes identified by the handicap numbers 1 through 10 on the scorecard and no extra strokes on the remaining eight. A player with a handicap of 22 is granted 22 strokes: one on each of the 18 holes and an additional one on each of the four holes identified by the handicap numbers 1 through 4 on the scorecard.</p>
+
+<p>Example for the calculation of "net" results: Assume that A is granted one stroke on a par four hole and player B is granted none. If A plays six strokes and B plays five, their "net" scores are equal. Therefore, in match play the hole is halved; in stroke play both have played a "net" bogey (one over par). If both play five strokes, A has played better by one "net" stroke. Therefore, in match play A wins the hole; in stroke play A has played a "net" par and B a "net" bogey.</p>
+<script type="text/javascript">
+AddLicenseInfo("Wikipedia", "http://en.wikipedia.org/wiki/Golf_handicap");
+AddTagLine();
+</script>
+</body>
+</html>

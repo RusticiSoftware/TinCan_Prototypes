@@ -1,0 +1,112 @@
+﻿body 
+{
+	margin-left:20px;
+}
+p,li,th,td
+{
+	font-family:verdana,helvetica,arial,sans-serif;
+	font-size:12px;
+	font-weight:400;
+	font-style:normal;
+}
+img#golfimg
+{
+	float:right;
+	width:300px;
+	margin-left: 10px;
+	margin-right: 10px;
+	border: solid 1px Black;
+}
+h1, h2, h3 {
+  color: #003366;
+  font-family: BankGothic Lt BT;
+}
+h1 {
+  font-size: 25px;
+}
+h2 {
+  font-size: 20px;
+}
+h3 {
+  font-size: 16px;
+}
+div#attribution
+{
+	background-color: #F9F9F9;
+	border: double 3px #000000;
+	padding: 5px 5px 5px 5px;
+	margin: 20px 40px;
+	font-family: Tw Cen MT Condensed,Garamond;
+	font-size: 10pt;
+	width:auto;
+	float:left;
+	
+}
+div.salespitch
+{
+	margin: 0px 40px;
+	float:left;
+}
+
+
+
+blockquote
+{
+	font-family:Courier,verdana,helvetica,arial,sans-serif;
+	font-size:10pt;
+}
+table 
+{
+	background:#F9F9F9;
+	border: 1px #AAAAAA solid;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	margin-left: 50px;
+
+}
+
+th
+{
+	background-color: #dfdfdf;
+	text-align:center;
+	border: solid 1px #AAAAAA;
+	font-weight:bold;
+	padding: 3px 3px 3px 3px;
+}
+td
+{
+	text-align:center;
+	border: solid 1px #AAAAAA;
+	padding: 3px 3px 3px 3px;
+}
+td.rowheader
+{
+	background-color: #dfdfdf;
+	border: solid 1px #AAAAAA;
+}
+
+div.question
+{
+	font-family:verdana,helvetica,arial,sans-serif;
+	font-size:12px;
+	font-weight:400;
+	font-style:normal;
+	margin-bottom: 20px;
+}
+div.answer
+{
+	font-family:verdana,helvetica,arial,sans-serif;
+	font-size:12px;
+	font-weight:400;
+	font-style:normal;
+	margin-left: 30px;
+}
+div.correctAnswer
+{
+	font-family:verdana,helvetica,arial,sans-serif;
+	font-size:12px;
+	font-weight:bolder;
+	font-style:normal;
+	color: #003366;
+	margin-left: 30px;
+}

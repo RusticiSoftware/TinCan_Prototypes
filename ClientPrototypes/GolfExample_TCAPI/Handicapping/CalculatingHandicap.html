@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+    <title>Handicap Calculating</title>
+    <style type="text/css" media="screen">
+		@import url( ../css/style.css );
+	</style>
+	<script src="../scripts/TCDriver.js" type="text/javascript"></script>
+	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var pageObj = new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/CalculatingHandicap.html")
+			.SetValue("definition",new TCObject()
+				.SetValue("name","Handicap Calculating")
+				.SetValue("description","An overview of how to calculate a handicap in golf."));
+		var stmt = new TCStatement(tc_lrs).SetValue("verb","read").SetValue("object",pageObj).Send();
+
+	</script>
+</head>
+<body>
+<h1>Calculating a Handicap</h1>
+<img src="calchandi.jpg" id="golfimg" alt="golfing image"/>
+<p>In the United States (and elsewhere) each officially rated golf course is described by two numbers, the course rating and the slope rating. The rating of a particular course is a number generally between 67 and 77 that is used to measure the average "good score" by a scratch golfer on that course. The slope of a particular course is a ratio generally between 105 and 155 that describes the relative difficulty of a course for a bogey golfer (defined above) compared to a scratch golfer. These two numbers are used to calculate a player's handicap differential, which adjusts a player's score in relation to par according to the slope and rating of the course.</p>
+
+<p>For each officially posted round, the player's handicap differential is calculated according to the following formula:</p>
+
+<blockquote>Handicap differential = (adjusted gross score - course rating) x 113 / (slope rating).</blockquote>
+
+<p>The differential is rounded to the nearest tenth.</p>
+
+<p>The handicap index is then calculated using the average of the best 10 differentials of the player's past 20 total rounds, multiplied by 0.96. Any digits in the handicap index after the tenths are truncated. If a golfer has at least 5 but fewer than 20 rounds posted, the index is calculated using from one to nine differentials according to the following schedule:</p>
+
+<table>
+<tr>
+<th>Number of rounds</th>
+<th>Differentials to use</th>
+</tr>
+<tr>
+<td align="center">5 or 6</td>
+<td align="center">lowest 1</td>
+</tr>
+<tr>
+<td align="center">7 or 8</td>
+<td align="center">lowest 2</td>
+
+</tr>
+<tr>
+<td align="center">9 or 10</td>
+<td align="center">lowest 3</td>
+</tr>
+<tr>
+<td align="center">11 or 12</td>
+<td align="center">lowest 4</td>
+</tr>
+<tr>
+<td align="center">13 or 14</td>
+<td align="center">lowest 5</td>
+
+</tr>
+<tr>
+<td align="center">15 or 16</td>
+<td align="center">lowest 6</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td align="center">lowest 7</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td align="center">lowest 8</td>
+
+</tr>
+<tr>
+<td align="center">19</td>
+<td align="center">lowest 9</td>
+</tr>
+</table>
+
+
+<p>Updates to a golfer's index are calculated periodically according to schedules provided by state and regional golf associations.</p>
+
+<p>The handicap index is used with the course's slope rating to determine the golfer's course handicap according to the following formula:</p>
+
+<blockquote>Course Handicap = Handicap index * Slope Rating / 113.</blockquote>
+<p>The course rating is not used to determine a course handicap. The result is rounded to the nearest whole number.</p>
+
+<p>The course handicap is the number of strokes to be deducted from the golfer's gross score to determine the net score.</p>
+
+<p>For example, the following table shows the impact of the same score at two different tee positions at the same course, and the resulting handicap differential:</p>
+
+<blockquote>
+White tees:<br />
+Gross score: 85 Course rating: 69.3 Course slope: 117<br />
+Yields a handicap differential of 15.2. If this golfer's handicap index is 10.5, the course handicap would be 10.5 * 117 / 113 = 11, and the net score would be 85 - 11 = 74.
+</blockquote>
+<blockquote>
+Blue tees:<br />
+Gross score: 85 Course rating: 71.9 Course slope: 124<br />
+Yields a handicap differential of 11.9. If this golfer's handicap index is 10.5, the course handicap would be 10.5 * 124 / 113 = 12, and the net score would be 85 - 12 = 73.
+</blockquote>
+<p>Additionally, before making the above calculation, the gross score must be adjusted using the equitable score control table, which removes the effect of abnormally high individual hole scores by establishing a maximum score per hole depending on the player's handicap index. For example, a golfer with a course handicap of 20 through 29 can record a maximum of 8 strokes on any one hole for handicap calculation purposes only.</p>
+
+<script type="text/javascript">
+AddLicenseInfo("Wikipedia", "http://en.wikipedia.org/wiki/Golf_handicap");
+AddTagLine();
+</script>
+</body>
+</html>
