@@ -338,9 +338,9 @@ function Tetris()
 
 	// keyboard
 	var keyboard = new Keyboard();
-	keyboard.set(keyboard.n, this.start);
+	//keyboard.set(keyboard.n, this.start);
 	//keyboard.set(keyboard.r, this.reset);
-	keyboard.set(keyboard.p, this.pause);
+	//keyboard.set(keyboard.p, this.pause);
 	keyboard.set(keyboard.up, this.up);
 	keyboard.set(keyboard.down, this.down);
 	keyboard.set(keyboard.left, this.left);
