@@ -5,9 +5,9 @@ function TCDriver_GetLRSObject(){
 	var lrsProps = ["endpoint","auth","actor","registration","activity_id"];
 	var lrs = new Object();
 	
-	for (var prop in lrsProps){
-		if (getQueryStringParam(lrsProps[prop]) != ""){
-			lrs[lrsProps[prop]] = getQueryStringParam(lrsProps[prop]);
+	for (var i = 0; i<lrsProps.length; i++){
+		if (getQueryStringParam(lrsProps[i]) != ""){
+			lrs[lrsProps[i]] = getQueryStringParam(lrsProps[i]);
 		}
 	}
 	return lrs;
