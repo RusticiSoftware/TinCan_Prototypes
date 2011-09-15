@@ -2,17 +2,17 @@ var tc_lrs = TCDriver_GetLRSObject();
 //alert(JSON.stringify(tc_lrs));
 
 function TCDriver_GetLRSObject(){
-	
+	var lrsProps = ["endpoint","auth","actor","registration","activity_id"];
 	var lrs = new Object();
-	lrs.endpoint = getQueryStringParam('endpoint');
-	lrs.auth = getQueryStringParam('auth');
-	lrs.actor = getQueryStringParam('actor');
-	//lrs.registration = getQueryStringParam('registration');
-	//lrs.activity_id = getQueryStringParam('activity_id');
 	
+	for (var prop in lrsProps){
+		if (getQueryStringParam(lrsProps[prop]) != ""){
+			lrs[lrsProps[prop]] = getQueryStringParam(lrsProps[prop]);
+		}
+	}
 	return lrs;
-	
 }
+
 
 function TCDriver_CheckStatus(xhr){
 	if(xhr.status!=204){
@@ -21,17 +21,18 @@ function TCDriver_CheckStatus(xhr){
 }
 
 function TCDriver_SendStatement (lrs,stmt) {
-	
-	var xhr = new XMLHttpRequest();
-	xhr.open("PUT", lrs.endpoint+_ruuid(), true);
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.setRequestHeader("Authorization", lrs.auth);
-	xhr.onreadystatechange = function() {
-	    if(xhr.readyState == 4 ) {
-             TCDriver_CheckStatus(xhr);
-		}
-	};
-	xhr.send(JSON.stringify(stmt));
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var xhr = new XMLHttpRequest();
+		xhr.open("PUT", lrs.endpoint+_ruuid(), true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.onreadystatechange = function() {
+		    if(xhr.readyState == 4 ) {
+	             TCDriver_CheckStatus(xhr);
+			}
+		};
+		xhr.send(JSON.stringify(stmt));
+	}
 }
 
 
