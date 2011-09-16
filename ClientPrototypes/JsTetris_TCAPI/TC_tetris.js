@@ -102,7 +102,11 @@ function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
 function tc_sendStatment_EndGame(level,time,apm,lines,score){
 	if (TCActive){
 		
-		var tcGameObj = new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI");
+		var tcGameObj = new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI")
+			.SetValue("definition",new TCObject()
+				.SetValue("name","Js Tetris - Tin Can Prototype")
+				.SetValue("type","Game")
+				.SetValue("description","A game of tetris."));
 		var contextObj = new TCObject().SetValue("registration",gameId)
 			.SetValue("level",level)
 			.SetValue("time",time)

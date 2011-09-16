@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Tin Can Viewer</title>
+        
+        <link rel="stylesheet" href="css/base.css">
+		<link rel="stylesheet" href="css/skeleton.css">
+		<link rel="stylesheet" href="css/layout.css">
+		<link rel="stylesheet" href="css/TinCanViewer.css">
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script src="scripts/tabs.js"></script>
+		<script src="scripts/TinCanViewer.js"></script>
+		
+        
+        <script type="text/javascript">
+        
+		
+
+        
+        
+        </script>
+        
+    </head>
+    
+    
+    <body>
+		
+       
+		<div class="container">
+			<h1>Tin Can Viewer</h1>
+			
+			<ul class="tabs">
+			  <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
+			  <li><a class="active" href="#allStatements">Statements</a></li>
+			  <li><a href="#other">Other</a></li>
+			  <li><a href="#more">More</a></li>
+			</ul>
+
+			<!-- Standard <ul> with class of "tabs-content" -->
+			<ul class="tabs-content">
+			  <!-- Give ID that matches HREF of above anchors -->
+			  <li class="active" id="allStatements">
+					<button id='refreshStatements'>Refresh</button>
+					<div id='theStatements'></div>
+					<button id='showAllStatements'>Show All</button>
+				</li>
+			  <li id="other">No other right now.</li>
+			  <li id="more">Nothing more at this time.</li>
+			</ul>
+			
+		</div>
+
+    </body>
+</html>

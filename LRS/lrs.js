@@ -281,14 +281,19 @@ function prepareStatement(statement, request) {
 function handleStatementGetRequest(request, response, collections) {
 	"use strict";
 	var query, ii;
-	
+	var limit = 0;
 	query = {};
 	
 	if (request.url.length > (methods.statements.length + 1)) {
-		query._id = request.url.substring(methods.statements.length + 1);
+		if (isNaN(request.url.substring(methods.statements.length + 1))){
+			query._id = request.url.substring(methods.statements.length + 1);
+		} else {
+			limit = Number(request.url.substring(methods.statements.length + 1));
+		}
+		
 	}
 
-	collections.statements.find(query).toArray( function(error, results) {
+	collections.statements.find(query).sort( { stored : -1 } ).limit(limit).toArray( function(error, results) {
 		if (error !== null) {
 			checkError(error, request, response, 'handleStatementGetRequest_find');
 		} else {
