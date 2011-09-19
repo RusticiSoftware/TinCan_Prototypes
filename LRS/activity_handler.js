@@ -19,7 +19,19 @@ function parseStateRequest(methodParts) {
 	return key;
 }
 
-function handleStateRequest(requestContext, key) {
+function parseActivityProfile(methodParts) {
+	"use strict";
+	var key = {};
+
+	key.activity = decodeURIComponent(methodParts[0]);
+	if (methodParts.length > 2) {
+		key.stateId = decodeURIComponent(methodParts[2]);
+	}
+
+	return key;
+}
+
+function handleStateRequest(requestContext, key, collection) {
 	"use strict";
 	var method, response;
 	method = requestContext.request.method;
@@ -30,7 +42,7 @@ function handleStateRequest(requestContext, key) {
 			if (error !== null) {
 				throw error;
 			}
-			requestContext.storage.collections.state.save({_id : key, data : data}, { safe : true }, function (error) {
+			collection.save({_id : key, data : data}, { safe : true }, function (error) {
 				if (util.checkError(error, requestContext.request, response, "storing state")) {
 					response.statusCode = 204;
 					response.end('');
@@ -38,7 +50,7 @@ function handleStateRequest(requestContext, key) {
 			});
 		});
 	} else if (method === 'DELETE') {
-		requestContext.storage.collections.state.remove({_id : key}, { safe : true }, function (error) {
+		collection.remove({_id : key}, { safe : true }, function (error) {
 			if (util.checkError(error, requestContext.request, response, "clearing state")) {
 				response.statusCode = 204;
 				response.end('');
@@ -46,16 +58,27 @@ function handleStateRequest(requestContext, key) {
 		});
 	} else {
 		// then get
-		requestContext.storage.collections.state.find({_id : key}).toArray(function (error, result) {
+		collection.find({_id : key}).toArray(function (error, result) {
 			if (util.checkError(error, requestContext.request, response, "loading state")) {
-				response.statusCode = 200;
-				response.end(result[0].data);
+				switch (result.length) {
+					case 0 :
+						response.statusCode = 404;
+						response.end();
+						break;
+					case 1 :
+						response.statusCode = 200;
+						response.end(result[0].data);
+						break;
+					default :
+						util.checkError(new Error('Found too many state objects'), requestContext.request, response, "loading state");
+						break;
+				}
 			}
 		});
 	}
 }
 
-function clearState(requestContext, key) {
+function clearState(requestContext, key, collection) {
 	"use strict";
 	var response, query;
 	response = requestContext.response;
@@ -63,7 +86,7 @@ function clearState(requestContext, key) {
 	query = {$and : [ {"_id.activity" : key.activity}, {"_id.actor" : key.actor}]};
 	//query = {'_id.actor' : key.actor};
 	
-	requestContext.storage.collections.state.remove(query, { safe : true }, function (error) {
+	collection.remove(query, { safe : true }, function (error) {
 		error = new Error("doesn't work yet");
 		if (util.checkError(error, requestContext.request, response, "clearing state")) {
 			response.statusCode = 204;
@@ -75,8 +98,9 @@ function clearState(requestContext, key) {
 
 function handleActivityRequest(requestContext) {
 	"use strict";
-	var request, parts, key;
+	var request, parts, key, collections;
 	request = requestContext.request;
+	collections = requestContext.storage.collections;
 
 	if (request.method !== 'PUT' && request.method !== 'GET' && request.method !== 'DELETE') {
 		return false;
@@ -89,12 +113,17 @@ function handleActivityRequest(requestContext) {
 	if (parts[1] === 'state' && parts.length === 4) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
 		key = parseStateRequest(parts);
-		handleStateRequest(requestContext, key);
+		handleStateRequest(requestContext, key, collections.state);
 		return true;
 	} else 	if (parts[1] === 'state' && parts.length === 3 && request.method === 'DELETE') {
 		// state API -- clear all state for this activity + actor
 		key = parseStateRequest(parts);
-		clearState(requestContext, key);
+		clearState(requestContext, key, collections.state);
+		return true;
+	} else if (parts[1] === 'profile' && parts.length === 3) {
+		// activity profile API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/profile/<profile object key>
+		key = parseActivityProfile(parts);
+		handleStateRequest(requestContext, key, collections.activity_profile);
 		return true;
 	} else {
 		return false;

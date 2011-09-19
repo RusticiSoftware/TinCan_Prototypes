@@ -1,7 +1,7 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 var methods, collectionNames, actorUniqueProps, async, http, mongodb, requestHandlers, util;
 
-collectionNames = ['statements', 'actors', 'activities', 'state'];
+collectionNames = ['statements', 'actors', 'activities', 'state', 'activity_profile'];
 
 async = require('async');
 http = require('http');
