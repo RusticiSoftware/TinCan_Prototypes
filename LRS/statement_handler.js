@@ -108,21 +108,37 @@ function processStatements(statements, storage, request, callback) {
 
 function handleStatementGetRequest(requestContext) {
 	"use strict";
-	var query, ii, limit, request;
+	var query, ii, limit, request, methodDetail, parameters;
 
 	request = requestContext.request;
 	limit = 0;
 	query = {};
 
-	if (request.url.length > (method.length + 1)) {
-		if (isNaN(request.url.substring(method.length + 1))) {
-			query._id = request.url.substring(method.length + 1);
-		} else {
-			limit = Number(request.url.substring(method.length + 1));
+	if (request.url.length > method.length) {
+		methodDetail = request.url.substring(method.length);
+
+		// statements?query or statements/?query are both valid, 
+		if ('/' === methodDetail.charAt(0)) {
+			methodDetail = methodDetail.substring(1);
+		} else if ('?' !== methodDetail.charAt(0)) {
+			util.checkError(new Error('Invalid request, expected "?" or "/" after statements'), request, requestContext.response, 'handleStatementGetRequest');
+		}
+
+		if (methodDetail.indexOf('/') >= 0) {
+			util.checkError(new Error('Invalid request, "/" not expected in method detail'), request, requestContext.response, 'handleStatementGetRequest');
+		}
+
+		if (methodDetail.charAt(0) === '?') {
+			parameters = require('querystring').parse(methodDetail.substring(1));
+			if (parameters.limit !== undefined) {
+				limit = parameters.limit;
+			}
+		} else if (methodDetail.length > 0) {
+			query._id = methodDetail[0];
 		}
 	}
 
-	requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).limit(limit).toArray(function (error, results) {
+	requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).limit(parseInt(limit, 10)).toArray(function (error, results) {
 		if (error !== null) {
 			util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find');
 		} else {
@@ -132,10 +148,16 @@ function handleStatementGetRequest(requestContext) {
 				delete results[ii]._id;
 			}
 
-			if (results.length === 1) {
-				results = results[0];
+			if (results.length === 0 && query._id !== undefined) {
+				requestContext.response.statusCode = 404;
+				requestContext.response.end();
+			} else {
+				if (results.length === 1) {
+					results = results[0];
+				}
+
+				requestContext.response.end(JSON.stringify(results, null, 4));
 			}
-			requestContext.response.end(JSON.stringify(results, null, 4));
 		}
 	});
 }

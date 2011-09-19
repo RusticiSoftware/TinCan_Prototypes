@@ -61,17 +61,17 @@ function handleStateRequest(requestContext, key, collection) {
 		collection.find({_id : key}).toArray(function (error, result) {
 			if (util.checkError(error, requestContext.request, response, "loading state")) {
 				switch (result.length) {
-					case 0 :
-						response.statusCode = 404;
-						response.end();
-						break;
-					case 1 :
-						response.statusCode = 200;
-						response.end(result[0].data);
-						break;
-					default :
-						util.checkError(new Error('Found too many state objects'), requestContext.request, response, "loading state");
-						break;
+				case 0:
+					response.statusCode = 404;
+					response.end();
+					break;
+				case 1:
+					response.statusCode = 200;
+					response.end(result[0].data);
+					break;
+				default:
+					util.checkError(new Error('Found too many state objects'), requestContext.request, response, "loading state");
+					break;
 				}
 			}
 		});
@@ -85,7 +85,7 @@ function clearState(requestContext, key, collection) {
 
 	query = {$and : [ {"_id.activity" : key.activity}, {"_id.actor" : key.actor}]};
 	//query = {'_id.actor' : key.actor};
-	
+
 	collection.remove(query, { safe : true }, function (error) {
 		error = new Error("doesn't work yet");
 		if (util.checkError(error, requestContext.request, response, "clearing state")) {
@@ -115,7 +115,7 @@ function handleActivityRequest(requestContext) {
 		key = parseStateRequest(parts);
 		handleStateRequest(requestContext, key, collections.state);
 		return true;
-	} else 	if (parts[1] === 'state' && parts.length === 3 && request.method === 'DELETE') {
+	} else if (parts[1] === 'state' && parts.length === 3 && request.method === 'DELETE') {
 		// state API -- clear all state for this activity + actor
 		key = parseStateRequest(parts);
 		clearState(requestContext, key, collections.state);
