@@ -104,7 +104,7 @@
         SetupIFrame();
         		
 //get activity_id bookmark if it exists
-       	var bookmark = "";
+       	var bookmark = TCDriver_GetState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location");
         
         //if there isn't a stored bookmark, start the user at the first page
         if (bookmark == ""){
@@ -149,38 +149,16 @@
             nextButton.disabled = false;
             prevButton.disabled = false;
         }
-        
-//save the current location as the bookmark
-        //ScormProcessSetValue("cmi.location", currentPage);
-     
-		//in this sample course, the course is considered complete when the last page is reached
-        if (currentPage == (pageArray.length - 1)){
-            reachedEnd = true;
-        //    ScormProcessSetValue("cmi.completion_status", "completed");
-        }
+
+        //save the current location as the bookmark
+		TCDriver_SendState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
+
         
 
         
     }
     
-    function doUnload(){
-        
-        //don't call this function twice
-        if (processedUnload == true){return;}
-        
-        processedUnload = true;
-        
-        
-        if (reachedEnd != false){
-			
-
-
-        }
-        
-
-    }
-
-	function doFinish(){
+    function doFinish(){
         
         var stmt = new TCStatement(tc_lrs).SetValue("verb","completed").SetValue("object",courseObj).Send();
 
@@ -200,19 +178,9 @@
         goToPage();
     }
     
-    function doExit(){
+    function setBookmark(){
 
-        //note use of short-circuit AND. If the user reached the end, don't prompt.
-        //just exit normally and submit the results.
-        if (reachedEnd == false && confirm("Would you like to save your progress to resume later?")){
-
-//send bookmark
-            
-           
-        }
-        else{
-//send completed            
-        }
+        TCDriver_SendState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
         
         
     }
@@ -287,14 +255,14 @@
     </script>
 
 </head>
-<body onload="doStart(false);" onbeforeunload="doUnload(false);" onunload="doUnload();">
+<body onload="doStart(false);">
    
     <iframe width="100%" id="contentFrame" src=""></iframe>
     
     <div id="navDiv">
         <input type="button" value="<- Previous" id="butPrevious" onclick="doPrevious();"/>
         <input type="button" value="Next ->" id="butNext" onclick="doNext();"/>
-        <!--<input type="button" value="Exit" id="butExit" onclick="doExit();"/>-->
+        <!--<input type="button" value="SetBookmark" id="setBookmark" onclick="setBookmark();"/>-->
     </div>
 
 </body>

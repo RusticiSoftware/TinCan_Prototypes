@@ -1,20 +1,85 @@
+<html>
+    <head>
+        <title>Tin Can Prototypes</title>
 
-<h4>This is the index page for the Tin Can Prototypes. Click a link below to check out a prototype.</h4>
+		<link rel="stylesheet" href="TinCanViewer/css/base.css">
+		<link rel="stylesheet" href="TinCanViewer/css/skeleton.css">
+		<link rel="stylesheet" href="TinCanViewer/css/layout.css">
+        
+        <style type="text/css">
+		.container {background:transparent url(GolfExample_TCAPI/img/tincan-300x176.png) no-repeat right 0;}
+		a,a:hover,a:focus,a:visited {color:#0000EE;}
+		.prototypeDiv {margin:25px 0;}
+		
+		input[type="text"],	input[type="password"],	input[type="email"] {display:inline;}
+		
+		li {margin:0 0 2px 5px;list-style:disc inside none;}
+		</style>
+		
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		
+		
+        
+        <script type="text/javascript">
+        
+		$(document).ready(function(){
+			$('#golfExampleLaunch').click(function(){
+				var actor = {"mbox" : "mailto:" + $("#tc_emailInput").val(), "name" : $("#tc_nameInput").val()};
+				
+				$(this).attr('href',$(this).attr('href') + encodeURIComponent(JSON.stringify(actor)));
+				return true;
+			});
+			
 
-<h1><a href="GolfExample_TCAPI/?endpoint=http%3A%2F%2Flocalhost%3A8080%2FTCAPI%2FStatements%2F&auth=Basic%20dGVzdDpwYXNzd29yZA%3D%3D&actor=%7B%20%22name%22%20%3A%20%22Project%20Tin%20Can%22%2C%20%22mbox%22%20%3A%20%22mailto%3Atincan%40scorm.com%22%20%7D">Golf Example</a></h1>
+		});
+
+        
+        
+        </script>
+        
+    </head>
+    
+    
+    <body>
+<div class="container">
+
+<h1>Tin Can Prototypes</h1>
+<h2 class=""><a href="TinCanViewer">LRS Viewer</a></h2>
+
+<div class='prototypeDiv'>
+
+<h2><a id="golfExampleLaunch" href="GolfExample_TCAPI/?endpoint=http%3A%2F%2Flocalhost%3A8080%2FTCAPI%2F&auth=Basic%20dGVzdDpwYXNzd29yZA%3D%3D&actor=">Golf Example</a></h2>
+(add your own actor info if you would like)<br/>
+Name: <input type="text" id="tc_nameInput" value="Project Tin Can" /> 
+&nbsp;&nbsp;&nbsp;
+Email: <input type="text" id="tc_emailInput" value="tincan@scorm.com"/ > 
+<br/>
 
 Launch Args:
 <ul>
-	<li>endpoint=http://localhost:8080/TCAPI/Statements/</li>
+	<li>endpoint=http://localhost:8080/TCAPI/</li>
 	<li>auth=Basic dGVzdDpwYXNzd29yZA==</li>
-	<li>actor={ "name" : "Project Tin Can", "mbox" : "mailto:tincan@scorm.com" }</li>
+	<li>actor={ "name" : "Project Tin Can", "mbox" : "mailto:tincan@scorm.com" }  (default)</li>
 </ul>
 
-<br/><br/><br/>
-<h1><a href="JsTetris_TCAPI/tetris.html">Js Tetris</a></h1>
+
+</div>
+
+<div class='prototypeDiv'>
+
+<h2><a href="JsTetris_TCAPI/tetris.html">Js Tetris</a></h2>
 
 <ul>
 	<li>The endpoint and auth values are included in the site.</li>
 	<li>If Tin Can tracking is enabled, user will be prompted for name and email before tracking can begin. That info will be used as the actor in Tin Can statements.</li>
 	<li>Statements to LRS report a game start, passing levels, and the results of a game when over. </li>
 </ul>
+
+
+</div>
+
+
+</div>
+
+    </body>
+</html>

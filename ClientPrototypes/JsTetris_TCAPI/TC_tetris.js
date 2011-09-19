@@ -5,9 +5,10 @@ var actorEmail = "";
 
 var gameId = "";
 
-tc_lrs.endpoint = "http://localhost:8080/TCAPI/Statements/";
+tc_lrs.endpoint = "http://localhost:8080/TCAPI/";
 tc_lrs.auth = "Basic dGVzdDpwYXNzd29yZA==";
 
+var GAME_ID = "scorm.com/JsTetris_TCAPI";
 
 $(document).ready(function(){
 
@@ -58,11 +59,12 @@ $(document).ready(function(){
 
 });
 
+
 function tc_sendStatment_StartNewGame(){
 	if (TCActive){
 		gameId = _ruuid();
 	
-		var tcGameObj = new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI")
+		var tcGameObj = new TCObject().SetValue(GAME_ID)
 			.SetValue("definition",new TCObject()
 				.SetValue("name","Js Tetris - Tin Can Prototype")
 				.SetValue("type","Game")
@@ -102,7 +104,7 @@ function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
 function tc_sendStatment_EndGame(level,time,apm,lines,score){
 	if (TCActive){
 		
-		var tcGameObj = new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI")
+		var tcGameObj = new TCObject().SetValue("id",GAME_ID)
 			.SetValue("definition",new TCObject()
 				.SetValue("name","Js Tetris - Tin Can Prototype")
 				.SetValue("type","Game")
@@ -116,10 +118,82 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
 				.SetValue("raw",score)
 				.SetValue("min",0));
 		var stmt = new TCStatement(tc_lrs)
-			.SetValue("verb","achieved")
+			.SetValue("verb","completed")
 			.SetValue("object",tcGameObj)
 			.SetValue("context",contextObj)
 			.SetValue("result",resultObj)
 			.Send();
+			
+		//update high score
+		
+		var newScoreObj =  new TCObject().SetValue("actor",eval("(" + tc_lrs.actor + ")"))
+			.SetValue("score",score)
+			.SetValue("date",new Date());
+		
+		tc_InitHighScoresObject();
+		var highScorePos = tc_findScorePosition(HighScoresArray, 0, HighScoresArray.length-1 ,score);
+		if (highScorePos < 15){
+			HighScoresArray.splice(highScorePos,0,newScoreObj);
+			if (HighScoresArray.length>15) HighScoresArray.pop();
+			TCDriver_SendActivityProfile (tc_lrs, GAME_ID, "highscores", JSON.stringify(HighScoresArray));
+		}
+		
+		
+		
+		
+		
+		
+			
+			
+			
 	}	
 }
+
+var HighScoresArray;
+function tc_InitHighScoresObject(){
+	if (HighScoresArray == undefined){
+		var lrsHighScoresStr = TCDriver_GetActivityProfile (tc_lrs, GAME_ID, "highscores");
+		if (lrsHighScoresStr == ""){
+			HighScoresArray = new Array();
+		} else {
+			HighScoresArray = eval("(" + lrsHighScoresStr + ")");
+		}
+	}
+	
+	
+}
+
+
+function tc_findScorePosition(hsArray, start, end ,val){
+	if (hsArray.length == 0) return 0;
+	
+	var insert = 1;
+	var keepsearching = true;
+	while (keepsearching){
+		if (end - start == 0){
+			insert = (val <= parseInt(hsArray[start].score))?start+1:start;
+			keepsearching = false;
+		} else if (end - start == 1) {
+			if 	(val > parseInt(hsArray[start].score)){
+				insert = start;
+			} else if (val > parseInt(hsArray[end].score)){
+				insert = end;
+			} else {
+				insert = end+1;
+			}
+			keepsearching = false;	
+		} else {
+			var mid = start + Math.ceil((end - start)/2);
+			if (val <= parseInt(hsArray[mid].score)){
+				start = mid;
+			} else {
+				end = mid
+			}
+		}
+	}
+	return insert;
+}
+	
+	
+
+

@@ -23,7 +23,7 @@ function TCDriver_CheckStatus(xhr){
 function TCDriver_SendStatement (lrs,stmt) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var xhr = new XMLHttpRequest();
-		xhr.open("PUT", lrs.endpoint+_ruuid(), true);
+		xhr.open("PUT", lrs.endpoint+"statements/"+_ruuid(), true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Authorization", lrs.auth);
 		xhr.onreadystatechange = function() {
@@ -34,6 +34,93 @@ function TCDriver_SendStatement (lrs,stmt) {
 		xhr.send(JSON.stringify(stmt));
 	}
 }
+
+function TCDriver_SendState (lrs, activityId, stateKey, stateVal) {
+	
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
+		
+		url = url.replace('<activity ID>',encodeURIComponent(activityId));
+		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<statekey>',encodeURIComponent(stateKey));
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("PUT", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.onreadystatechange = function() {
+		    if(xhr.readyState == 4 ) {
+	             TCDriver_CheckStatus(xhr);
+			}
+		};
+		xhr.send(stateVal);
+	}
+}
+
+function TCDriver_GetState (lrs, activityId, stateKey) {
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
+		
+		url = url.replace('<activity ID>',encodeURIComponent(activityId));
+		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<statekey>',encodeURIComponent(stateKey));
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, false);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.send(null);
+		if(xhr.status == 404 ) {
+             return "";
+		} else {
+			return xhr.responseText;
+		}
+	}
+}
+
+function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr) {
+	
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
+		
+		url = url.replace('<activity ID>',encodeURIComponent(activityId));
+		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("PUT", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.onreadystatechange = function() {
+		    if(xhr.readyState == 4 ) {
+	             TCDriver_CheckStatus(xhr);
+			}
+		};
+		xhr.send(profileStr);
+	}
+}
+
+function TCDriver_GetActivityProfile (lrs, activityId, profileKey) {
+	
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
+		
+		url = url.replace('<activity ID>',encodeURIComponent(activityId));
+		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, false);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.send(null);
+		if(xhr.status == 404 ) {
+             return "";
+		} else {
+			return xhr.responseText;
+		}
+	}
+}
+
+
 
 
 /***************************

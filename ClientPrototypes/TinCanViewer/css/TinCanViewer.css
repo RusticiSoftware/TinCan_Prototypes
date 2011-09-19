@@ -7,4 +7,9 @@
 .statement .object {color:#222222;}
 .statement .score {font-weight:bold;}
 
-#showAllStatements {margin-top:20px;}
+#showAllStatements, #refreshHighScores {margin-top:20px;}
+
+.highScoreRow .scoreRank{}
+.highScoreRow .actor{margin-left:20px;}
+.highScoreRow .score{margin-left:20px;font-weight:bold;}
+.highScoreRow .date{font-size:.7em;color:#666666;margin-left:20px;}
