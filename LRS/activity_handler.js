@@ -5,15 +5,25 @@ method = '/tcapi/activities';
 util = require('./util.js');
 async = require('async');
 
-function handleStateRequest(requestContext, methodParts) {
+
+function parseStateRequest(methodParts) {
 	"use strict";
-	var key, method, response;
+	var key = {};
+
+	key.activity = decodeURIComponent(methodParts[0]);
+	key.actor = JSON.parse(decodeURIComponent(methodParts[2]));
+	if (methodParts.length > 3) {
+		key.stateId = decodeURIComponent(methodParts[3]);
+	}
+
+	return key;
+}
+
+function handleStateRequest(requestContext, key) {
+	"use strict";
+	var method, response;
 	method = requestContext.request.method;
 	response = requestContext.response;
-
-	key = { activity : decodeURIComponent(methodParts[0]),
-			actor : decodeURIComponent(methodParts[2]),
-			state : decodeURIComponent(methodParts[3]) };
 
 	if (method === 'PUT') {
 		util.loadRequestBody(requestContext.request, function (error, data) {
@@ -45,9 +55,27 @@ function handleStateRequest(requestContext, methodParts) {
 	}
 }
 
+function clearState(requestContext, key) {
+	"use strict";
+	var response, query;
+	response = requestContext.response;
+
+	query = {$and : [ {"_id.activity" : key.activity}, {"_id.actor" : key.actor}]};
+	//query = {'_id.actor' : key.actor};
+	
+	requestContext.storage.collections.state.remove(query, { safe : true }, function (error) {
+		error = new Error("doesn't work yet");
+		if (util.checkError(error, requestContext.request, response, "clearing state")) {
+			response.statusCode = 204;
+			response.end('');
+		}
+	});
+}
+
+
 function handleActivityRequest(requestContext) {
 	"use strict";
-	var request, parts;
+	var request, parts, key;
 	request = requestContext.request;
 
 	if (request.method !== 'PUT' && request.method !== 'GET' && request.method !== 'DELETE') {
@@ -60,7 +88,13 @@ function handleActivityRequest(requestContext) {
 	parts = request.url.toLowerCase().substring(method.length + 1).split('/');
 	if (parts[1] === 'state' && parts.length === 4) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
-		handleStateRequest(requestContext, parts);
+		key = parseStateRequest(parts);
+		handleStateRequest(requestContext, key);
+		return true;
+	} else 	if (parts[1] === 'state' && parts.length === 3 && request.method === 'DELETE') {
+		// state API -- clear all state for this activity + actor
+		key = parseStateRequest(parts);
+		clearState(requestContext, key);
 		return true;
 	} else {
 		return false;
