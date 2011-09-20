@@ -120,11 +120,11 @@ function handleStatementGetRequest(requestContext) {
 		if ('/' === methodDetail.charAt(0)) {
 			methodDetail = methodDetail.substring(1);
 		} else if ('?' !== methodDetail.charAt(0)) {
-			util.checkError(new Error('Invalid request, expected "?" or "/" after statements'), request, requestContext.response, 'handleStatementGetRequest');
+			throw new Error('Invalid request, expected "?" or "/" after statements');
 		}
 
 		if (methodDetail.indexOf('/') >= 0) {
-			util.checkError(new Error('Invalid request, "/" not expected in method detail'), request, requestContext.response, 'handleStatementGetRequest');
+			throw new Error('Invalid request, "/" not expected in method detail');
 		}
 
 		if (methodDetail.charAt(0) === '?') {

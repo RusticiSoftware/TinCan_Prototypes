@@ -11,7 +11,7 @@ exports.collections = collections;
 
 // merges source into target, returns true if target is updated.
 // exception if source and target contain contradictary information
-function mergeActivities(source, target) {
+function mergeActivities(source, target, onlyEmpty) {
 	"use strict";
 	var modified, property;
 	modified = false;
@@ -21,7 +21,7 @@ function mergeActivities(source, target) {
 			if (target[property] === undefined) {
 				target[property] = source[property];
 				modified = true;
-			} else if (target[property] !== source[property] && JSON.stringify(target[property]) !== JSON.stringify(source[property])) {
+			} else if (!(onlyEmpty) && target[property] !== source[property] && JSON.stringify(target[property]) !== JSON.stringify(source[property])) {
 				throw new Error('Activity : "' + source.id + '", conflicting values of: ' + property);
 			}
 		}
@@ -383,7 +383,7 @@ function normalizeStatements(statements, sparse, callback) {
 
 		// activity detail
 		exports.collections.activities.find({ id : { $in : activityIds } }).toArray(function (error, dbActivities) {
-			var ii, jj;
+			var ii, jj, kk, children, prop;
 
 			if (error !== null && error !== undefined) {
 				callback(error);
@@ -393,7 +393,20 @@ function normalizeStatements(statements, sparse, callback) {
 			for (ii = 0; ii < dbActivities.length; ii++) {
 				for (jj = 0; jj < activities.length; jj++) {
 					if (dbActivities[ii].id === activities[jj].id) {
-						mergeActivities(dbActivities[ii], activities[jj]);
+						mergeActivities(dbActivities[ii], activities[jj], true);
+
+						// even for non-sparse, don't include activity child detail
+						if (activities[jj].definition !== undefined && activities[jj].definition.children !== undefined) {
+							children = activities[jj].definition.children;
+
+							for (kk = 0; kk < children.length; kk++) {
+								for (prop in children[kk]) {
+									if (children[kk].hasOwnProperty(prop) && prop !== 'id') {
+										delete children[kk][prop];
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -424,11 +437,19 @@ function buildStatementQuery(parameters) {
 	if (parameters.verb !== undefined) {
 		query.verb = parameters.verb.toLowerCase();
 	}
-	/*if (parameters.object !== undefined) {
+	if (parameters.object !== undefined) {
+		parameters.object = JSON.parse(parameters.object);
+	}
+
+	console.log('statement get parameters: ' + JSON.stringify(parameters, null, 4));
+
+	if (parameters.object !== undefined) {
 		if (util.isActivity(parameters.object)) {
-			query['object
+			query['object.id'] = parameters.object.id;
 		}
-	}*/
+	}
+
+	console.log('query: ' + JSON.stringify(query, null, 4));
 
 	return query;
 }
