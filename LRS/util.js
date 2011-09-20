@@ -21,6 +21,22 @@ function ruuid() {
 	});
 }
 
+function inList(test, list) {
+	"use strict";
+	var ii;
+	for (ii = 0; ii < list.length; ii++) {
+		if (test === list[ii]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function isStatementObjectActor(statement) {
+	"use strict";
+	return (statement.verb === 'mentored' || statement.verb === 'mentored by');
+}
+
 function checkError(error, request, response, text) {
 	"use strict";
 	var errString;
@@ -120,7 +136,40 @@ function areActorsEqual(source, target) {
 	return false;
 }
 
+function addStatementActivities(statement, activities) {
+	"use strict";
+
+	if (statement.context !== undefined && statement.context.activity !== undefined) {
+		activities.push(statement.context.activity);
+	}
+
+	if (!isStatementObjectActor(statement) && statement.object !== undefined) {
+		activities.push(statement.object);
+	}
+}
+
+function addStatementActors(statement, actors) {
+	"use strict";
+	var context;
+
+	actors.push(statement.authority, statement.actor);
+	if (statement.context !== undefined) {
+		context = statement.context;
+		if (context.instructor !== undefined) {
+			actors.push(context.instructor);
+		}
+		if (context.team !== undefined) {
+			actors.push(context.team);
+		}
+	}
+	if (isStatementObjectActor(statement) && statement.object !== undefined) {
+		actors.push(statement.object);
+	}
+}
+
 exports.ruuid = ruuid;
+exports.inList = inList;
+exports.isStatementObjectActor = isStatementObjectActor;
 exports.checkError = checkError;
 exports.parseJSONRequest = parseJSONRequest;
 exports.loadRequestBody = loadRequestBody;
@@ -128,3 +177,5 @@ exports.isAuthorized = isAuthorized;
 exports.getAuthenticatedUser = getAuthenticatedUser;
 exports.hasAllProperties = hasAllProperties;
 exports.areActorsEqual = areActorsEqual;
+exports.addStatementActivities = addStatementActivities;
+exports.addStatementActors = addStatementActors;

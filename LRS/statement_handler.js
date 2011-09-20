@@ -70,22 +70,17 @@ function processStatements(statements, storage, request, callback) {
 	while (statements.length > 0) {
 		statement = statements.pop();
 
-		actors.push(statement.authority, statement.actor);
+		util.addStatementActivities(statement, activities);
+		util.addStatementActors(statement, actors);
+
 		if (statement.context !== undefined) {
 			context = statement.context;
-			actors.push(context.instructor, context.team);
-			activities.push(context.activity);
 			if (statement.context.statement !== undefined) {
 				statements.push(statement.context.statement);
 				// don't store the entire context statement, if provided, with this statement, just the ID -- particularly 
 				// since when storing statements in the DB they will be transformed, but the context reference should not be.
 				statement.context.statement = {id : statement.context.statement.id};
 			}
-		}
-		if (statement.verb === 'mentored' || statement.verb === 'mentored by') {
-			actors.push(statement.object);
-		} else {
-			activities.push(statement.object);
 		}
 
 		prepareStatement(statement, request);
@@ -108,7 +103,7 @@ function processStatements(statements, storage, request, callback) {
 
 function handleStatementGetRequest(requestContext) {
 	"use strict";
-	var query, ii, limit, request, methodDetail, parameters;
+	var query, limit, request, methodDetail, parameters;
 
 	request = requestContext.request;
 	limit = 0;
@@ -139,24 +134,21 @@ function handleStatementGetRequest(requestContext) {
 	}
 
 	requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).limit(parseInt(limit, 10)).toArray(function (error, results) {
-		if (error !== null) {
-			util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find');
-		} else {
-			// db uses _id for primary key, spec expects id
-			for (ii = 0; ii < results.length; ii++) {
-				results[ii].id = results[ii]._id;
-				delete results[ii]._id;
-			}
-
+		if (util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find')) {
 			if (results.length === 0 && query._id !== undefined) {
 				requestContext.response.statusCode = 404;
 				requestContext.response.end();
 			} else {
-				if (results.length === 1) {
-					results = results[0];
-				}
+				requestContext.storage.normalizeStatements(results, false, function (error) {
+					if (util.checkError(error, requestContext.request, requestContext.response, "handleStatementGetRequest_prepare")) {
+						// single statements should be returned as a document, not an array
+						if (query._id !== undefined) {
+							results = results[0];
+						}
 
-				requestContext.response.end(JSON.stringify(results, null, 4));
+						requestContext.response.end(JSON.stringify(results, null, 4));
+					}
+				});
 			}
 		}
 	});
@@ -204,7 +196,6 @@ function handleStatementSetRequest(requestContext) {
 		}
 	});
 }
-
 
 function handleStatementRequest(requestContext) {
 	"use strict";

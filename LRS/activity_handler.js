@@ -95,7 +95,6 @@ function clearState(requestContext, key, collection) {
 	});
 }
 
-
 function handleActivityRequest(requestContext) {
 	"use strict";
 	var request, parts, key, collections;

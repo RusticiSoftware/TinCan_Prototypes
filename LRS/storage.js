@@ -17,7 +17,7 @@ function mergeActivities(source, target) {
 	modified = false;
 
 	for (property in source) {
-		if (source.hasOwnProperty(property)) {
+		if (source.hasOwnProperty(property) && property !== '_id') {
 			if (target[property] === undefined) {
 				target[property] = source[property];
 				modified = true;
@@ -126,7 +126,7 @@ function storeUniqueActors(actors, callback) {
 		var ii, ids, query;
 		ids = [];
 		for (ii = 0; ii < actors.length; ii++) {
-			if (actors[ii][property] !== undefined && !ids.hasOwnProperty(actors[ii][property])) {
+			if (actors[ii][property] !== undefined && !util.inList(actors[ii][property], ids)) {
 				ids.push(actors[ii][property]);
 			}
 		}
@@ -161,7 +161,7 @@ function storeUniqueActors(actors, callback) {
 
 			// in addition to merged actors, save all actors with no match
 			for (ii = 0; ii < actors.length; ii++) {
-				if (!duplicates.hasOwnProperty(ii)) {
+				if (!util.inlist(ii, duplicates)) {
 					updates.push(actors[ii]);
 					console.log('storing new actor: ' + JSON.stringify(actors[ii]));
 				}
@@ -299,6 +299,77 @@ function storeProcessedStatements(statements, callback) {
 	});
 }
 
+// when returning statements, the specified level of detail should be used, if sparse activities & actors should only be included by ID,
+// if not sparse complete first level of activity & actor should be included
+function normalizeStatements(statements, sparse, callback) {
+	"use strict";
+	var ii, id, activityIds, activities, actors, prop;
+
+	activityIds = [];
+	activities = [];
+	actors = [];
+
+	// db uses _id for primary key, spec expects id
+	for (ii = 0; ii < statements.length; ii++) {
+		statements[ii].id = statements[ii]._id;
+		delete statements[ii]._id;
+
+		util.addStatementActivities(statements[ii], activities);
+		util.addStatementActors(statements[ii], actors);
+	}
+
+	// remove data other than IDs from actors & activities if sparse
+	if (sparse) {
+		for (ii = 0; ii < actors.length; ii++) {
+			for (prop in actors[ii]) {
+				if (actors[ii].hasOwnProperty(prop)) {
+					if (!util.inList(prop, actorUniqueProps)) {
+						delete actors[ii][prop];
+					}
+				}
+			}
+		}
+		for (ii = 0; ii < activities.length; ii++) {
+			for (prop in activities[ii]) {
+				if (activities[ii].hasOwnProperty(prop) && prop !== 'id') {
+					delete activities[ii][prop];
+				}
+			}
+		}
+	} else {
+		// not sparse, add statement & activity detail
+		for (ii = 0; ii < activities.length; ii++) {
+			id = activities[ii].id;
+			if (!util.inList(id, activityIds)) {
+				activityIds.push(id);
+			}
+		}
+
+		exports.collections.activities.find({ id : { $in : activityIds } }).toArray(function (error, dbActivities) {
+			var ii, jj;
+
+			if (error !== null && error !== undefined) {
+				callback(error);
+				return;
+			}
+
+			for (ii = 0; ii < dbActivities.length; ii++) {
+				for (jj = 0; jj < activities.length; jj++) {
+					if (dbActivities[ii].id === activities[jj].id) {
+						mergeActivities(dbActivities[ii], activities[jj]);
+					}
+				}
+			}
+
+			callback(null);
+		});
+	}
+}
+
+//util.isStatementObjectActor(statement)
+
+
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
 exports.storeProcessedStatements = storeProcessedStatements;
+exports.normalizeStatements = normalizeStatements;

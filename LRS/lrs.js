@@ -51,8 +51,6 @@ function main() {
 	"use strict";
 	var mongoserver, db, storage;
 
-	console.log('loaded');
-
 	mongoserver = new mongodb.Server('localhost', mongodb.Connection.DEFAULT_PORT);
 	db = new mongodb.Db('local', mongoserver);
 	storage = require('./storage.js');
@@ -70,7 +68,6 @@ function main() {
 					console.log("error: " + err);
 					throw err;
 				}
-
 
 				for (ii = 0; ii < collectionsArray.length; ii++) {
 					//collectionsArray[ii].remove({});
