@@ -52,7 +52,7 @@ function findActorMatches(actors, callback) {
 		}
 	}, function (error, results) {
 		var uniqueResults, ii, jj, kk, found, actor;
-		uniqueResults= [];
+		uniqueResults = [];
 
 		if (error !== null && error !== undefined) {
 			callback(error);
@@ -65,7 +65,7 @@ function findActorMatches(actors, callback) {
 				if (actor !== undefined) {
 					found = false;
 					for (kk = 0; kk < uniqueResults.length; kk++) {
-						if (String(actor._id) === String(uniqueResults[kk]._id) ) {
+						if (String(actor._id) === String(uniqueResults[kk]._id)) {
 							found = true;
 							break;
 						}
@@ -74,9 +74,9 @@ function findActorMatches(actors, callback) {
 						uniqueResults.push(actor);
 					}
 				}
-			}	
+			}
 		}
-		
+
 		callback(null, uniqueResults);
 	});
 }
@@ -84,7 +84,7 @@ function findActorMatches(actors, callback) {
 // store activity
 function storeActivities(activities, callback) {
 	"use strict";
-	var ii, uniqueActivities, flatActivities, uniqueActivityIDs, activity, updates;
+	var ii, uniqueActivities, flatActivities, uniqueActivityIDs, activity, updates, children;
 
 	uniqueActivities = {};
 	uniqueActivityIDs = [];
@@ -94,9 +94,10 @@ function storeActivities(activities, callback) {
 		activity = activities.pop();
 		if (activity !== undefined) {
 			flatActivities.push(activity);
-			if (activity.children !== undefined) {
-				for (ii = 0; ii < activity.children.length; ii++) {
-					activities.push(activity.children[ii]); // store children as well as top level activities
+			if (activity.definition !== undefined && activity.definition.children !== undefined) {
+				children = activity.definition.children;
+				for (ii = 0; ii < children.length; ii++) {
+					activities.push(children[ii]); // store children as well as top level activities
 				}
 			}
 			// it's possible to have multiple references to the same activity in a set of statements, get unique list
@@ -134,6 +135,7 @@ function storeActivities(activities, callback) {
 
 			if (updates.length > 0) {
 				async.map(updates, function (update, callback) {
+					console.log('saving activity: ' + JSON.stringify(update, null, 4));
 					collections.activities.save(update, { safe : true, upsert : true},  callback);
 				}, callback);
 			} else {
@@ -173,9 +175,9 @@ function storeUniqueActors(actors, callback) {
 	}
 
 	// identify any matching actors in DB, merge & update, for each inverse functional property
-	findActorMatches( actors, function (err, results) {
+	findActorMatches(actors, function (err, results) {
 		// results is a list of all matching actors, iterate through and merge matches 
-		var ii, jj,duplicates, updates;
+		var ii, jj, duplicates, updates;
 
 		duplicates = [];
 		updates = [];
@@ -369,6 +371,7 @@ function normalizeStatements(statements, sparse, callback) {
 				}
 			}
 		}
+		callback(null);
 	} else {
 		// not sparse, add statement & activity detail
 		for (ii = 0; ii < activities.length; ii++) {
@@ -414,7 +417,24 @@ function normalizeStatements(statements, sparse, callback) {
 	}
 }
 
+function buildStatementQuery(parameters) {
+	"use strict";
+	var query = {};
+
+	if (parameters.verb !== undefined) {
+		query.verb = parameters.verb.toLowerCase();
+	}
+	/*if (parameters.object !== undefined) {
+		if (util.isActivity(parameters.object)) {
+			query['object
+		}
+	}*/
+
+	return query;
+}
+
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
 exports.storeProcessedStatements = storeProcessedStatements;
 exports.normalizeStatements = normalizeStatements;
+exports.buildStatementQuery = buildStatementQuery;

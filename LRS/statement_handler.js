@@ -32,6 +32,9 @@ function prepareStatement(statement, request) {
 		statement.actor =  statement.authority;
 	}
 
+	if (statement.verb !== undefined) {
+		statement.verb = statement.verb.toLowerCase();
+	}
 	statement.stored = new Date();
 
 	// db layer uses _id for primary key
@@ -103,10 +106,11 @@ function processStatements(statements, storage, request, callback) {
 
 function handleStatementGetRequest(requestContext) {
 	"use strict";
-	var query, limit, request, methodDetail, parameters;
+	var query, limit, request, methodDetail, parameters, sparse;
 
 	request = requestContext.request;
 	limit = 0;
+	sparse = true;
 	query = {};
 
 	if (request.url.length > method.length) {
@@ -128,10 +132,18 @@ function handleStatementGetRequest(requestContext) {
 			if (parameters.limit !== undefined) {
 				limit = parameters.limit;
 			}
+			if (parameters.sparse !== undefined) {
+				sparse = util.toBool('sparse', parameters.sparse);
+			}
+
+			query = requestContext.storage.buildStatementQuery(parameters);
 		} else if (methodDetail.length > 0) {
-			query._id = methodDetail[0];
+			sparse = false;
+			query = {'_id' : methodDetail};
 		}
 	}
+
+	//console.log('query: ' + JSON.stringify(query, null, 4));
 
 	requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).limit(parseInt(limit, 10)).toArray(function (error, results) {
 		if (util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find')) {
@@ -139,7 +151,7 @@ function handleStatementGetRequest(requestContext) {
 				requestContext.response.statusCode = 404;
 				requestContext.response.end();
 			} else {
-				requestContext.storage.normalizeStatements(results, false, function (error) {
+				requestContext.storage.normalizeStatements(results, sparse, function (error) {
 					if (util.checkError(error, requestContext.request, requestContext.response, "handleStatementGetRequest_prepare")) {
 						// single statements should be returned as a document, not an array
 						if (query._id !== undefined) {
@@ -162,6 +174,7 @@ function handleStatementSetRequest(requestContext) {
 	response = requestContext.response;
 
 	util.parseJSONRequest(request, function (error, data) {
+		//console.log('data: ' + JSON.stringify(data, null, 4));
 		if (util.checkError(error, request, response, "parsing request body")) {
 			if (request.method === 'PUT') {
 				data._id = request.url.substring(method.length + 1);

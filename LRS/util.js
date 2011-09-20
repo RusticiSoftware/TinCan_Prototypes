@@ -37,6 +37,23 @@ function isStatementObjectActor(statement) {
 	return (statement.verb === 'mentored' || statement.verb === 'mentored by');
 }
 
+function isActivity(object) {
+	"use strict";
+	return object.id !== undefined;
+}
+
+function toBool(name, value) {
+	"use strict";
+
+	if (value.toLowerCase() === 'false') {
+		return false;
+	} else if (value.toLowerCase() === 'true') {
+		return true;
+	} else {
+		throw new Error('Bad argument: ' + name + '=' + value.toLowerCase() + ' expected true/false.');
+	}
+}
+
 function checkError(error, request, response, text) {
 	"use strict";
 	var errString;
@@ -169,7 +186,9 @@ function addStatementActors(statement, actors) {
 
 exports.ruuid = ruuid;
 exports.inList = inList;
+exports.toBool = toBool;
 exports.isStatementObjectActor = isStatementObjectActor;
+exports.isActivity = isActivity;
 exports.checkError = checkError;
 exports.parseJSONRequest = parseJSONRequest;
 exports.loadRequestBody = loadRequestBody;
