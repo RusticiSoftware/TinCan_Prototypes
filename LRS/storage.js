@@ -30,6 +30,29 @@ function mergeActivities(source, target) {
 	return modified;
 }
 
+// find matching actors in db
+// returns error, array of matching actors
+function findActorsMatches(actors, callback) {
+	"use strict";
+	async.map(actorUniqueProps, function (property, callback) {
+		var ii, ids, query;
+		ids = [];
+		for (ii = 0; ii < actors.length; ii++) {
+			if (actors[ii][property] !== undefined && !util.inList(actors[ii][property], ids)) {
+				ids.push(actors[ii][property]);
+			}
+		}
+
+		if (ids.length > 0) {
+			query = {};
+			query[property] = { $in : ids };
+			collections.actors.find(query).toArray(callback);
+		} else {
+			callback(null, []);
+		}
+	});
+}
+
 // store activity
 function storeActivities(activities, callback) {
 	"use strict";
@@ -161,7 +184,7 @@ function storeUniqueActors(actors, callback) {
 
 			// in addition to merged actors, save all actors with no match
 			for (ii = 0; ii < actors.length; ii++) {
-				if (!util.inlist(ii, duplicates)) {
+				if (!util.inList(ii, duplicates)) {
 					updates.push(actors[ii]);
 					console.log('storing new actor: ' + JSON.stringify(actors[ii]));
 				}
@@ -345,6 +368,7 @@ function normalizeStatements(statements, sparse, callback) {
 			}
 		}
 
+		// activity detail
 		exports.collections.activities.find({ id : { $in : activityIds } }).toArray(function (error, dbActivities) {
 			var ii, jj;
 
@@ -361,7 +385,56 @@ function normalizeStatements(statements, sparse, callback) {
 				}
 			}
 
-			callback(null);
+			// actor detail
+			async.map(actorUniqueProps, function (property, callback) {
+				var ii, ids, query;
+				ids = [];
+				for (ii = 0; ii < actors.length; ii++) {
+					if (actors[ii][property] !== undefined && !util.inList(actors[ii][property], ids)) {
+						ids.push(actors[ii][property]);
+					}
+				}
+
+				if (ids.length > 0) {
+					query = {};
+					query[property] = { $in : ids };
+					collections.actors.find(query).toArray(callback);
+				} else {
+					callback(null, []);
+				}
+			}, function (err, results) {
+				// results is a list (of lists) of all matching actors, iterate through and merge matches 
+				var ii, jj, kk, duplicates, updates;
+
+				duplicates = [];
+				updates = [];
+
+				if (err !== undefined && err !== null) {
+					callback(err);
+				} else {
+					for (ii = 0; ii < actors.length; ii++) {
+						for (jj = 0; jj < results.length; jj++) {
+							for (kk = 0; kk < results[jj].length; kk++) {
+								if (mergeActors(actors[ii], results[jj][kk])) {
+									updates.push(results[jj][kk]);
+									duplicates.push(ii);
+								}
+							}
+						}
+					}
+
+					// in addition to merged actors, save all actors with no match
+					for (ii = 0; ii < actors.length; ii++) {
+						if (!util.inlist(ii, duplicates)) {
+							updates.push(actors[ii]);
+							console.log('storing new actor: ' + JSON.stringify(actors[ii]));
+						}
+					}
+					async.map(updates, function (update, callback) {
+						collections.actors.save(update, { safe : true, upsert : true }, callback);
+					}, callback);
+				}
+			});
 		});
 	}
 }
