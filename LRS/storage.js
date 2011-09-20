@@ -1,11 +1,12 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, util, async, collections, actorUniqueProps;
+var exports, util, async, collections, actorUniqueProps, activityIdProps;
 util = require('./util.js');
 async = require('async');
 collections = {};
 
 actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
+activityIdProps = ['id', 'platform', 'revision'];
 
 exports.collections = collections;
 
@@ -17,7 +18,7 @@ function mergeActivities(source, target, onlyEmpty) {
 	modified = false;
 
 	for (property in source) {
-		if (source.hasOwnProperty(property) && property !== '_id') {
+		if (source.hasOwnProperty(property) && property !== '_id' && !util.inList(property, activityIdProps)) {
 			if (target[property] === undefined) {
 				target[property] = source[property];
 				modified = true;
@@ -28,6 +29,30 @@ function mergeActivities(source, target, onlyEmpty) {
 	}
 
 	return modified;
+}
+
+function hasActorUniqueProperty(actor) {
+	"use strict";
+	var jj;
+
+	for (jj = 0; jj < actorUniqueProps.length; jj++) {
+		if (actor[actorUniqueProps[jj]] !== undefined) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function hasActivityIdProperty(activity) {
+	"use strict";
+	var jj;
+
+	for (jj = 0; jj < activityIdProps.length; jj++) {
+		if (activity[activityIdProps[jj]] !== undefined) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // find matching actors in db
@@ -160,6 +185,10 @@ function mergeActors(source, target) {
 				}
 			}
 		}
+		// note the ID of the merged actor
+		if (target._id !== undefined) {
+			source._id = target._id;
+		}
 		return true;
 	} else {
 		return false;
@@ -201,31 +230,32 @@ function storeUniqueActors(actors, callback) {
 					console.log('storing new actor: ' + JSON.stringify(actors[ii]));
 				}
 			}
+
 			async.map(updates, function (update, callback) {
-				collections.actors.save(update, { safe : true, upsert : true }, callback);
+				collections.actors.save(update, { safe : true, upsert : true }, function (error, result) {
+					if (error !== null && error !== undefined) {
+						callback(error);
+					} else {
+						// key of new actor must be stored in actor object so it can be saved in associated statement for actor filtering
+						update._id = result._id;
+						callback();
+					}
+				});
 			}, callback);
 		}
 	});
 }
 
-// store actors (authority, "object")
 function storeActors(actors, callback) {
 	"use strict";
-	var ii, jj, hasUniqueProp, uniqueActors, isUnique;
+	var ii, jj, uniqueActors, isUnique;
 
 	uniqueActors = [];
 	for (ii = 0; ii < actors.length; ii++) {
 		if (actors[ii] !== undefined) {
-			hasUniqueProp = false;
 			isUnique = true;
 
-			for (jj = 0; jj < actorUniqueProps.length; jj++) {
-				if (actors[ii][actorUniqueProps[jj]] !== undefined) {
-					hasUniqueProp = true;
-					break;
-				}
-			}
-			if (!hasUniqueProp) {
+			if (!hasActorUniqueProperty(actors[ii])) {
 				callback(new Error('Actor has no members which have the inverse functional property (actor is not uniquely identified): ' + JSON.stringify(actors[ii])));
 				return;
 			}
@@ -243,12 +273,34 @@ function storeActors(actors, callback) {
 		}
 	}
 
-	storeUniqueActors(uniqueActors, callback);
+	storeUniqueActors(uniqueActors, function (error) {
+		if (error !== undefined && error !== null) {
+			callback(error);
+		} else {
+			for (ii = 0; ii < uniqueActors.length; ii++) {
+				for (jj = 0; jj < actors.length; jj++) {
+					if (actors[jj] !== undefined && util.areActorsEqual(actors[jj], uniqueActors[ii])) {
+						actors[jj]._id = uniqueActors[ii]._id;
+					}
+				}
+			}
+
+			callback();
+		}
+	});
 }
 
 function areActivitiesEqual(activity1, activity2) {
 	"use strict";
-	return activity1.id === activity2.id;
+	var ii, prop;
+	for (ii = 0; ii < activityIdProps; ii++) {
+		prop = activityIdProps[ii];
+		if (activity1[prop] !== activity2[prop]) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // are the objects (objects of a statement) equal
@@ -326,6 +378,11 @@ function storeProcessedStatements(statements, callback) {
 			}
 
 			if (newStatements.length > 0) {
+				for (ii = 0; ii < newStatements.length; ii++) {
+					if (newStatements[ii].actor._id === undefined) {
+						callback(new Error('internal error: undefined actor id -- ' + JSON.stringify(newStatements[ii], null, 4)));
+					}
+				}
 				collections.statements.insert(newStatements, { safe : true}, callback);
 			} else {
 				callback();
@@ -366,7 +423,7 @@ function normalizeStatements(statements, sparse, callback) {
 		}
 		for (ii = 0; ii < activities.length; ii++) {
 			for (prop in activities[ii]) {
-				if (activities[ii].hasOwnProperty(prop) && prop !== 'id') {
+				if (activities[ii].hasOwnProperty(prop) && !util.inList(prop, activityIdProps)) {
 					delete activities[ii][prop];
 				}
 			}
@@ -421,6 +478,8 @@ function normalizeStatements(statements, sparse, callback) {
 							if (mergeActors(results[jj], actors[ii])) {
 								break;
 							}
+							// even when returning actor detail, don't include internal ID
+							delete actors[ii]._id;
 						}
 					}
 					callback(null);
@@ -430,28 +489,194 @@ function normalizeStatements(statements, sparse, callback) {
 	}
 }
 
-function buildStatementQuery(parameters) {
+/*
+add the specified query condition, properly placing it directly on the propery being
+queried on if there are no other conditions on that property, or as part of the $and
+property if there is already a condition on the property being queried (and move the 
+old condition under $and instead of its property)
+*/
+function addQueryCondition(property, condition, query) {
 	"use strict";
-	var query = {};
+	var conditionObj, oldConditionObj;
+	conditionObj = {};
+	oldConditionObj = {};
+	conditionObj[property] = condition;
 
-	if (parameters.verb !== undefined) {
-		query.verb = parameters.verb.toLowerCase();
+	if (query[property] === undefined && (query.$and === undefined || !util.hasElementWithProperty(query.$and, property))) {
+		query[property] = condition;
+	} else {
+		if (query[property] !== undefined) {
+			oldConditionObj[property] = query[property];
+			delete query[property];
+
+			if (query.$and === undefined) {
+				query.$and = [oldConditionObj];
+			} else {
+				query.$and.push(oldConditionObj);
+			}
+		}
+		query.$and.push(conditionObj);
 	}
-	if (parameters.object !== undefined) {
-		parameters.object = JSON.parse(parameters.object);
-	}
+}
 
-	console.log('statement get parameters: ' + JSON.stringify(parameters, null, 4));
+function getActorKeys(props, callback) {
+	"use strict";
+	var conditionProp, condition, query, ii;
+	query = {$or : []};
 
-	if (parameters.object !== undefined) {
-		if (util.isActivity(parameters.object)) {
-			query['object.id'] = parameters.object.id;
+	// populate list of actors with all known inverse functional properties
+	for (conditionProp in props) {
+		if (props.hasOwnProperty(conditionProp)) {
+			for (ii = 0; ii < props[conditionProp].length; ii++) {
+				condition = {};
+				condition[conditionProp] = props[conditionProp][ii];
+				query.$or.push(condition);
+			}
 		}
 	}
 
-	console.log('query: ' + JSON.stringify(query, null, 4));
+	if (query.$or.length > 0) {
+		exports.collections.actors.find(query).toArray(callback);
+	} else {
+		callback(null, []);
+	}
+}
 
-	return query;
+function addQueryActorConditions(actorConditions, query, callback) {
+	"use strict";
+	var props, conditionName, condition, conditionProp, ii, found;
+	props = {};
+
+	// build list of all inverse functional properties (and values) in specified actor conditions
+	for (conditionName in actorConditions) {
+		if (actorConditions.hasOwnProperty(conditionName)) {
+			condition = actorConditions[conditionName];
+			for (conditionProp in condition) {
+				if (condition.hasOwnProperty(conditionProp)) {
+					if (util.inList(conditionProp, actorUniqueProps)) {
+						if (props[conditionProp] === undefined) {
+							props[conditionProp] = [];
+						}
+						if (!util.inList(condition[conditionProp], props[conditionProp])) {
+							props[conditionProp].push(condition[conditionProp]);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	getActorKeys(props, function (error, dbActors) {
+		var idCondition, conditionName;
+		// use db actors to add actor IDs to main query
+		if (error !== null && error !== undefined) {
+			callback(error);
+			return;
+		}
+
+		//console.log(JSON.stringify(actorConditions, null, 4));
+		for (conditionName in actorConditions) {
+			if (actorConditions.hasOwnProperty(conditionName)) {
+				found = false;
+				for (ii = 0; ii < dbActors.length; ii++) {
+					if (util.areActorsEqual(actorConditions[conditionName], dbActors[ii])) {
+						if (found === true) {
+							callback(new Error('Inconsistant data, multiple actors match ' + JSON.stringify(actorConditions[conditionName], null, 4)));
+							return;
+						}
+						found = true;
+						idCondition = {};
+						idCondition[conditionName + '._id'] = dbActors[ii]._id;
+						if (query.$and === undefined) {
+							query.$and = [];
+						}
+						query.$and.push(idCondition);
+					}
+				}
+				if (!found) {
+					query.INVALID_ACTOR_FILTER = 'true';
+					console.error('Unknown actor, no statements will match: ' + JSON.stringify(actorConditions[conditionName], null, 4));
+				}
+			}
+		}
+		callback();
+	});
+}
+
+function buildStatementObjectQuery(parameters, actorConditions, query) {
+	"use strict";
+	var object, ii;
+
+	object = parameters.object;
+
+	if (hasActivityIdProperty(object)) {
+		for (ii = 0; ii < activityIdProps.length; ii++) {
+			if (object[activityIdProps[ii]] !== undefined) {
+				query['object.' + activityIdProps[ii]] = object[activityIdProps[ii]];
+			}
+		}
+	} else if (hasActorUniqueProperty(object)) {
+		// filter based on actor
+		actorConditions.object = object;
+	} else {
+		throw new Error("Object specified in query is neither valid as an activity nor an actor filter. " + JSON.stringify(object));
+	}
+}
+
+function buildStatementQuery(parameters, callback) {
+	"use strict";
+	var query, parameter, actorConditions;
+	query = {};
+	actorConditions = {};
+
+	for (parameter in parameters) {
+		if (parameters.hasOwnProperty(parameter) && !util.inList(parameter, ['limit', 'sparse', 'offset'])) {
+			switch (parameter.toLowerCase()) {
+			case 'id':
+				query._id = parameters.id;
+				break;
+			case 'verb':
+				query.verb = parameters.verb.toLowerCase();
+				break;
+			case 'object':
+				buildStatementObjectQuery(parameters, actorConditions, query);
+				break;
+			case 'registration':
+				query.registration = parameters.registration.toLowerCase();
+				break;
+			case 'since':
+				addQueryCondition('stored', { $gt : new Date(parameters.since)}, query);
+				break;
+			case 'until':
+				addQueryCondition('stored', { $lte : new Date(parameters.until)}, query);
+				break;
+			case 'authoritative':
+				console.log("\nWARNING: this LRS considers all statements to be authoritative!\n");
+				break;
+			case 'actor':
+				actorConditions.actor = parameters.actor;
+				break;
+			case 'instructor':
+				actorConditions['context.instructor'] = parameters.instructor;
+				break;
+			case 'team':
+				actorConditions['context.team'] = parameters.team;
+				break;
+			default:
+				throw new Error('Unexpected get statements parameter: ' + parameter);
+			}
+		}
+	}
+
+	addQueryActorConditions(actorConditions, query, function (error) {
+		if (error !== null && error !== undefined) {
+			callback(error);
+		}
+		console.log('Get statements parameters: ' + JSON.stringify(parameters, null, 4));
+		console.log('query: ' + JSON.stringify(query, null, 4));
+
+		callback(null, query);
+	});
 }
 
 exports.storeActivities = storeActivities;

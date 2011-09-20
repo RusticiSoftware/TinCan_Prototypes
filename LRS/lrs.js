@@ -56,8 +56,26 @@ function main() {
 	storage = require('./storage.js');
 
 	db.open(function (err, db) {
-		if (err === null) {
+		if (err !== null) {
+			throw err;
+		}
+
+		// version 2.0.0 + is required for $and support, needed for statement GET api.
+		/*jslint evil: true */ // necessary evil -- no version call in mongo driver. using a literal, so safe.
+		db['eval']('db.version()', function (error, result) {
+			/*jslint evil: false */
+			if (error !== null) {
+				throw error;
+			} else {
+				console.log('Mongo DB version: ' + result);
+				if (parseInt(result, 10) < 2) {
+					console.error('Mongo DB 2.0.0 or later required.');
+					return;
+				}
+			}
+
 			console.log("DB 'local' Initialized");
+
 			async.map(collectionNames, function (collectionName, callback) {
 				db.collection(collectionName, callback);
 
@@ -70,7 +88,6 @@ function main() {
 				}
 
 				for (ii = 0; ii < collectionsArray.length; ii++) {
-					//collectionsArray[ii].remove({});
 					storage.collections[collectionsArray[ii].collectionName] = collectionsArray[ii];
 				}
 
@@ -79,9 +96,7 @@ function main() {
 				});
 				server.listen(8080, "127.0.0.1");
 			});
-		} else {
-			throw err;
-		}
+		});
 	});
 }
 

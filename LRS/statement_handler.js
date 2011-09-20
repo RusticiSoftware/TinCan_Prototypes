@@ -73,9 +73,6 @@ function processStatements(statements, storage, request, callback) {
 	while (statements.length > 0) {
 		statement = statements.pop();
 
-		util.addStatementActivities(statement, activities);
-		util.addStatementActors(statement, actors);
-
 		if (statement.context !== undefined) {
 			context = statement.context;
 			if (statement.context.statement !== undefined) {
@@ -88,6 +85,9 @@ function processStatements(statements, storage, request, callback) {
 
 		prepareStatement(statement, request);
 
+		util.addStatementActivities(statement, activities);
+		util.addStatementActors(statement, actors);
+
 		// only context statements can have reached this point without an object, and lack of an object makes an incomplete statement
 		// since the statement is incomplete, it can't be stored (since statements are immutable, it can't be completed later).
 		// we have to assume it is a reference to a statement that either has already been stored in this system,
@@ -97,21 +97,29 @@ function processStatements(statements, storage, request, callback) {
 		}
 	}
 
-	async.parallel([
-		function (callback) { storage.storeProcessedStatements(processedStatements, callback); },
-		function (callback) { storage.storeActors(actors, callback); },
-		function (callback) { storage.storeActivities(activities, callback); }
-	], callback);
+	// actors must be stored before statements to determine surrogate actor key to associate with statements
+	storage.storeActors(actors, function (error) {
+		if (error !== null && error !== undefined) {
+			callback(error);
+			return;
+		}
+		async.parallel([
+			function (callback) { storage.storeProcessedStatements(processedStatements, callback); },
+			function (callback) { storage.storeActivities(activities, callback); }
+		], callback);
+	});
 }
 
 function handleStatementGetRequest(requestContext) {
 	"use strict";
-	var query, limit, request, methodDetail, parameters, sparse;
+	var query, limit, request, methodDetail, parameters, sparse, offset;
 
 	request = requestContext.request;
 	limit = 0;
+	offset = 0;
 	sparse = true;
 	query = {};
+	parameters = {};
 
 	if (request.url.length > method.length) {
 		methodDetail = request.url.substring(method.length);
@@ -129,40 +137,46 @@ function handleStatementGetRequest(requestContext) {
 
 		if (methodDetail.charAt(0) === '?') {
 			parameters = require('querystring').parse(methodDetail.substring(1));
-			if (parameters.limit !== undefined) {
-				limit = parameters.limit;
-			}
-			if (parameters.sparse !== undefined) {
-				sparse = util.toBool('sparse', parameters.sparse);
-			}
-
-			query = requestContext.storage.buildStatementQuery(parameters);
+			util.parseProps(parameters);
 		} else if (methodDetail.length > 0) {
+			parameters = { id : methodDetail };
 			sparse = false;
-			query = {'_id' : methodDetail};
+		}
+		if (parameters.limit !== undefined) {
+			limit = parseInt(parameters.limit, 10);
+		}
+		if (parameters.offset !== undefined) {
+			offset = parseInt(parameters.offset, 10);
+		}
+		if (parameters.sparse !== undefined) {
+			sparse = util.toBool('sparse', parameters.sparse);
 		}
 	}
 
-	//console.log('query: ' + JSON.stringify(query, null, 4));
-
-	requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).limit(parseInt(limit, 10)).toArray(function (error, results) {
-		if (util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find')) {
-			if (results.length === 0 && query._id !== undefined) {
-				requestContext.response.statusCode = 404;
-				requestContext.response.end();
-			} else {
-				requestContext.storage.normalizeStatements(results, sparse, function (error) {
-					if (util.checkError(error, requestContext.request, requestContext.response, "handleStatementGetRequest_prepare")) {
-						// single statements should be returned as a document, not an array
-						if (query._id !== undefined) {
-							results = results[0];
-						}
-
-						requestContext.response.end(JSON.stringify(results, null, 4));
-					}
-				});
-			}
+	requestContext.storage.buildStatementQuery(parameters, function (error, query) {
+		if (!util.checkError(error, request, requestContext.response)) {
+			return;
 		}
+		requestContext.storage.collections.statements.find(query).sort({ stored : -1 }).skip(offset).limit(limit).toArray(function (error, results) {
+			if (util.checkError(error, request, requestContext.response, 'handleStatementGetRequest_find')) {
+				if (results.length === 0 && query._id !== undefined) {
+					requestContext.response.statusCode = 404;
+					requestContext.response.end();
+				} else {
+					console.log(results.length);
+					requestContext.storage.normalizeStatements(results, sparse, function (error) {
+						if (util.checkError(error, requestContext.request, requestContext.response, "handleStatementGetRequest_prepare")) {
+							// single statements should be returned as a document, not an array
+							if (query._id !== undefined) {
+								results = results[0];
+							}
+
+							requestContext.response.end(JSON.stringify(results, null, 4));
+						}
+					});
+				}
+			}
+		});
 	});
 }
 

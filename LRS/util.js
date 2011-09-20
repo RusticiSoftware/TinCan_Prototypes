@@ -25,7 +25,7 @@ function inList(test, list) {
 	"use strict";
 	var ii;
 	for (ii = 0; ii < list.length; ii++) {
-		if (test === list[ii]) {
+		if (test === list[ii] || (typeof test === 'object' && (JSON.stringify(test) === JSON.stringify(list[ii])))) {
 			return true;
 		}
 	}
@@ -35,11 +35,6 @@ function inList(test, list) {
 function isStatementObjectActor(statement) {
 	"use strict";
 	return (statement.verb === 'mentored' || statement.verb === 'mentored by');
-}
-
-function isActivity(object) {
-	"use strict";
-	return object.id !== undefined;
 }
 
 function toBool(name, value) {
@@ -56,9 +51,12 @@ function toBool(name, value) {
 
 function checkError(error, request, response, text) {
 	"use strict";
-	var errString;
+	var errString, context;
+
+	context = text === undefined ? "" : (" (" + text + ") ");
 	if (error !== null && error !== undefined) {
-		errString = 'ERROR: ' + request.method + " : " + request.url + " (" + text + ") \n" + error.stack;
+		errString = 'ERROR: ' + request.method + " : " + request.url + context;
+		errString += (error.stack === undefined ? "\n" + error.toString() :  "\n" + error.stack);
 		console.error(errString);
 		if (error.HTTPStatus !== undefined) {
 			response.writeHead(error.HTTPStatus);
@@ -184,11 +182,35 @@ function addStatementActors(statement, actors) {
 	}
 }
 
+function hasElementWithProperty(array, property) {
+	"use strict";
+	var ii, test;
+	for (ii = 0; ii < array.length; ii++) {
+		for (test in array[ii]) {
+			if (array[ii].hasOwnProperty(test) && test === property) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+// parses any properties of the specified object that contain JSON
+function parseProps(obj) {
+	"use strict";
+	var prop;
+
+	for (prop in obj) {
+		if (obj.hasOwnProperty(prop) && (/^\s*\{/).test(obj[prop])) {
+			obj[prop] = JSON.parse(obj[prop]);
+		}
+	}
+}
+
 exports.ruuid = ruuid;
 exports.inList = inList;
 exports.toBool = toBool;
 exports.isStatementObjectActor = isStatementObjectActor;
-exports.isActivity = isActivity;
 exports.checkError = checkError;
 exports.parseJSONRequest = parseJSONRequest;
 exports.loadRequestBody = loadRequestBody;
@@ -198,3 +220,5 @@ exports.hasAllProperties = hasAllProperties;
 exports.areActorsEqual = areActorsEqual;
 exports.addStatementActivities = addStatementActivities;
 exports.addStatementActors = addStatementActors;
+exports.hasElementWithProperty = hasElementWithProperty;
+exports.parseProps = parseProps;
