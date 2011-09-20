@@ -386,6 +386,8 @@ function normalizeStatements(statements, sparse, callback) {
 			}
 
 			// actor detail
+			callback(null);
+			/*
 			async.map(actorUniqueProps, function (property, callback) {
 				var ii, ids, query;
 				ids = [];
@@ -425,7 +427,7 @@ function normalizeStatements(statements, sparse, callback) {
 
 					// in addition to merged actors, save all actors with no match
 					for (ii = 0; ii < actors.length; ii++) {
-						if (!util.inlist(ii, duplicates)) {
+						if (!util.inList(ii, duplicates)) {
 							updates.push(actors[ii]);
 							console.log('storing new actor: ' + JSON.stringify(actors[ii]));
 						}
@@ -434,7 +436,7 @@ function normalizeStatements(statements, sparse, callback) {
 						collections.actors.save(update, { safe : true, upsert : true }, callback);
 					}, callback);
 				}
-			});
+			});*/
 		});
 	}
 }
