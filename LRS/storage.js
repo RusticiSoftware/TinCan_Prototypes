@@ -32,7 +32,7 @@ function mergeActivities(source, target) {
 
 // find matching actors in db
 // returns error, array of matching actors
-function findActorsMatches(actors, callback) {
+function findActorMatches(actors, callback) {
 	"use strict";
 	async.map(actorUniqueProps, function (property, callback) {
 		var ii, ids, query;
@@ -50,6 +50,34 @@ function findActorsMatches(actors, callback) {
 		} else {
 			callback(null, []);
 		}
+	}, function (error, results) {
+		var uniqueResults, ii, jj, kk, found, actor;
+		uniqueResults= [];
+
+		if (error !== null && error !== undefined) {
+			callback(error);
+		}
+
+		// coalesce results
+		for (ii = 0; ii < results.length; ii++) {
+			for (jj = 0; jj < results[ii].length; jj++) {
+				actor = results[ii][jj];
+				if (actor !== undefined) {
+					found = false;
+					for (kk = 0; kk < uniqueResults.length; kk++) {
+						if (String(actor._id) === String(uniqueResults[kk]._id) ) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						uniqueResults.push(actor);
+					}
+				}
+			}	
+		}
+		
+		callback(null, uniqueResults);
 	});
 }
 
@@ -122,7 +150,7 @@ function mergeActors(source, target) {
 	// if equivilant, copy new information about this actor to the existing instance
 	if (util.areActorsEqual(source, target)) {
 		for (prop in source) {
-			if (source.hasOwnProperty(prop)) {
+			if (source.hasOwnProperty(prop) && prop !== '_id') {
 				if (target[prop] === undefined) {
 					target[prop] = source[prop];
 				} else if (target[prop] !== source[prop] && JSON.stringify(target[prop]) !== JSON.stringify(source[prop])) {
@@ -145,25 +173,9 @@ function storeUniqueActors(actors, callback) {
 	}
 
 	// identify any matching actors in DB, merge & update, for each inverse functional property
-	async.map(actorUniqueProps, function (property, callback) {
-		var ii, ids, query;
-		ids = [];
-		for (ii = 0; ii < actors.length; ii++) {
-			if (actors[ii][property] !== undefined && !util.inList(actors[ii][property], ids)) {
-				ids.push(actors[ii][property]);
-			}
-		}
-
-		if (ids.length > 0) {
-			query = {};
-			query[property] = { $in : ids };
-			collections.actors.find(query).toArray(callback);
-		} else {
-			callback(null, []);
-		}
-	}, function (err, results) {
-		// results is a list (of lists) of all matching actors, iterate through and merge matches 
-		var ii, jj, kk, duplicates, updates;
+	findActorMatches( actors, function (err, results) {
+		// results is a list of all matching actors, iterate through and merge matches 
+		var ii, jj,duplicates, updates;
 
 		duplicates = [];
 		updates = [];
@@ -173,11 +185,9 @@ function storeUniqueActors(actors, callback) {
 		} else {
 			for (ii = 0; ii < actors.length; ii++) {
 				for (jj = 0; jj < results.length; jj++) {
-					for (kk = 0; kk < results[jj].length; kk++) {
-						if (mergeActors(actors[ii], results[jj][kk])) {
-							updates.push(results[jj][kk]);
-							duplicates.push(ii);
-						}
+					if (mergeActors(actors[ii], results[jj])) {
+						updates.push(results[jj]);
+						duplicates.push(ii);
 					}
 				}
 			}
@@ -386,63 +396,23 @@ function normalizeStatements(statements, sparse, callback) {
 			}
 
 			// actor detail
-			callback(null);
-			/*
-			async.map(actorUniqueProps, function (property, callback) {
-				var ii, ids, query;
-				ids = [];
-				for (ii = 0; ii < actors.length; ii++) {
-					if (actors[ii][property] !== undefined && !util.inList(actors[ii][property], ids)) {
-						ids.push(actors[ii][property]);
-					}
-				}
-
-				if (ids.length > 0) {
-					query = {};
-					query[property] = { $in : ids };
-					collections.actors.find(query).toArray(callback);
-				} else {
-					callback(null, []);
-				}
-			}, function (err, results) {
-				// results is a list (of lists) of all matching actors, iterate through and merge matches 
-				var ii, jj, kk, duplicates, updates;
-
-				duplicates = [];
-				updates = [];
-
-				if (err !== undefined && err !== null) {
-					callback(err);
+			findActorMatches(actors, function (error, results) {
+				if (error !== null && error !== undefined) {
+					callback(error);
 				} else {
 					for (ii = 0; ii < actors.length; ii++) {
 						for (jj = 0; jj < results.length; jj++) {
-							for (kk = 0; kk < results[jj].length; kk++) {
-								if (mergeActors(actors[ii], results[jj][kk])) {
-									updates.push(results[jj][kk]);
-									duplicates.push(ii);
-								}
+							if (mergeActors(results[jj], actors[ii])) {
+								break;
 							}
 						}
 					}
-
-					// in addition to merged actors, save all actors with no match
-					for (ii = 0; ii < actors.length; ii++) {
-						if (!util.inList(ii, duplicates)) {
-							updates.push(actors[ii]);
-							console.log('storing new actor: ' + JSON.stringify(actors[ii]));
-						}
-					}
-					async.map(updates, function (update, callback) {
-						collections.actors.save(update, { safe : true, upsert : true }, callback);
-					}, callback);
+					callback(null);
 				}
-			});*/
+			});
 		});
 	}
 }
-
-//util.isStatementObjectActor(statement)
-
 
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
