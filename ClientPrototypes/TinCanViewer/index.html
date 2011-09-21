@@ -7,18 +7,13 @@
 		<link rel="stylesheet" href="css/layout.css">
 		<link rel="stylesheet" href="css/TinCanViewer.css">
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+        	google.load("jquery", "1.6.4");
+		</script>
 		<script src="scripts/tabs.js"></script>
 		<script src="scripts/TinCanViewer.js"></script>
-		
-        
-        <script type="text/javascript">
-        
-		
 
-        
-        
-        </script>
         
     </head>
     
@@ -45,12 +40,16 @@
 					<button id='showAllStatements'>Show All</button>
 				</li>
 			  <li id="tetrisScores">
-			  	<h3>Tetris high Scores</h3>
+				<button id='refreshHighScores'>Refresh</button>
+			  	<div class="clear"></div>
 				<div id='tetrisHighScores'>
+					<div class="heading">Tetris high Scores</div>
 					<div id='tetrisHighScoreData'>There are no scores reported at this time.</div>
-					<button id='refreshHighScores'>Refresh</button>
-					
 				</div>
+				<div id='tetrisGamesScores'></div>
+				<div class="clear"></div>
+				<div id='tetrisScoresChart'></div>
+				
 			
 			
 			  </li>
