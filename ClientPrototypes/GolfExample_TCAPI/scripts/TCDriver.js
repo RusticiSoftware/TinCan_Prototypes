@@ -120,6 +120,34 @@ function TCDriver_GetActivityProfile (lrs, activityId, profileKey) {
 	}
 }
 
+function TCDriver_GetStatements (lrs,sendActor,verb,activityId) {
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		
+		var url = lrs.endpoint + "statements/?sparse=false";
+		if (sendActor){
+			url += "&actor=" + encodeURIComponent(JSON.stringify(lrs.actor));
+		}
+		
+		if (verb != null){
+			url += "&verb=" + verb;
+		}
+		if (activityId != null){
+			var obj = {id:activityId};
+			url += "&object=" + encodeURIComponent(JSON.stringify(obj));
+		}
+	
+	
+		var xhr = new XMLHttpRequest();
+		xhr.open("Get", url, false);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.send(null);
+		return xhr.responseText;
+		
+	}
+}
+
+
 
 
 

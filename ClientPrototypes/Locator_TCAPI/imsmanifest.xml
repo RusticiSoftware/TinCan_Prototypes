@@ -1,0 +1,37 @@
+<?xml version="1.0" ?> 
+	<!--SCORM Imanifest-->
+	<manifest identifier="AssessmentEngine" version="1" 
+				xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" 
+				xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" 
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd 
+									http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd 
+									http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+																		 
+	<metadata>
+		<schema>ADL SCORM</schema> 
+		<schemaversion>1.2</schemaversion> 
+		<!--adlcp:location>metadata.xml</adlcp:location--> 
+	</metadata>
+	
+	<organizations>
+    		<organization identifier="Course">
+    			<title>Mobile Location SCORM 1.2 Demo</title>
+      			<item identifier="ITEM1" identifierref="SCO1" isvisible="true">
+        			<title>Mobile Location SCORM 1.2 Demo</title>
+     			</item>
+   		</organization>
+	</organizations>
+	
+	<resources>
+		<resource identifier="SCO1" type="webcontent" adlcp:scormtype="sco" href="indexAPI.html">				
+			<file href="assessment.html" />
+			<file href="scripts/scormdriver.js" />
+			<file href="rseca/blank.html" />
+			<file href="rseca/browsersniff.js" />
+			<file href="rseca/goodbye.html" />
+			<file href="rseca/indexAPI.html" />		
+		</resource>
+	</resources>
+	
+</manifest>
