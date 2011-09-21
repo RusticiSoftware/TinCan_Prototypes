@@ -163,7 +163,7 @@ function handleStatementGetRequest(requestContext) {
 					requestContext.response.statusCode = 404;
 					requestContext.response.end();
 				} else {
-					console.log(results.length);
+					console.log(results.length + ' statements returned.');
 					requestContext.storage.normalizeStatements(results, sparse, function (error) {
 						if (util.checkError(error, requestContext.request, requestContext.response, "handleStatementGetRequest_prepare")) {
 							// single statements should be returned as a document, not an array

@@ -662,6 +662,9 @@ function buildStatementQuery(parameters, callback) {
 			case 'team':
 				actorConditions['context.team'] = parameters.team;
 				break;
+			case 'descendants':
+				throw new Error('Not Implemented -- get statements parameter: ' + parameter);
+				break;
 			default:
 				throw new Error('Unexpected get statements parameter: ' + parameter);
 			}
