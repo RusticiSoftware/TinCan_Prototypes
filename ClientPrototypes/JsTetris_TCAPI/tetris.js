@@ -221,7 +221,7 @@ function Tetris()
 		
 		document.getElementById("tetris-nextpuzzle").style.display = "none";
 		document.getElementById("tetris-gameover").style.display = "block";
-		if (this.highscores.mayAdd(this.stats.getScore())) {
+		/*if (this.highscores.mayAdd(this.stats.getScore())) {
 			var name;
 			if (actorName != ""){
 				name = actorName;
@@ -232,7 +232,7 @@ function Tetris()
 			if (name && name.trim().length) {
 				this.highscores.add(name, this.stats.getScore());
 			}
-		}
+		}*/
 	};
 
 	/**
@@ -1287,95 +1287,6 @@ function Tetris()
 	 */
 	function Highscores(maxscores)
 	{
-		this.maxscores = maxscores;
-		this.scores = [];
-
-		/**
-		 * Load scores from cookie.
-		 * Note: it is automatically called when creating new instance of object Highscores.
-		 * @return void
-		 * @access public
-		 */
-		this.load = function()
-		{
-			var cookie = new Cookie();
-			var s = cookie.get("tetris-highscores");
-			this.scores = [];
-			if (s.length) {
-				var scores = s.split("|");
-				for (var i = 0; i < scores.length; ++i) {
-					var a = scores[i].split(":");
-					this.scores.push(new Score(a[0], Number(a[1])));
-				}
-			}
-		};
-
-		/**
-		 * Save scores to cookie.
-		 * Note: it is automatically called after adding new score.
-		 * @return void
-		 * @access public
-		 */
-		this.save = function()
-		{
-			var cookie = new Cookie();
-			var a = [];
-			for (var i = 0; i < this.scores.length; ++i) {
-				a.push(this.scores[i].name+":"+this.scores[i].score);
-			}
-			var s = a.join("|");
-			cookie.set("tetris-highscores", s, 3600*24*1000);
-		};
-
-		/**
-		 * Is the score high enough to be able to add ?
-		 * @return bool
-		 * @access public
-		 */
-		this.mayAdd = function(score)
-		{
-			if (this.scores.length < this.maxscores) { return true; }
-			for (var i = this.scores.length - 1; i >= 0; --i) {
-				if (this.scores[i].score < score) { return true; }
-			}
-			return false;
-		};
-
-		/**
-		 * @param string name
-		 * @param int score
-		 * @return void
-		 * @access public
-		 */
-		this.add = function(name, score)
-		{
-			name = name.replace(/[;=:|]/g, "?");
-			name = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-			if (this.scores.length < this.maxscores) {
-				this.scores.push(new Score(name, score));
-			} else {
-				for (var i = this.scores.length - 1; i >= 0; --i) {
-					if (this.scores[i].score < score) {
-						this.scores.removeByIndex(i);
-						this.scores.push(new Score(name, score));
-						break;
-					}
-				}
-			}
-			this.sort();
-			this.save();
-		};
-
-		/**
-		 * Get array of scores.
-		 * @return array [Score, Score, ..]
-		 * @access public
-		 */
-		this.getScores = function()
-		{
-			return this.scores;
-		};
-
 		/**
 		 * All highscores returned in html friendly format.
 		 * @return string
@@ -1383,45 +1294,18 @@ function Tetris()
 		 */
 		this.toHtml = function()
 		{
+			tc_InitHighScoresObject();
+			
+			
 			var s = '<table cellspacing="0" cellpadding="2"><tr><th></th><th>Name</th><th>Score</th></tr>';
-			for (var i = 0; i < this.scores.length; ++i) {
-				s += '<tr><td>?.</td><td>?</td><td>?</td></tr>'.format(i+1, this.scores[i].name, this.scores[i].score);
+			for (var i = 0; i < HighScoresArray.length; ++i) {
+				s += '<tr><td>?.</td><td>?</td><td>?</td></tr>'.format(i+1, HighScoresArray[i].actor.name, HighScoresArray[i].score);
 			}
 			s += '</table>';
 			return s;
 		};
 
-		/**
-		 * Sort table with scores.
-		 * @return void
-		 * @access private
-		 */
-		this.sort = function()
-		{
-			var scores = this.scores;
-			var len = scores.length;
-			this.scores = [];
-			for (var i = 0; i < len; ++i) {
-				var el = null, index = null;
-				for (var j = 0; j < scores.length; ++j) {
-					if (!el || (scores[j].score > el.score)) {
-						el = scores[j];
-						index = j;
-					}
-				}
-				scores.removeByIndex(index);
-				this.scores.push(el);
-			}
-		};
-
-		/* Simple score object. */
-		function Score(name, score)
-		{
-			this.name = name;
-			this.score = score;
-		}
-
-		this.load();
+		
 	}
 
 	/**

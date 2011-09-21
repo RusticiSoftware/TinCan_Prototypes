@@ -1,6 +1,12 @@
 
 
 .statement {margin:3px 0;}
+
+.statement table {width:100%;}
+.statement td {vertical-align:top;padding:2px;}
+.statement td.date{width:100px;}
+
+
 .statement .date {font-size:.7em;color:#666666;}
 .statement .actor {color:#222222;}
 .statement .verb {font-weight:bold;}
@@ -9,7 +15,14 @@
 
 #showAllStatements, #refreshHighScores {margin-top:20px;}
 
-.highScoreRow .scoreRank{}
-.highScoreRow .actor{margin-left:20px;}
-.highScoreRow .score{margin-left:20px;font-weight:bold;}
-.highScoreRow .date{font-size:.7em;color:#666666;margin-left:20px;}
+#tetrisHighScores {float:left;width:45%;margin-top:20px;}
+#tetrisGamesScores {float:right;}
+
+#tetrisHighScores .heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
+
+
+
+.highScoreRow .scoreRank{width:25px;}
+.highScoreRow .actor{padding:0 5px;}
+.highScoreRow .score{padding:0 5px;font-weight:bold;}
+.highScoreRow .date{font-size:.7em;color:#666666;width:120px;text-align:right;}
