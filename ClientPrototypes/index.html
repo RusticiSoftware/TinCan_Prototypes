@@ -59,7 +59,9 @@
 			
 			
 			$('#locatorExampleLaunch').click(function(){
-				var actor = {"mbox" : "mailto:" + $("#tc_emailInput_loc").val(), "name" : $("#tc_nameInput_loc").val()};
+				var em = $("#tc_emailInput_loc").val();
+				var nm = $("#tc_nameInput_loc").val();
+				var actor = {'mbox' : 'mailto:' + em, 'name' : nm};
 				
 				$(this).attr('href',$(this).attr('href') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
@@ -164,7 +166,7 @@
 
 				<div class='prototypeDiv'>
 
-				<h2><a id="locatorExampleLaunch" href="Locator_TCAPI/?">Locator Example</a></h2>
+				<h2><a id="locatorExampleLaunch" href="Locator_TCAPI/?">Nashville Museums Tour Example</a></h2>
 				Name: <input type="text" id="tc_nameInput_loc" /> 
 				&nbsp;&nbsp;&nbsp;
 				Email: <input type="text" id="tc_emailInput_loc" / > 
@@ -172,6 +174,7 @@
 					<li>Requires a browser/device that allows location tracking.</li>
 					<li>Reports to the LRS when a user is at a specified geographic location and selects to "Save Location".(Uses LRS single statement puts with context.)</li>
 					<li>Reports completion to the LRS when a user has visited and saved all of the specified locations in the course.(Uses LRS single statement puts with context.)</li>
+					<li>For testing purposes, this example has a "cheat" such that by pressing '?' on the page, the finder will identify you as being at one of the placemarks.  Pressing '?' again will disable this "cheat".</li>
 				</ul>
 
 

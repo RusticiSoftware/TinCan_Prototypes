@@ -35,6 +35,8 @@ window.Scavenger = (function() {
 	scavenger.currentVisitedIcon = "img/currentVisited.png";
 	scavenger.currentNotVisitedIcon = "img/currentNotVisited.png";
 	
+	scavenger.useLocationCheat = false;
+	
     scavenger.geoLocationError = function(error) {
 		//need to do something better here	
 		alert(error.code);
@@ -54,7 +56,9 @@ window.Scavenger = (function() {
 
     scavenger.showLocation = function(position) {
         scavenger.currentPosition = position;
-        if (scavenger.lastdist > scavenger.cachedist) {
+
+		var thisCheat = scavenger.useLocationCheat;
+        if (scavenger.lastdist > scavenger.cachedist || thisCheat) {
 			//refresh the mapview
             scavenger.showMap(position.coords.latitude, position.coords.longitude);
 			//update the location properties
@@ -63,14 +67,17 @@ window.Scavenger = (function() {
             scavenger.lastloc = newloc;
 			//check to see if we're close to a Placemark
 			scavenger.currentPlacemark = null;
+			
+			
 			for(pmrk in scavenger.config.Placemarks){
 				
 				var pmrkLoc = new google.maps.LatLng(scavenger.config.Placemarks[pmrk].lat, scavenger.config.Placemarks[pmrk].lng);
 				
-				if(scavenger.getStraightLineDistance(newloc, pmrkLoc) < scavenger.config.Placemarks[pmrk].visitrange) {
+				if(scavenger.getStraightLineDistance(newloc, pmrkLoc) < scavenger.config.Placemarks[pmrk].visitrange || (thisCheat && !scavenger.config.Placemarks[pmrk].visited)) {
 					scavenger.config.Placemarks[pmrk].gmarker.setIcon((scavenger.config.Placemarks[pmrk].visited) ? scavenger.currentVisitedIcon : scavenger.currentNotVisitedIcon); 
 					scavenger.currentPlacemark = scavenger.config.Placemarks[pmrk];
-					scavenger.onCurrentPlacemarkCallback();			
+					scavenger.onCurrentPlacemarkCallback();
+					thisCheat = false;			
 				} else {
 					scavenger.config.Placemarks[pmrk].gmarker.setIcon((scavenger.config.Placemarks[pmrk].visited) ? scavenger.visitedIcon : scavenger.notVisitedIcon); 
 				}

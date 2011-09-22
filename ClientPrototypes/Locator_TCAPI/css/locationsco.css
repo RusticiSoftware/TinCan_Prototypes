@@ -40,12 +40,12 @@ div.title {font-size:2.5em;font-weight:bold;float:left;}
 .btnSaveLocationToLRS {display:none;float:right;margin:0;}
 .loc.onPlacemark .btnSaveLocationToLRS {display:block;}
 
-.loc {margin:5px 0;background:transparent url(../img/notvisited.png)no-repeat 0 0; padding-left:35px;height:37px;}
+.loc {margin:5px 0;background:transparent url(../img/notvisited.png)no-repeat 0 0; padding-left:35px;min-height:37px;}
 .loc.visited {background-image:url(../img/visited.png);}
 .loc.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentNotVisited.png);padding:2px 2px 2px 35px;}
 .loc.visited.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentVisited.png);}
 .loc .desc {font-size:.8em;color:#888888;margin-left:5px;}
-
+.loc a {font-size:.8em;}
 
 
 #map_canvas 

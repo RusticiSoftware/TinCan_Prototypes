@@ -29,8 +29,9 @@
 			<ul class="tabs">
 			  <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
 			  <li><a class="active" href="#allStatements">Statements</a></li>
+			  <li><a href="#golfCourse">Golf Course Reporting</a></li>
 			  <li><a href="#tetrisScores">Tetris Reporting</a></li>
-			  <li><a href="#more">More</a></li>
+			  <li><a href="#locatorCourse">Locations Course Reporting</a></li>
 			</ul>
 
 			<!-- Standard <ul> with class of "tabs-content" -->
@@ -44,7 +45,29 @@
 					<div id='theStatements'></div>
 					<button id='showAllStatements'>Show All</button>
 				</li>
-			  <li id="tetrisScores">
+			  
+				<li id="golfCourse">
+					<button id='refreshGolfData'>Refresh</button>
+					<div class="heading">Golf Course Learners</div>
+					<div id='golfCourseData'></div>
+					<br/><br/>
+					<div class="heading">Assessment Question Results</div>
+					<div id='golfCourseQuestionData'>
+						<table id='golfQuestions'>
+							<tr class="labels">
+								<td class="question">Question</td>
+								<td class="correctAnswer">Correct Answer</td>
+								<td class="metric">Total</td>
+								<td class="metric">Correct</td>
+								<td class="metric">Incorrect</td>
+							</tr>
+							
+						</table>
+					</div>
+				
+				</li>
+			  	
+				<li id="tetrisScores">
 				<button id='refreshHighScores'>Refresh</button>
 			  	<div class="clear"></div>
 				<div id='tetrisHighScores'>
@@ -59,7 +82,7 @@
 			
 			  </li>
 			
-			  <li id="more">Nothing more at this time.</li>
+			  <li id="locatorCourse">Nothing more at this time.</li>
 			</ul>
 			
 		</div>

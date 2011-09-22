@@ -88,16 +88,20 @@ function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
 				.SetValue("type","Game")
 				.SetValue("description","Starting at 1, the higher the level, the harder the game."));
 		var contextObj = new TCObject().SetValue("activity",new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI"))
-			.SetValue("registration",gameId)
-			.SetValue("time",time)
+			.SetValue("registration",gameId);
+			
+		var resultObj = new TCObject().SetValue("time",time)
 			.SetValue("apm",apm)
 			.SetValue("lines",lines)
-			.SetValue("score",score);
+			.SetValue("score",new TCObject()
+				.SetValue("raw",score)
+				.SetValue("min",0));
 			
 		var stmt = new TCStatement(tc_lrs)
 			.SetValue("verb","achieved")
 			.SetValue("object",tcGameObj)
 			.SetValue("context",contextObj)
+			.SetValue("result",resultObj)
 			.Send();
 	}	
 }
@@ -110,14 +114,14 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
 				.SetValue("name","Js Tetris - Tin Can Prototype")
 				.SetValue("type","Game")
 				.SetValue("description","A game of tetris."));
-		var contextObj = new TCObject().SetValue("registration",gameId)
-			.SetValue("level",level)
-			.SetValue("time",time)
-			.SetValue("apm",apm)
-			.SetValue("lines",lines);
+		var contextObj = new TCObject().SetValue("registration",gameId);
 		var resultObj = new TCObject().SetValue("score",new TCObject()
-				.SetValue("raw",score)
-				.SetValue("min",0));
+					.SetValue("raw",score)
+					.SetValue("min",0))
+				.SetValue("level",level)
+				.SetValue("time",time)
+				.SetValue("apm",apm)
+				.SetValue("lines",lines);
 		var stmt = new TCStatement(tc_lrs)
 			.SetValue("verb","completed")
 			.SetValue("object",tcGameObj)
@@ -138,14 +142,6 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
 			if (HighScoresArray.length>15) HighScoresArray.pop();
 			TCDriver_SendActivityProfile (tc_lrs, GAME_ID, "highscores", JSON.stringify(HighScoresArray));
 		}
-		
-		
-		
-		
-		
-		
-			
-			
 			
 	}	
 }

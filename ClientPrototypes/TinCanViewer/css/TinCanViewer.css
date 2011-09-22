@@ -21,7 +21,7 @@ tr.statement {cursor:pointer;}
 #tetrisHighScores {float:left;width:45%;margin-top:20px;}
 #tetrisGamesScores {float:right;}
 
-#tetrisHighScores .heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
+.heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
 
 
 
@@ -29,3 +29,20 @@ tr.statement {cursor:pointer;}
 .highScoreRow .actor{padding:0 5px;}
 .highScoreRow .score{padding:0 5px;font-weight:bold;}
 .highScoreRow .date{font-size:.7em;color:#666666;width:120px;text-align:right;}
+
+#golfCourseData table {width:300px;}
+#golfCourseData tr.labels td {font-size:.8em;text-decoration:underline;}
+#golfCourseData td {padding:3px 0;}
+#golfCourseData td.name {}
+#golfCourseData td.completion {text-align:right;}
+#golfCourseData td.completion.complete {color:green;}
+#golfCourseData td.completion.incomplete {color:red;}
+#golfCourseData td.score {text-align:right;}
+
+table#golfQuestions {}
+table#golfQuestions tr.labels td {font-size:.8em;text-decoration:underline;}
+table#golfQuestions td {padding:3px;text-align:right;}
+table#golfQuestions td.question {text-align:left;}
+table#golfQuestions td.correctAnswer {}
+table#golfQuestions td.metric {}
+

@@ -15,7 +15,7 @@
 	    src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true">
 	</script>
 	<script src="scripts/scavenger.js" type="text/javascript" charset="utf-8"></script>
-	<script src="scripts/locations.js" type="text/javascript" charset="utf-8"></script>
+	<script src="locations.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div class="headerDiv">
@@ -79,6 +79,14 @@
 				//$('#locations').append('all visisted? '+CheckForAllVisited());
 			});
 			
+			$(document).keypress(function(event) {
+				if ( event.which == 63 ) Scavenger.useLocationCheat = !Scavenger.useLocationCheat;
+				if (Scavenger.watching){
+					Scavenger.showLocation(Scavenger.currentPosition);
+				}
+			});
+			
+			
 		});
 		
 		function onPlacemark(){
@@ -119,7 +127,10 @@
 				$('.loc[name="' + pmrk.name + '"]').addClass('visited'); 
 				
 				CheckForAllVisited();	
-					
+				
+				if (Scavenger.useLocationCheat){
+					Scavenger.showLocation(position);
+				}
 				
 			} /*else {
 			
@@ -176,6 +187,7 @@
 			
 			var Placemarks = Scavenger.config.Placemarks;
 			var idx = 0;
+			
 	        for (itm in Placemarks) {
 				idx++;
 				var visited = "";
@@ -187,7 +199,10 @@
 				}
 				
 				var html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
-				html += " <span class='desc'>" + Placemarks[itm].description + "</span></div>";
+				html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
+				if (Placemarks[itm].website != undefined && Placemarks[itm].website != "")
+					html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
+				html += "</div>";
 				
 				$("#locationListings").append(html);
 	            

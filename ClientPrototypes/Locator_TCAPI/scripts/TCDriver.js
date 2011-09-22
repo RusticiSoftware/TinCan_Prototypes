@@ -1,4 +1,5 @@
 var tc_lrs = TCDriver_GetLRSObject();
+//alert(tc_lrs.actor);
 //alert(JSON.stringify(tc_lrs));
 
 function TCDriver_GetLRSObject(){
@@ -140,7 +141,7 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId) {
 		
 		var url = lrs.endpoint + "statements/?sparse=false";
 		if (sendActor){
-			url += "&actor=" + encodeURIComponent(JSON.stringify(lrs.actor));
+			url += "&actor=" + encodeURIComponent(lrs.actor);
 		}
 		
 		if (verb != null){
@@ -218,10 +219,11 @@ function getQueryStringParam( name )
   var regexS = "[\\?&]"+name+"=([^&#]*)";
   var regex = new RegExp( regexS );
   var results = regex.exec( window.location.href );
-  if( results == null )
+  if( results == null ){
     return "";
-  else
-    return decodeURIComponent(results[1]);
+  }else{
+	return decodeURIComponent(results[1]);
+  }
 }
 
 /*!

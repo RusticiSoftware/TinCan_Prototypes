@@ -7,9 +7,6 @@ google.load('visualization', '1.0', {'packages':['corechart']});
 $(document).ready(function(){
 
 	TC_GetStatements(25,null,null,RenderStatements);
-	TC_GetActivityProfile ("scorm.com/JsTetris_TCAPI", "highscores", RenderHighScores);
-	TC_GetStatements(0,"completed","scorm.com/JsTetris_TCAPI",RenderTetrisScoreChart);
-	
 	$('#refreshStatements').click(function(){
 		$("#theStatements").empty();
 		TC_GetStatements(25,null,null,RenderStatements);
@@ -21,11 +18,30 @@ $(document).ready(function(){
 		}
 	});
 	
+	TC_GetActivityProfile ("scorm.com/JsTetris_TCAPI", "highscores", RenderHighScores);
+	TC_GetStatements(0,"completed","scorm.com/JsTetris_TCAPI",RenderTetrisScoreChart);
 	$("#refreshHighScores").click(function(){
 		$("#tetrisHighScoreData").empty();
 		TC_GetActivityProfile("scorm.com/JsTetris_TCAPI", "highscores", RenderHighScores);
 		TC_GetStatements(0,"completed","scorm.com/JsTetris_TCAPI",RenderTetrisScoreChart);
 	});
+	
+	
+	$("#refreshGolfData").click(function(){
+		$("#golfCourseData").empty();
+		TC_GetStatements(0,null,"scorm.com/GolfExample_TCAPI",RenderGolfData);
+		$(".golfQuestion").empty();
+		RequestGolfQuestions();
+	});
+	
+	
+	TC_GetStatements(0,null,"scorm.com/GolfExample_TCAPI",RenderGolfData);
+	RequestGolfQuestions();
+	
+	
+
+	
+	
 	
 	
 
@@ -276,3 +292,117 @@ function RenderTetrisScoreChart(statementsStr){
 	
 }
 
+function RenderGolfData(statementsStr){
+	var statements = eval('(' + statementsStr + ')');
+	
+	var html = "<table><tr class='labels'>";
+	html += "<td class='name'>Learner</td>";
+	html += "<td class='completion'>Completion</td>";
+	html += "<td class='score'>Score</td>";
+	html += "</tr>";
+	
+	var learners = new Array();
+	var learnerObjs = new Object();
+	
+	var i;
+	for (i = 0; i < statements.length ; i++){
+		var l;
+		var mbox = statements[i].actor.mbox;
+		if (learnerObjs[mbox] == undefined){
+			learners.push(mbox);
+			learnerObjs[mbox] = new Object()
+			learnerObjs[mbox].complete = 'incomplete';
+			learnerObjs[mbox].score = '-';
+		}
+		if (learnerObjs[mbox].name == undefined || learnerObjs[mbox].name == mbox)
+			learnerObjs[mbox].name = (statements[i].actor.name != undefined) ? statements[i].actor.name : mbox;
+	
+		if (statements[i].verb == "completed"){
+			//l.score = statements[i].result.score.raw;
+			learnerObjs[mbox].complete = 'complete';
+		}
+	
+	}
+	for (var j in learners){
+		var l = learnerObjs[learners[j]];
+		html += "<tr>";
+		html += "<td class='name'>" + l.name + "</td>";
+		html += "<td class='completion " + l.complete + "'>" + l.complete + "</td>";
+		html += "<td class='score' mbox='" + learners[j] + "'>" + l.score + "</td>";
+		
+		html += "<tr>";
+		
+	}
+	html += "</table>";
+	
+	$("#golfCourseData").append(html);
+	TC_GetStatements(0,'completed',"scorm.com/GolfExample_TCAPI/GolfAssessment.html",RenderGolfDataScores);
+	
+}
+
+function RenderGolfDataScores(statementsStr){
+	var statements = eval('(' + statementsStr + ')');
+	
+	var i;
+	for (i = 0; i < statements.length ; i++){
+		var mbox = statements[i].actor.mbox;
+		
+		$('.score[mbox="' + mbox + '"]').text(statements[i].result.score.raw);
+		
+	}
+	
+}
+
+function RequestGolfQuestions(){
+	var questions = ["com.scorm.golfsamples.interactions.playing_1",
+					"com.scorm.golfsamples.interactions.playing_2",
+					"com.scorm.golfsamples.interactions.playing_3",
+					"com.scorm.golfsamples.interactions.playing_4",
+					"com.scorm.golfsamples.interactions.playing_5",
+					"com.scorm.golfsamples.interactions.etiquette_1",
+					"com.scorm.golfsamples.interactions.etiquette_2",
+					"com.scorm.golfsamples.interactions.etiquette_3",
+					"com.scorm.golfsamples.interactions.handicap_1",
+					"com.scorm.golfsamples.interactions.handicap_2",
+					"com.scorm.golfsamples.interactions.handicap_3",
+					"com.scorm.golfsamples.interactions.handicap_4",
+					"com.scorm.golfsamples.interactions.fun_1",
+					"com.scorm.golfsamples.interactions.fun_2",
+					"com.scorm.golfsamples.interactions.fun_3"];
+	
+	for (var i = 0; i < questions.length ; i++){
+		TC_GetStatements(0,'answered',questions[i],RenderGolfQuestions);
+	}
+	
+}
+function RenderGolfQuestions(statementsStr){
+	var statements = eval('(' + statementsStr + ')');
+	
+	if (statements.length > 0){
+		var html = "<tr class='golfQuestion'>";
+	
+		var q = statements[0];
+		html += "<td class='question'>" + q.object.definition.description + "</td>";
+		html += "<td class='correctAnswer'>" + q.object.definition.correct_responses + "</td>";
+	
+		
+		var correct = 0;
+		var incorrect = 0;
+		var i;
+		for (i = 0; i < statements.length ; i++){
+			if (statements[i].result.success){
+				correct++;
+			} else {
+				incorrect++;
+			}
+		
+		}
+		html += "<td class='metric'>" + statements.length + "</td>";
+		html += "<td class='metric'>" + correct + "</td>";
+		html += "<td class='metric'>" + incorrect + "</td>";
+		
+		html += "</tr>";
+	
+		$("table#golfQuestions").append(html);
+	}
+}

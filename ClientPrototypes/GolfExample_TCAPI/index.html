@@ -27,7 +27,10 @@
 						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/HavingFun/MakeFriends.html"),
 						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/HavingFun/HowToBeStylish.html"),
 						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/GolfAssessment.html")	]));
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","attempted").SetValue("object",courseObj).Send();
+		var stmt = new TCStatement(tc_lrs).SetValue("verb","attempted")
+			.SetValue("inprogress",true)
+			.SetValue("object",courseObj)
+			.Send();
 
 
 	
