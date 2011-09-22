@@ -5,6 +5,7 @@ var actorEmail = "";
 
 var gameId = "";
 
+//DEFAULT ENDPOINT AND AUTH INFO
 tc_lrs.endpoint = "http://localhost:8080/TCAPI/";
 tc_lrs.auth = "Basic dGVzdDpwYXNzd29yZA==";
 
