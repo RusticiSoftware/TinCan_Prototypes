@@ -27,6 +27,7 @@ $(document).ready(function(){
 		TC_GetStatements(0,"completed","scorm.com/JsTetris_TCAPI",RenderTetrisScoreChart);
 	});
 	
+	
 
 });
 
@@ -68,11 +69,12 @@ function RenderStatements(statementsStr){
 	for (i = 0; i < statements.length ; i++){
 		stmtStr += "<tr class='statement' tcid='" + statements[i].id + "'>";
 		
-		var dt = statements[i].stored.substr(0,19).replace("T"," ");//yyyy-MM-ddTHH:mm:ss
-		stmtStr += "<td class='date'>"+ dt +"</td>";
+		//var dt = statements[i].stored.substr(0,19).replace("T"," ");//yyyy-MM-ddTHH:mm:ss
+		var dt = new Date(statements[i].stored);
+		stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString() +"</td>";
 		
 		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name : statements[i].actor.mbox;
-		stmtStr += "<td> <span class='actor'>"+ name +"</span>";
+		stmtStr += "<td > <span class='actor'>"+ name +"</span>";
 		
 		
 		
@@ -101,6 +103,17 @@ function RenderStatements(statementsStr){
 				stmtStr += (answer != "")? answer : ".";
 				stmtStr += corrAnswer;
 				
+			} else if (statements[i].verb == "experienced" && statements[i].object.definition.type != undefined && statements[i].object.definition.type == "Location"){
+				
+				stmtStr += " <span class='verb'>visited</span>";
+				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name : obj;
+				stmtStr += " <span class='object'>"+ obj +"</span>";
+				
+				if (statements[i].context.latitude != null && statements[i].context.longitude != null){
+					stmtStr += " (latitude: "+ statements[i].context.latitude +", longitude: " + statements[i].context.longitude + ")";
+				}
+			
+			
 			} else {
 				stmtStr += " <span class='verb'>"+ statements[i].verb +"</span>";
 				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name : obj;
@@ -119,14 +132,19 @@ function RenderStatements(statementsStr){
 				stmtStr += " with score <span class='score'>"+ statements[i].result.score.raw +"</span>";
 			}
 		}
+		stmtStr += "<div class='tc_rawdata' tcid_data='" + statements[i].id + "'><pre>" + JSON.stringify(statements[i], null, 4) + "</pre></div>";
 		
 		stmtStr += "</td></tr>";
+		
 		
 		
 	}
 	stmtStr += "</table>";
 	
 	$("#theStatements").append(stmtStr);
+	$('tr[tcid]').click(function(){
+		$('[tcid_data="' + $(this).attr('tcid') + '"]').toggle();
+	})
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {

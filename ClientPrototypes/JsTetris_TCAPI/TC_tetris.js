@@ -5,6 +5,7 @@ var actorEmail = "";
 
 var gameId = "";
 
+//DEFAULT ENDPOINT AND AUTH INFO
 tc_lrs.endpoint = "http://localhost:8080/TCAPI/";
 tc_lrs.auth = "Basic dGVzdDpwYXNzd29yZA==";
 
@@ -64,7 +65,7 @@ function tc_sendStatment_StartNewGame(){
 	if (TCActive){
 		gameId = _ruuid();
 	
-		var tcGameObj = new TCObject().SetValue(GAME_ID)
+		var tcGameObj = new TCObject().SetValue('id',GAME_ID)
 			.SetValue("definition",new TCObject()
 				.SetValue("name","Js Tetris - Tin Can Prototype")
 				.SetValue("type","Game")

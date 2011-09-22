@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="viewport" content="width=device-width initial-scale=1.0" />
+	
+	<link rel="stylesheet" href="css/locationsco.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	
+	<script src="scripts/modernizr.custom.js" type="text/javascript" charset="utf-8"></script>
+	<script	type="text/javascript" src="scripts/jquery-1.6.4.min.js"></script>
+	<script	type="text/javascript" src="scripts/TCDriver.js"></script>
+	<script type="text/javascript"
+	    src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true">
+	</script>
+	<script src="scripts/scavenger.js" type="text/javascript" charset="utf-8"></script>
+	<script src="scripts/locations.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+	<div class="headerDiv">
+		
+		
+		<div class="title"></div>
+		<button id="WatchingLocationAction">Enable Location Tracking</button> 
+		
+		<div class='clear'></div>
+		
+		<div class='locationsDiv '>
+			
+			<div id="locationListings">
+				
+			
+			</div>
+			<div class='clear'></div>
+		</div>
+		<div class="exerciseComplete">Exercise Complete!</div>
+		
+	</div>
+	<div id="map_canvas"></div>
+	<div id="info">
+		<div id="legend">
+			<b>Legend</b>
+			<table>
+				<tr><td class="icon notVisited"></td><td>Not yet visited</td></tr>
+				<tr><td class="icon visited"></td><td>Already visited</td></tr>
+				<tr><td class="icon currentVisited"></td><td>Currently visiting</td></tr>
+				<tr><td class="icon currentNotVisited"></td><td>Currently visiting but not yet saved</td></tr>
+			</table>
+		</div>
+		When you arrive at one of the locations listed above, a 'Save Location' button will appear next to the associated location.
+		Click the button to save back to the learning record system that you have arrived and experienced that location.
+		<br/><br/>
+		When you have visited all of the locations, you will have finished this exercise.
+		<div class='clear'></div>
+	</div>
+	<script>
+	
+		$(document).ready(function(){
+			$('title').text(COURSE_NAME);
+			$('div.title').text(COURSE_NAME);
+			
+			InitLocationsState();
+			Scavenger.onCurrentPlacemarkCallback = onPlacemark;
+			Scavenger.onNoPlacemarksCallback = noPlacemarks;
+			
+			$('.btnSaveLocationToLRS').click(function(){
+				SaveLocationToLRS();
+			});
+			
+			$('#WatchingLocationAction').click(function(){
+				if(Scavenger.watching){
+					Scavenger.stopWatchingLocation();	
+					$(this).text('Enable Location Tracking');
+				}else{
+					Scavenger.startWatchingLocation();
+					$(this).text('Disable Location Tracking');
+				}
+				//$('#locations').append('all visisted? '+CheckForAllVisited());
+			});
+			
+		});
+		
+		function onPlacemark(){
+			$('.loc').removeClass('onPlacemark');
+			$('.loc[name="' + Scavenger.currentPlacemark.name + '"]').addClass('onPlacemark');
+			
+		}
+		
+		function noPlacemarks(){
+			$('.loc').removeClass('onPlacemark');
+		}
+		
+		function SaveLocationToLRS() {
+	        position = Scavenger.currentPosition;
+	
+			if (Scavenger.currentPlacemark != null){
+				var pmrk = Scavenger.currentPlacemark;
+				
+				//save to Tin Can
+				var tcPosObj = new TCObject().SetValue('id',pmrk.tc_id)
+					.SetValue("definition",new TCObject()
+						.SetValue("name",pmrk.name)
+						.SetValue("type","Location")
+						.SetValue("description",pmrk.description));
+				var contextObj = new TCObject()
+					.SetValue("activity",new TCObject().SetValue("id",COURSE_ID))
+					.SetValue("latitude",position.coords.latitude)
+					.SetValue("longitude",position.coords.longitude);
+				var stmt = new TCStatement(tc_lrs)
+					.SetValue("verb","experienced")
+					.SetValue("object",tcPosObj)
+					.SetValue("context",contextObj)
+					.Send();
+				
+				pmrk.visited = true;
+				pmrk.gmarker.setIcon(Scavenger.currentVisitedIcon);
+				
+				$('.loc[name="' + pmrk.name + '"]').addClass('visited'); 
+				
+				CheckForAllVisited();	
+					
+				
+			} /*else {
+			
+		        //write the current location to the screen
+		        $('#locations').append('Recording position : ' + position.coords.latitude + ' | ' + position.coords.longitude + ' | alt=' + position.coords.altitude + ' | accuracy=' + position.coords.accuracy + '<br/>');
+
+		        //save to Tin Can
+	
+				var tcPosObj = new TCObject().SetValue('id',_ruuid())
+					.SetValue("definition",new TCObject()
+						.SetValue("name","User Saved Location")
+						.SetValue("type","Location")
+						.SetValue("description","The actor visited this spot."));
+				var contextObj = new TCObject()
+					.SetValue("latitude",position.coords.latitude)
+					.SetValue("longitude",position.coords.longitude);
+				var stmt = new TCStatement(tc_lrs)
+					.SetValue("verb","experienced")
+					.SetValue("object",tcPosObj)
+					.SetValue("context",contextObj)
+					.Send();
+				
+			}*/
+	        
+	    }
+	
+		function CheckForAllVisited() {
+			var allVisited = true; //default to true and change to false if a placemark is not visited
+			for(pmrk in Scavenger.config.Placemarks) {
+				if(Scavenger.config.Placemarks[pmrk].visited===false) {
+					allVisited = false;
+				}
+			}
+			if (allVisited){
+				
+				var tcCourseObj = new TCObject().SetValue('id',COURSE_ID)
+					.SetValue("definition",new TCObject()
+						.SetValue("name",COURSE_NAME)
+						.SetValue("type","Course")
+						.SetValue("description",COURSE_DESC));
+				var stmt = new TCStatement(tc_lrs)
+					.SetValue("verb","completed")
+					.SetValue("object",tcCourseObj)
+					.Send();
+				
+				$(".exerciseComplete").show();
+			}
+			
+			return allVisited;
+		}
+		
+		
+		function InitLocationsState(){
+			
+			var Placemarks = Scavenger.config.Placemarks;
+			var idx = 0;
+	        for (itm in Placemarks) {
+				idx++;
+				var visited = "";
+				var stmts = eval( '(' + TCDriver_GetStatements(tc_lrs, true,"experienced",Placemarks[itm].tc_id) + ')');
+				if (stmts.length > 0){
+					Placemarks[itm].visited = true;
+					Placemarks[itm].icon = Scavenger.visitedIcon;
+					visited = "visited";
+				}
+				
+				var html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
+				html += " <span class='desc'>" + Placemarks[itm].description + "</span></div>";
+				
+				$("#locationListings").append(html);
+	            
+	        }
+			
+			CheckForAllVisited();
+			
+			
+		}
+		
+
+	</script>
+</body>
+</html>

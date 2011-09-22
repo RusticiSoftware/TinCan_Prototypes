@@ -211,7 +211,7 @@
     
     
     //called from the assessmenttemplate.html page to record the results of a question
-    function RecordQuestion(id, questionText, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
+    function GetQuestionAnswerStatement(id, questionText, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
         
 		//send question info
  		var questionObj = new TCObject().SetValue("id",id);
@@ -227,9 +227,9 @@
 		var stmt = new TCStatement(tc_lrs).SetValue("verb","answered")
 			.SetValue("object",questionObj)
 			.SetValue("result",resultObj)
-			.SetValue("context",contextObj)
-			.Send();
-
+			.SetValue("context",contextObj);
+		
+		return stmt.GetStatement();
     }
     
     function FormatChoiceResponse(value){
