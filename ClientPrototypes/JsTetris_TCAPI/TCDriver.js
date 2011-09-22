@@ -15,7 +15,7 @@ function TCDriver_GetLRSObject(){
 
 
 function TCDriver_CheckStatus(xhr){
-	if(xhr.status!=204){
+	if(xhr.status!=204 && xhr.status!=200){
 		alert("There was a problem sending data back to the Learning Record Store.");
     }
 }
@@ -32,6 +32,21 @@ function TCDriver_SendStatement (lrs,stmt) {
 			}
 		};
 		xhr.send(JSON.stringify(stmt));
+	}
+}
+
+function TCDriver_SendMultiStatements (lrs,stmtArray) {
+	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", lrs.endpoint+"statements/"+_ruuid(), true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", lrs.auth);
+		xhr.onreadystatechange = function() {
+		    if(xhr.readyState == 4 ) {
+	             TCDriver_CheckStatus(xhr);
+			}
+		};
+		xhr.send(JSON.stringify(stmtArray));
 	}
 }
 

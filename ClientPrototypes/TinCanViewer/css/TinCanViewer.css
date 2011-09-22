@@ -13,6 +13,9 @@
 .statement .object {color:#222222;}
 .statement .score {font-weight:bold;}
 
+tr.statement {cursor:pointer;}
+.tc_rawdata{display:none;font-size:.8em;}
+
 #showAllStatements, #refreshHighScores {margin-top:20px;}
 
 #tetrisHighScores {float:left;width:45%;margin-top:20px;}
