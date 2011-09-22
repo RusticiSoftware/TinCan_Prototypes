@@ -71,36 +71,48 @@ function checkError(error, request, response, text) {
 
 function parseJSONRequest(request, callback) {
 	"use strict";
-	var result, error, data;
-	data = '';
-	error = null;
+	var result;
 
+	loadRequestBody(request, function (error, data) {
+		if (error !== null && error !== undefined) {
+			callback(error);
+		} else {
+			try {
+				result = JSON.parse(data);
+			} catch (ex) {
+				callback(ex);
+			}
+			callback(null, result);
+		}
+	});
+
+}
+
+function storeRequestBody(request) {
+	"use strict";
+	request.data = '';
+	request.finished = false;
+	
 	request.on('data', function (chunk) {
-		data += chunk.toString('ascii');
+		request.data += chunk.toString('ascii');
 	});
 
 	request.on('end', function () {
-		try {
-			result = JSON.parse(data);
-		} catch (ex) {
-			error = ex;
-		}
-		callback(error, result);
+		request.finished = true;
 	});
 }
 
 function loadRequestBody(request, callback) {
 	"use strict";
-	var data;
-	data = '';
 
-	request.on('data', function (chunk) {
-		data += chunk.toString('ascii');
-	});
-
-	request.on('end', function () {
-		callback(null, data);
-	});
+	if (request.finished) {
+		console.log('already finished!');
+		callback(null, request.data);
+	} else {
+		request.on('end', function () {
+			callback(null, request.data);
+		});
+	}
 }
 
 function isAuthorized(request) {
@@ -213,6 +225,7 @@ exports.toBool = toBool;
 exports.isStatementObjectActor = isStatementObjectActor;
 exports.checkError = checkError;
 exports.parseJSONRequest = parseJSONRequest;
+exports.storeRequestBody = storeRequestBody;
 exports.loadRequestBody = loadRequestBody;
 exports.isAuthorized = isAuthorized;
 exports.getAuthenticatedUser = getAuthenticatedUser;

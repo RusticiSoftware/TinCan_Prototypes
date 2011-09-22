@@ -31,53 +31,6 @@ function parseActivityProfile(methodParts) {
 	return key;
 }
 
-function handleStateRequest(requestContext, key, collection) {
-	"use strict";
-	var method, response;
-	method = requestContext.request.method;
-	response = requestContext.response;
-
-	if (method === 'PUT') {
-		util.loadRequestBody(requestContext.request, function (error, data) {
-			if (error !== null) {
-				throw error;
-			}
-			collection.save({_id : key, data : data}, { safe : true }, function (error) {
-				if (util.checkError(error, requestContext.request, response, "storing state")) {
-					response.statusCode = 204;
-					response.end('');
-				}
-			});
-		});
-	} else if (method === 'DELETE') {
-		collection.remove({_id : key}, { safe : true }, function (error) {
-			if (util.checkError(error, requestContext.request, response, "clearing state")) {
-				response.statusCode = 204;
-				response.end('');
-			}
-		});
-	} else {
-		// then get
-		collection.find({_id : key}).toArray(function (error, result) {
-			if (util.checkError(error, requestContext.request, response, "loading state")) {
-				switch (result.length) {
-				case 0:
-					response.statusCode = 404;
-					response.end();
-					break;
-				case 1:
-					response.statusCode = 200;
-					response.end(result[0].data);
-					break;
-				default:
-					util.checkError(new Error('Found too many state objects'), requestContext.request, response, "loading state");
-					break;
-				}
-			}
-		});
-	}
-}
-
 function clearState(requestContext, key, collection) {
 	"use strict";
 	var response, query;
@@ -109,22 +62,17 @@ function handleActivityRequest(requestContext) {
 		return false;
 	}
 	parts = request.url.toLowerCase().substring(method.length + 1).split('/');
-	if (parts[1] === 'state' && parts.length === 4) {
+	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && request.method === 'DELETE'))) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
 		key = parseStateRequest(parts);
-		handleStateRequest(requestContext, key, collections.state);
+		requestContext.storage.handleKVPRequest(requestContext, key, collections.state);
 		return true;
-	} else if (parts[1] === 'state' && parts.length === 3 && request.method === 'DELETE') {
-		// state API -- clear all state for this activity + actor
-		key = parseStateRequest(parts);
-		clearState(requestContext, key, collections.state);
-		return true;
-	} else if (parts[1] === 'profile' && parts.length === 3) {
+	} /*else if (parts[1] === 'profile' && parts.length === 3) {
 		// activity profile API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/profile/<profile object key>
 		key = parseActivityProfile(parts);
-		handleStateRequest(requestContext, key, collections.activity_profile);
+		requestContext.storage.handleKVPRequest(requestContext, key, collections.activity_profile);
 		return true;
-	} else {
+	}*/ else {
 		return false;
 	}
 }

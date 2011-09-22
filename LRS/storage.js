@@ -542,27 +542,33 @@ function getActorKeys(props, callback) {
 	}
 }
 
+function addActorUniqueProps(actor, props) {
+	"use strict";
+	var prop;
+
+	for (prop in actor) {
+		if (actor.hasOwnProperty(prop)) {
+			if (util.inList(prop, actorUniqueProps)) {
+				if (props[prop] === undefined) {
+					props[prop] = [];
+				}
+				if (!util.inList(actor[prop], props[prop])) {
+					props[prop].push(actor[prop]);
+				}
+			}
+		}
+	}
+}
+
 function addQueryActorConditions(actorConditions, query, callback) {
 	"use strict";
-	var props, conditionName, condition, conditionProp, ii, found;
+	var props, conditionName, conditionProp, ii, found, actorProps;
 	props = {};
 
 	// build list of all inverse functional properties (and values) in specified actor conditions
 	for (conditionName in actorConditions) {
 		if (actorConditions.hasOwnProperty(conditionName)) {
-			condition = actorConditions[conditionName];
-			for (conditionProp in condition) {
-				if (condition.hasOwnProperty(conditionProp)) {
-					if (util.inList(conditionProp, actorUniqueProps)) {
-						if (props[conditionProp] === undefined) {
-							props[conditionProp] = [];
-						}
-						if (!util.inList(condition[conditionProp], props[conditionProp])) {
-							props[conditionProp].push(condition[conditionProp]);
-						}
-					}
-				}
-			}
+			addActorUniqueProps(actorConditions[conditionName], props);
 		}
 	}
 
@@ -682,8 +688,89 @@ function buildStatementQuery(parameters, callback) {
 	});
 }
 
+function handleKVPRequest(requestContext, key, collection) {
+	"use strict";
+	var method, response, collectionName;
+	method = requestContext.request.method;
+	response = requestContext.response;
+
+	try {
+		collectionName = collection.collectionName;
+		if (method === 'PUT') {
+			util.loadRequestBody(requestContext.request, function (error, data) {
+				console.log('load request');
+				if (!util.checkError(error, requestContext.request, response, "parsing request to store " + collectionName + " object")) {
+					return;
+				}
+				collection.save({_id : key, data : data}, { safe : true }, function (error) {
+					console.log(collectionName + ' ' + JSON.stringify({_id : key, data : data}, null, 4));
+					if (util.checkError(error, requestContext.request, response, "storing " + collectionName + " object")) {
+						response.statusCode = 204;
+						response.end('');
+					}
+				});
+			});
+		} else if (method === 'DELETE') {
+			collection.remove({_id : key}, { safe : true }, function (error) {
+				if (util.checkError(error, requestContext.request, response, "clearing " + collectionName + " object")) {
+					response.statusCode = 204;
+					response.end('');
+				}
+			});
+		} else {
+			// then get
+			collection.find({_id : key}).toArray(function (error, result) {
+				if (util.checkError(error, requestContext.request, response, "loading " + collectionName + " object")) {
+					switch (result.length) {
+					case 0:
+						response.statusCode = 404;
+						response.end();
+						break;
+					case 1:
+						response.statusCode = 200;
+						response.end(result[0].data);
+						break;
+					default:
+						util.checkError(new Error('Found too many objects'), requestContext.request, response, "loading " + collectionName + " object");
+						break;
+					}
+				}
+			});
+		}
+	} catch (ex) {
+		console.error('error');
+		util.checkError(ex, requestContext.request, response);
+	}
+}
+
+function getActorId(actor, callback) {
+	"use strict";
+	var props, id;
+	props = {};
+	
+	addActorUniqueProps(actor, props);
+	getActorKeys(props, function (error, actorKeys) {
+		if (error !== null && error !== undefined) {
+			callback(error);
+			return;
+		}
+		if (actorKeys.length === 0) {
+			callback(new Error('Actor not found: ' + JSON.stringify(actor, null, 4)));
+			return;
+		} else if (actorKeys.length === 1) {
+			id = actorKeys[0]._id;
+		} else {
+			callback(new Error('Found multiple actors matching: ' + JSON.stringify(actor, null, 4)));
+			return;
+		}
+		callback(null, id);
+	});
+}
+
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
 exports.storeProcessedStatements = storeProcessedStatements;
 exports.normalizeStatements = normalizeStatements;
 exports.buildStatementQuery = buildStatementQuery;
+exports.handleKVPRequest = handleKVPRequest;
+exports.getActorId = getActorId;
