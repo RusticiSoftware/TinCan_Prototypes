@@ -19,18 +19,6 @@ function parseStateRequest(methodParts) {
 	return key;
 }
 
-function parseActivityProfile(methodParts) {
-	"use strict";
-	var key = {};
-
-	key.activity = decodeURIComponent(methodParts[0]);
-	if (methodParts.length > 2) {
-		key.stateId = decodeURIComponent(methodParts[2]);
-	}
-
-	return key;
-}
-
 function clearState(requestContext, key, collection) {
 	"use strict";
 	var response, query;
@@ -67,12 +55,7 @@ function handleActivityRequest(requestContext) {
 		key = parseStateRequest(parts);
 		requestContext.storage.handleKVPRequest(requestContext, key, collections.state);
 		return true;
-	} /*else if (parts[1] === 'profile' && parts.length === 3) {
-		// activity profile API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/profile/<profile object key>
-		key = parseActivityProfile(parts);
-		requestContext.storage.handleKVPRequest(requestContext, key, collections.activity_profile);
-		return true;
-	}*/ else {
+	} else {
 		return false;
 	}
 }

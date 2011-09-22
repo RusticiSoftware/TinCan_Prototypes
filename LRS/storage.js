@@ -1,10 +1,12 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, util, async, collections, actorUniqueProps, activityIdProps;
+var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb;
 util = require('./util.js');
+mongodb = require('mongodb');
 async = require('async');
 collections = {};
 
+collectionNames = ['statements', 'actors', 'activities', 'state', 'activity_profile', 'actor_profile'];
 actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
 activityIdProps = ['id', 'platform', 'revision'];
 
@@ -562,7 +564,7 @@ function addActorUniqueProps(actor, props) {
 
 function addQueryActorConditions(actorConditions, query, callback) {
 	"use strict";
-	var props, conditionName, conditionProp, ii, found, actorProps;
+	var props, conditionName, ii, found;
 	props = {};
 
 	// build list of all inverse functional properties (and values) in specified actor conditions
@@ -670,7 +672,6 @@ function buildStatementQuery(parameters, callback) {
 				break;
 			case 'descendants':
 				throw new Error('Not Implemented -- get statements parameter: ' + parameter);
-				break;
 			default:
 				throw new Error('Unexpected get statements parameter: ' + parameter);
 			}
@@ -747,7 +748,7 @@ function getActorId(actor, callback) {
 	"use strict";
 	var props, id;
 	props = {};
-	
+
 	addActorUniqueProps(actor, props);
 	getActorKeys(props, function (error, actorKeys) {
 		if (error !== null && error !== undefined) {
@@ -767,6 +768,90 @@ function getActorId(actor, callback) {
 	});
 }
 
+function init(initCallback) {
+	"use strict";
+	var db, storage, mongoserver;
+
+	mongoserver = new mongodb.Server('localhost', mongodb.Connection.DEFAULT_PORT);
+	db = new mongodb.Db('local', mongoserver);
+	storage = exports;
+
+	db.open(function (err, db) {
+		if (err !== null) {
+			throw err;
+		}
+
+		storage.db = db;
+
+		// version 2.0.0 + is required for $and support, needed for statement GET api.
+		/*jslint evil: true */ // necessary evil -- no version call in mongo driver. using a literal, so safe.
+		db['eval']('db.version()', function (error, result) {
+			/*jslint evil: false */
+			if (error !== null) {
+				initCallback(error);
+				return;
+			} else {
+				console.log('Mongo DB version: ' + result);
+				if (parseInt(result, 10) < 2) {
+					console.error('Mongo DB 2.0.0 or later required.');
+					return;
+				}
+			}
+
+			console.log("DB 'local' Initialized");
+
+			async.map(collectionNames, function (collectionName, callback) {
+				db.collection(collectionName, callback);
+
+			}, function (err, collectionsArray) {
+				var ii;
+
+				if (err !== null && err !== undefined) {
+					console.log("error: " + err);
+					throw err;
+				}
+
+				for (ii = 0; ii < collectionsArray.length; ii++) {
+					storage.collections[collectionsArray[ii].collectionName] = collectionsArray[ii];
+				}
+
+				initCallback(null);
+			});
+		});
+	});
+}
+
+function dropDatabase(callback) {
+	"use strict";
+	/*jslint evil: true */ // necessary evil -- no drop DB call in mongo driver. using a literal, so safe.
+	exports.db['eval']('db.dropDatabase()', callback);
+}
+
+// for testing convenience, provide capability to drop and re-create the DB
+function dropDBHandler(requestContext) {
+	"use strict";
+
+	if (requestContext.request.method !== 'DELETE' || !requestContext.request.url.match(/^\/tcapi\/?$/i)) {
+		return false;
+	}
+	console.log('*** Dropping Database! ***');
+	dropDatabase(function (error, result) {
+		if (util.checkError(error, requestContext.request, requestContext.response)) {
+			console.log(result);
+
+			// re-initialize, re-create DB
+			requestContext.storage.init(function (error) {
+				if (error) {
+					throw error;
+				}
+				requestContext.response.statusCode = 204;
+				requestContext.response.end();
+			});
+		}
+	});
+	return true;
+}
+
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
 exports.storeProcessedStatements = storeProcessedStatements;
@@ -774,3 +859,5 @@ exports.normalizeStatements = normalizeStatements;
 exports.buildStatementQuery = buildStatementQuery;
 exports.handleKVPRequest = handleKVPRequest;
 exports.getActorId = getActorId;
+exports.init = init;
+exports.dropDBHandler = dropDBHandler;

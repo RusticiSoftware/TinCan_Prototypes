@@ -1,14 +1,14 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-var methods, collectionNames, actorUniqueProps, async, http, mongodb, requestHandlers, util;
-
-collectionNames = ['statements', 'actors', 'activities', 'state', 'activity_profile', 'actor_profile'];
+var methods, actorUniqueProps, async, http, mongodb, requestHandlers, storage, util;
 
 async = require('async');
 http = require('http');
-mongodb = require('mongodb');
+storage = require('./storage.js');
+
 requestHandlers = [require('./statement_handler.js').handleRequest,
 	require('./activity_handler.js').handleRequest,
-	require('./profile_handler.js').handleProfile];
+	require('./profile_handler.js').handleProfile,
+	storage.dropDBHandler];
 util = require('./util.js');
 
 function handleRequest(request, response, storage) {
@@ -51,54 +51,15 @@ function handleRequest(request, response, storage) {
 
 function main() {
 	"use strict";
-	var mongoserver, db, storage;
 
-	mongoserver = new mongodb.Server('localhost', mongodb.Connection.DEFAULT_PORT);
-	db = new mongodb.Db('local', mongoserver);
-	storage = require('./storage.js');
-
-	db.open(function (err, db) {
-		if (err !== null) {
-			throw err;
+	storage.init(function (error) {
+		if (error) {
+			throw error;
 		}
 
-		// version 2.0.0 + is required for $and support, needed for statement GET api.
-		/*jslint evil: true */ // necessary evil -- no version call in mongo driver. using a literal, so safe.
-		db['eval']('db.version()', function (error, result) {
-			/*jslint evil: false */
-			if (error !== null) {
-				throw error;
-			} else {
-				console.log('Mongo DB version: ' + result);
-				if (parseInt(result, 10) < 2) {
-					console.error('Mongo DB 2.0.0 or later required.');
-					return;
-				}
-			}
-
-			console.log("DB 'local' Initialized");
-
-			async.map(collectionNames, function (collectionName, callback) {
-				db.collection(collectionName, callback);
-
-			}, function (err, collectionsArray) {
-				var ii, server;
-
-				if (err !== null && err !== undefined) {
-					console.log("error: " + err);
-					throw err;
-				}
-
-				for (ii = 0; ii < collectionsArray.length; ii++) {
-					storage.collections[collectionsArray[ii].collectionName] = collectionsArray[ii];
-				}
-
-				server = http.createServer(function (request, response) {
-					handleRequest(request, response, storage);
-				});
-				server.listen(8080, "127.0.0.1");
-			});
-		});
+		http.createServer(function (request, response) {
+			handleRequest(request, response, storage);
+		}).listen(8080, "127.0.0.1");
 	});
 }
 

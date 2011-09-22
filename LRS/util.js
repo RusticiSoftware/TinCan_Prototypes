@@ -69,6 +69,32 @@ function checkError(error, request, response, text) {
 	return true;
 }
 
+function storeRequestBody(request) {
+	"use strict";
+	request.data = '';
+	request.finished = false;
+
+	request.on('data', function (chunk) {
+		request.data += chunk.toString('ascii');
+	});
+
+	request.on('end', function () {
+		request.finished = true;
+	});
+}
+
+function loadRequestBody(request, callback) {
+	"use strict";
+
+	if (request.finished) {
+		callback(null, request.data);
+	} else {
+		request.on('end', function () {
+			callback(null, request.data);
+		});
+	}
+}
+
 function parseJSONRequest(request, callback) {
 	"use strict";
 	var result;
@@ -86,33 +112,6 @@ function parseJSONRequest(request, callback) {
 		}
 	});
 
-}
-
-function storeRequestBody(request) {
-	"use strict";
-	request.data = '';
-	request.finished = false;
-	
-	request.on('data', function (chunk) {
-		request.data += chunk.toString('ascii');
-	});
-
-	request.on('end', function () {
-		request.finished = true;
-	});
-}
-
-function loadRequestBody(request, callback) {
-	"use strict";
-
-	if (request.finished) {
-		console.log('already finished!');
-		callback(null, request.data);
-	} else {
-		request.on('end', function () {
-			callback(null, request.data);
-		});
-	}
 }
 
 function isAuthorized(request) {
