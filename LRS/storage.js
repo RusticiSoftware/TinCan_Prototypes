@@ -737,6 +737,7 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 					response.statusCode = 200;
 					if (result.length === 0) {
 						response.statusCode = 404;
+						response.end();
 					} else if (result.length === 1 && !multirow) {
 						response.end(result[0].data);
 					} else if (multirow) {

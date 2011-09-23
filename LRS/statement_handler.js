@@ -32,7 +32,6 @@ or is responsible for if not set
 */
 function prepareStatement(statement, request) {
 	"use strict";
-	var result;
 
 	if (statement.authority === undefined) {
 		statement.authority =  util.getAuthenticatedUser(request);
@@ -48,14 +47,14 @@ function prepareStatement(statement, request) {
 
 	if (util.inList(statement.verb, ['passed', 'failed', 'completed'])) {
 		if (statement.result === undefined) {
-			result = statement.result = {};
+			statement.result = {};
 		}
-		result.completion = true;
+		statement.result.completion = true;
 		if (statement.verb === 'passed') {
-			result.success = true;
+			statement.result.success = true;
 		}
 		if (statement.verb === 'failed') {
-			result.success = false;
+			statement.result.success = false;
 		}
 	}
 

@@ -52,7 +52,7 @@ function handleActivityRequest(requestContext) {
 	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && request.method === 'DELETE'))) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
 		key = parseStateRequest(parts);
-		requestContext.storage.handleKVPRequest(requestContext, key, collections.state);
+		requestContext.storage.handleKVPRequest(requestContext, key, parts.length === 3, collections.state);
 		return true;
 	} else {
 		return false;
