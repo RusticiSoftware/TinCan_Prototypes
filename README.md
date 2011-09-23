@@ -7,9 +7,9 @@
 
 ###This package contains server and client prototypes for the Tin Can API.
 * Client prototypes (see ClientPrototypes/index.html for details)
-	* GolfExample_TCAPI : a converted SCORM course
-	* JsTetris_TCAPI : Tetris
-	* Locator_TCAPI : a location based activity
+	* GolfExample\_TCAPI : a converted SCORM course
+	* JsTetris\_TCAPI : Tetris
+	* Locator\_TCAPI : a location based activity
 	* TinCanViewer : basic, and activity-specific reporting
 * LRS server prototype -- provides LRS functionality, except as described in known issues section
 
@@ -20,8 +20,8 @@ This is the url you will launch in your browser to run the client prototypes.
 
 ##LRS (Learning Record Store) Installation
 ###Prerequisite Installation
-* install mongodb (version 2.0.0 or later is required) http://www.mongodb.org/downloads
-* install node.js https://github.com/joyent/node/wiki/Installation
+* install [mongodb](http://www.mongodb.org/downloads) (version 2.0.0 or later is required)
+* install [node.js](https://github.com/joyent/node/wiki/Installation)
 * install the following node modules (npm install &lt;module&gt;)
 	* async
 	* mongodb (this is the node driver for mongodb, and is needed in addition to mongodb itself)
