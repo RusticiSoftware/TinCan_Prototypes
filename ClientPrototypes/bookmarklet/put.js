@@ -3,7 +3,6 @@ var auth = "Basic dGVzdDpwYXNzd29yZA==";
 var statement = {actor:{"mbox" : "mailto:learner@example.scorm.com", "name" : "Example Learner"},
 	verb:"",
 	object:{id:"",definition:{}},
-	context: {statement : {id:'13a6f89b-e913-474b-8ddf-9e73fe7ebfd9'}}
 	};
 var definition = statement.object.definition;
 
@@ -19,7 +18,11 @@ xhr.setRequestHeader("Content-Type", "application/json");
 xhr.setRequestHeader("Authorization", auth);
 xhr.onreadystatechange = function() {
 	if(xhr.readyState == 4 ) {
+		if (xhr.status === 204) {
+			window.open(url);
+		} else {
 			alert(xhr.status + " : " + xhr.responseText);
+		}
 	}
 };
 xhr.send(JSON.stringify(statement));
