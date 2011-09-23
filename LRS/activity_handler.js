@@ -24,8 +24,7 @@ function clearState(requestContext, key, collection) {
 	var response, query;
 	response = requestContext.response;
 
-	query = {$and : [ {"_id.activity" : key.activity}, {"_id.actor" : key.actor}]};
-	//query = {'_id.actor' : key.actor};
+	query = {"_id.activity" : key.activity, "_id.actor" : key.actor };
 
 	collection.remove(query, { safe : true }, function (error) {
 		error = new Error("doesn't work yet");

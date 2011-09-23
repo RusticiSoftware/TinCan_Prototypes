@@ -1,9 +1,10 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-var methods, actorUniqueProps, async, http, mongodb, requestHandlers, storage, util;
+var methods, actorUniqueProps, async, http, mongodb, requestHandlers, storage, util, config;
 
 async = require('async');
 http = require('http');
 storage = require('./storage.js');
+config = require('./config.js');
 
 requestHandlers = [require('./statement_handler.js').handleRequest,
 	require('./activity_handler.js').handleRequest,
@@ -59,7 +60,7 @@ function main() {
 
 		http.createServer(function (request, response) {
 			handleRequest(request, response, storage);
-		}).listen(8080, "127.0.0.1");
+		}).listen(config.port, config.listen_ip);
 	});
 }
 

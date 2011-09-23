@@ -1,9 +1,14 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, method, util, async;
+var exports, method, util, async, verbs;
 method = '/tcapi/statements';
 util = require('./util.js');
 async = require('async');
+verbs = ["experienced", "read", "watched", "witnessed", "studied", "reviewed", "learned", "attended",
+	"heard", "attempted", "performed", "played", "simulated", "completed", "passed", "mastered",
+	"failed", "answered", "interacted", "drove", "piloted", "used", "achieved", "participated",
+	"mentored", "mentored by", "commented", "asked", "created", "authored", "wrote", "edited",
+	"blogged", "shared", "posted", "taught", "imported"];
 
 /*
 verifies statement is valid
@@ -13,6 +18,9 @@ function isValidStatement(statement, request) {
 	"use strict";
 	if (statement.authority !== undefined && statement.authority.mbox !== util.getAuthenticatedUser(request).mbox) {
 		return 'Authentication Failed.';
+	}
+	if (!util.inList(statement.verb, verbs)) {
+		return 'Unexpected verb: "' + statement.verb + '"';
 	}
 
 	return util.hasAllProperties(statement, ['verb', 'object'], 'statement');
@@ -24,6 +32,7 @@ or is responsible for if not set
 */
 function prepareStatement(statement, request) {
 	"use strict";
+	var result;
 
 	if (statement.authority === undefined) {
 		statement.authority =  util.getAuthenticatedUser(request);
@@ -36,6 +45,19 @@ function prepareStatement(statement, request) {
 		statement.verb = statement.verb.toLowerCase();
 	}
 	statement.stored = new Date();
+
+	if (util.inList(statement.verb, ['passed', 'failed', 'completed'])) {
+		if (statement.result === undefined) {
+			result = statement.result = {};
+		}
+		result.completion = true;
+		if (statement.verb === 'passed') {
+			result.success = true;
+		}
+		if (statement.verb === 'failed') {
+			result.success = false;
+		}
+	}
 
 	// db layer uses _id for primary key
 	if (statement.id !== undefined) {
@@ -62,7 +84,7 @@ function processStatements(statements, storage, request, callback) {
 		validationError = isValidStatement(statements[ii], request);
 		if (validationError !== '') {
 			error = new Error(validationError);
-			error.HTTPstatus = 400;
+			error.HTTPStatus = 400;
 			callback(error);
 			return;
 		}

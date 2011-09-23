@@ -12,7 +12,10 @@ function parseProfileRequest(parts, requestContext, callback) {
 	key = operation.key = {};
 	operation.method = requestContext.request.method;
 	operation.collection = parts[1].toLowerCase() === 'activities' ? requestContext.storage.collections.activity_profile : requestContext.storage.collections.actor_profile;
-	key.key = decodeURIComponent(parts[3]);
+
+	if (parts[4] !== undefined) {
+		key.key = decodeURIComponent(parts[3]);
+	}
 
 	if (parts[1].toLowerCase() === 'actors') {
 		actor = JSON.parse(decodeURIComponent(parts[2]));
@@ -41,15 +44,16 @@ function handleProfile(requestContext) {
 	}
 
 	//actor/activity profile
-	parts = /tcapi\/(actors|activities)\/([^\/]+)\/profile\/([^\/]+)\/?/i.exec(request.url);
+	parts = /tcapi\/(actors|activities)\/([^\/]+)\/profile(\/([^\/]+)\/?)?/i.exec(request.url);
 
 	if (parts === null) {
 		return false;
+	} else if (parts[4] === undefined && request.method !== 'DELETE') {
+		return false;
 	} else {
-
 		parseProfileRequest(parts, requestContext, function (error, operation) {
 			if (util.checkError(error, request, requestContext.response)) {
-				requestContext.storage.handleKVPRequest(requestContext, operation.key, operation.collection);
+				requestContext.storage.handleKVPRequest(requestContext, operation.key, operation.key.key === undefined, operation.collection);
 			}
 		});
 		return true;

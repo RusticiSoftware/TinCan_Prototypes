@@ -373,7 +373,7 @@ function storeProcessedStatements(statements, callback) {
 					newStatements.push(statement);
 				} else if (!areStatementsEqual(statement, dbStatementMap[statement._id])) {
 					error = new Error('Attempt to redefine statement: ' + statement._id);
-					error.HTTPStatus = 400;
+					error.HTTPStatus = 409;
 					callback(error);
 					return;
 				}
@@ -689,11 +689,23 @@ function buildStatementQuery(parameters, callback) {
 	});
 }
 
-function handleKVPRequest(requestContext, key, collection) {
+function handleKVPRequest(requestContext, key, multirow, collection) {
 	"use strict";
 	var method, response, collectionName;
 	method = requestContext.request.method;
 	response = requestContext.response;
+
+	function query(key) {
+		var queryExp, prop;
+		queryExp = {};
+		for (prop in key) {
+			if (key.hasOwnProperty(prop)) {
+				queryExp["_id." + prop] = key[prop];
+			}
+		}
+
+		return queryExp;
+	}
 
 	try {
 		collectionName = collection.collectionName;
@@ -712,7 +724,7 @@ function handleKVPRequest(requestContext, key, collection) {
 				});
 			});
 		} else if (method === 'DELETE') {
-			collection.remove({_id : key}, { safe : true }, function (error) {
+			collection.remove(query(key), { safe : true }, function (error) {
 				if (util.checkError(error, requestContext.request, response, "clearing " + collectionName + " object")) {
 					response.statusCode = 204;
 					response.end('');
@@ -720,20 +732,17 @@ function handleKVPRequest(requestContext, key, collection) {
 			});
 		} else {
 			// then get
-			collection.find({_id : key}).toArray(function (error, result) {
+			collection.find(query(key)).toArray(function (error, result) {
 				if (util.checkError(error, requestContext.request, response, "loading " + collectionName + " object")) {
-					switch (result.length) {
-					case 0:
+					response.statusCode = 200;
+					if (result.length === 0) {
 						response.statusCode = 404;
-						response.end();
-						break;
-					case 1:
-						response.statusCode = 200;
+					} else if (result.length === 1 && !multirow) {
 						response.end(result[0].data);
-						break;
-					default:
-						util.checkError(new Error('Found too many objects'), requestContext.request, response, "loading " + collectionName + " object");
-						break;
+					} else if (multirow) {
+						response.end(JSON.stringify(result, null, 4));
+					} else {
+						util.checkError(new Error('Unexpected object count: ' + result.length), requestContext.request, response, "loading " + collectionName + " object");
 					}
 				}
 			});
