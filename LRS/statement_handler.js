@@ -212,7 +212,7 @@ function handleStatementSetRequest(requestContext) {
 		//console.log('data: ' + JSON.stringify(data, null, 4));
 		if (util.checkError(error, request, response, "parsing request body")) {
 			if (request.method === 'PUT') {
-				data._id = request.url.substring(method.length + 1);
+				data.id = request.url.substring(method.length + 1);
 				// wrap statement in an array since processStatements expects multiple statements
 				processStatements([data], requestContext.storage, request, function (error) {
 					if (util.checkError(error, request, response, "storing statements")) {
