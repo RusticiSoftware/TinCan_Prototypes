@@ -31,21 +31,7 @@ body:before
 		
 	}
 
-.headerDiv {width: 80%;
-	margin:auto;}	
-#WatchingLocationAction {float:right;}
-	
-div.title {font-size:2.5em;font-weight:bold;float:left;}
 
-.btnSaveLocationToLRS {display:none;float:right;margin:0;}
-.loc.onPlacemark .btnSaveLocationToLRS {display:block;}
-
-.loc {margin:5px 0;background:transparent url(../img/notvisited.png)no-repeat 0 0; padding-left:35px;min-height:37px;}
-.loc.visited {background-image:url(../img/visited.png);}
-.loc.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentNotVisited.png);padding:2px 2px 2px 35px;}
-.loc.visited.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentVisited.png);}
-.loc .desc {font-size:.8em;color:#888888;margin-left:5px;}
-.loc a {font-size:.8em;}
 
 
 #map_canvas 
@@ -92,11 +78,29 @@ button
     box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
 }
 
+.headerDiv {width: 80%;
+	margin:auto;}	
+
+	
+div.title {font-size:2.5em;font-weight:bold;text-align:center;}
+
+#enableLocButtonDiv {margin:0 auto;}
+
+.btnSaveLocationToLRS {display:none;float:right;margin:0;}
+.loc.onPlacemark .btnSaveLocationToLRS {display:block;}
+
+.loc {margin:5px 0;background:transparent url(../img/notvisited.png)no-repeat 0 0; padding-left:35px;min-height:37px;}
+.loc.visited {background-image:url(../img/visited.png);}
+.loc.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentNotVisited.png);padding:2px 2px 2px 35px;}
+.loc.visited.onPlacemark {background-color:#E2E4F8;background-image:url(../img/currentVisited.png);}
+.loc .desc {font-size:.8em;color:#888888;margin-left:5px;}
+.loc a {font-size:.8em;}
+
 #info {
 	width: 80%;
 	margin:20px auto;}
 
-#legend {border:1px solid;width:200px;float:right;text-align:center;margin-left:15px;}
+#legend {border:1px solid;width:200px;text-align:center;margin:0 auto;margin-bottom:15px;}
 #legend td {vertical-align:middle;text-align:left;}
 #legend td.icon {width:35px;height:37px;}
 #legend td.icon.notVisited {background:transparent url(../img/notvisited.png) no-repeat 0 0;}
@@ -104,7 +108,7 @@ button
 #legend td.icon.currentVisited {background:transparent url(../img/currentVisited.png) no-repeat 0 0;}
 #legend td.icon.currentNotVisited {background:transparent url(../img/currentNotVisited.png) no-repeat 0 0;}
 
-.exerciseComplete {font-size:3em;text-align:center;padding:10px;background-color: #E2F8E4;margin:5px 0;display:none;}
+.exerciseComplete {font-size:2em;text-align:center;padding:10px;background-color: #E2F8E4;margin:5px 0;display:none;}
 
 /* Large Viewports (iPad, wide windows) */
 
@@ -118,6 +122,10 @@ button
 		padding: 0;
 		padding: 10px 20px;
 	}
+	div.title {float:left;}
+	#enableLocButtonDiv {margin:0;float:right;}
+	#legend {margin:0;margin-left:15px;float:right;}
+	.exerciseComplete {font-size:3em;}
 }
 	
 /* High Resolution (iPhone 4) */
@@ -171,6 +179,8 @@ button
 		border-style: solid;
 		position: relative;
 	}
+	
+	div.title {font-size:2.5em;font-weight:bold;}
 }
 
 @media only screen and (max-device-width: 480px) {
