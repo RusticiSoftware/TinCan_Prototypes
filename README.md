@@ -1,7 +1,7 @@
 #Project Tin Can Prototypes
-Contact:
-	tincan@scorm.com
-	http://scorm.com/tincan
+###Contact:
+* tincan@scorm.com
+* http://scorm.com/tincan
 
 ##Overview
 
@@ -33,9 +33,10 @@ This is the url you will launch in your browser to run the client prototypes.
 ### LRS
 * By default the LRS runs on port 8080 and is accessable from other machines. If you wish to use a different port, or restrict access to the local machine or a specific IP, edit LRS/config.js.
 * Ensure mongo db (mongod) is running. You may simply launch a terminal and run mongod there.
-* Launch the lrs: node lrs.js. You should see:
-	Mongo DB version: 2.0.0
-	DB 'local' Initialized
+* Launch the lrs. In the directory "TinCan_Prototypes/LRS", type: node lrs.js
+	* You should see:
+		* Mongo DB version: 2.0.0
+		* DB 'local' Initialized
 
 ### Client
 * If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
