@@ -22,7 +22,7 @@ This is the url you will launch in your browser to run the client prototypes.
 ###Prerequisite Installation
 * install mongodb (version 2.0.0 or later is required) http://www.mongodb.org/downloads
 * install node.js https://github.com/joyent/node/wiki/Installation
-* install the following node modules (npm install <module>)
+* install the following node modules (npm install &lt;module&gt;)
 	* async
 	* mongodb (this is the node driver for mongodb, and is needed in addition to mongodb itself)
 
@@ -41,7 +41,7 @@ This is the url you will launch in your browser to run the client prototypes.
 ### Client
 * If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
 and set PROTOTYPE_ENDPOINT to use hostname and port to reference where you have installed the LRS.
-* Verify the LRS endpoint in your browser by navigating to the URL: <endpoint>/statements?limit=1
+* Verify the LRS endpoint in your browser by navigating to the URL: &lt;endpoint&gt;/statements?limit=1
 * You should be prompted to log in, the credentials are: test/password
 * You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
 
@@ -51,10 +51,10 @@ and set PROTOTYPE_ENDPOINT to use hostname and port to reference where you have 
 * The following API calls/modes are not implemented
 	* GET http://example.com/TCAPI/Statements/ -- descendants parameter
 	* POST http://example.com/TCAPI/Statements/ (POST mode of list statements)
-	* GET http://example.com/TCAPI/activities/<activity ID>/state/<actor>[?since=<timestamp>]
-	* GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
-	* GET http://example.com/TCAPI/activities/<activity ID>
-	* GET http://example.com/TCAPI/actors/<actor>/profile[?since=<timestamp>]
-	* GET http://example.com/TCAPI/actors/<actor>
+	* GET http://example.com/TCAPI/activities/&lt;activity ID&gt;/state/&lt;actor&gt;[?since=&lt;timestamp&gt;]
+	* GET http://example.com/TCAPI/activities/&lt;activity ID&gt;/profile[?since=&lt;timestamp&gt;]
+	* GET http://example.com/TCAPI/activities/&lt;activity ID&gt;
+	* GET http://example.com/TCAPI/actors/&lt;actor&gt;/profile[?since=&lt;timestamp&gt;]
+	* GET http://example.com/TCAPI/actors/&lt;actor&gt;
 	
 	
