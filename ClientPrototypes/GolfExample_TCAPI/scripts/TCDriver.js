@@ -1,4 +1,5 @@
 var tc_lrs = TCDriver_GetLRSObject();
+//alert(tc_lrs.actor);
 //alert(JSON.stringify(tc_lrs));
 
 function TCDriver_GetLRSObject(){
@@ -56,7 +57,7 @@ function TCDriver_SendState (lrs, activityId, stateKey, stateVal) {
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
 		var xhr = new XMLHttpRequest();
@@ -77,7 +78,7 @@ function TCDriver_GetState (lrs, activityId, stateKey) {
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
 		var xhr = new XMLHttpRequest();
@@ -85,7 +86,7 @@ function TCDriver_GetState (lrs, activityId, stateKey) {
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Authorization", lrs.auth);
 		xhr.send(null);
-		if(xhr.status == 404 ) {
+		if(xhr.status != 200 ) {
              return "";
 		} else {
 			return xhr.responseText;
@@ -140,7 +141,7 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId) {
 		
 		var url = lrs.endpoint + "statements/?sparse=false";
 		if (sendActor){
-			url += "&actor=" + encodeURIComponent(JSON.stringify(lrs.actor));
+			url += "&actor=" + encodeURIComponent(lrs.actor);
 		}
 		
 		if (verb != null){
@@ -218,10 +219,11 @@ function getQueryStringParam( name )
   var regexS = "[\\?&]"+name+"=([^&#]*)";
   var regex = new RegExp( regexS );
   var results = regex.exec( window.location.href );
-  if( results == null )
+  if( results == null ){
     return "";
-  else
-    return decodeURIComponent(results[1]);
+  }else{
+	return decodeURIComponent(results[1]);
+  }
 }
 
 /*!

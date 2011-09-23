@@ -31,7 +31,8 @@
 			  <li><a class="active" href="#allStatements">Statements</a></li>
 			  <li><a href="#golfCourse">Golf Course Reporting</a></li>
 			  <li><a href="#tetrisScores">Tetris Reporting</a></li>
-			  <li><a href="#locatorCourse">Locations Course Reporting</a></li>
+			  <li><a href="#locatorCourse">Nashville Museums Course Reporting</a></li>
+			  <li class='lrsUtils'><a href="#lrsUtils">LRS Utils</a></li>
 			</ul>
 
 			<!-- Standard <ul> with class of "tabs-content" -->
@@ -49,7 +50,7 @@
 				<li id="golfCourse">
 					<button id='refreshGolfData'>Refresh</button>
 					<div class="heading">Golf Course Learners</div>
-					<div id='golfCourseData'></div>
+					<div id='golfCourseData' ></div>
 					<br/><br/>
 					<div class="heading">Assessment Question Results</div>
 					<div id='golfCourseQuestionData'>
@@ -82,7 +83,37 @@
 			
 			  </li>
 			
-			  <li id="locatorCourse">Nothing more at this time.</li>
+			  <li id="locatorCourse">
+					<button id='refreshLocationCourseData'>Refresh</button>
+					<div class="heading">Nashville Museums Course Learners</div>
+					<div id='locationCourseData'></div>
+					<br/><br/>
+					<div class="heading">How many visitors per location?</div>
+					<div id='visitorLocationCourseData'>
+						<table id='courseLocations'>
+							<tr class="labels">
+								<td class="location">Location</td>
+								<td class="metric">Visitors</td>
+								
+							</tr>
+							
+						</table>
+					</div>
+				
+				
+			  </li>
+			
+			  	<li id='lrsUtils'>
+					Here you have the ability to clear out your Learning Record Store.  Please do so with caution.  
+					This will clear all of your stored LRS data.
+					
+					<br/><br/>
+					<button id='deleteAllData'>Delete LRS Data</button>
+					
+					
+					
+				</li>
+			
 			</ul>
 			
 		</div>

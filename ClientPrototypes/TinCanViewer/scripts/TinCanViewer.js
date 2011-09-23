@@ -26,22 +26,35 @@ $(document).ready(function(){
 		TC_GetStatements(0,"completed","scorm.com/JsTetris_TCAPI",RenderTetrisScoreChart);
 	});
 	
-	
+	TC_GetStatements(0,null,"scorm.com/GolfExample_TCAPI",RenderGolfData);
+	RequestGolfQuestions();
 	$("#refreshGolfData").click(function(){
 		$("#golfCourseData").empty();
 		TC_GetStatements(0,null,"scorm.com/GolfExample_TCAPI",RenderGolfData);
-		$(".golfQuestion").empty();
+		$(".golfQuestion").remove();
 		RequestGolfQuestions();
 	});
 	
 	
-	TC_GetStatements(0,null,"scorm.com/GolfExample_TCAPI",RenderGolfData);
-	RequestGolfQuestions();
-	
+	TC_GetStatements(0,null,"scorm.com/Course/NashvilleMuseumsTour",RenderLocationData);
+	RequestLocations();
+	$('#refreshLocationCourseData').click(function(){
+		$("#locationCourseData").empty();
+		TC_GetStatements(0,null,"scorm.com/Course/NashvilleMuseumsTour",RenderLocationData);
+		$(".locationRow").remove();
+		RequestLocations();
+	});
 	
 
 	
-	
+	$('#deleteAllData').click(function(){
+		if (confirm('Are you sure you wish to clear ALL of your LRS data?')){
+			TC_DeleteLRS();
+			
+		}
+		
+		
+	});
 	
 	
 
@@ -74,6 +87,42 @@ function TC_GetStatements (num,verb,activityId,callbackFunction) {
 	};
 	xhr.send(null);
 	
+}
+
+function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
+	
+	
+		var url = endpoint + "activities/<activity ID>/profile/<profilekey>";
+		
+		url = url.replace('<activity ID>',encodeURIComponent(activityId));
+		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.setRequestHeader("Authorization", auth);
+		xhr.onreadystatechange = function() {
+		    if(xhr.readyState == 4 ) {
+				if(xhr.status != 404 ) {
+		       		callbackFunction(xhr.responseText);
+				}
+	     	}
+		};
+		xhr.send(null);
+	
+}
+
+function TC_DeleteLRS(){
+
+	var url = endpoint;
+	
+	var xhr = new XMLHttpRequest();
+	xhr.open("DELETE", url, false);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.setRequestHeader("Authorization", auth);
+	xhr.send(null);
+	
+	window.location = window.location;
 }
 
 function RenderStatements(statementsStr){
@@ -163,28 +212,7 @@ function RenderStatements(statementsStr){
 	})
 }
 
-function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
-	
-	
-		var url = endpoint + "activities/<activity ID>/profile/<profilekey>";
-		
-		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
-		
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-				if(xhr.status != 404 ) {
-		       		callbackFunction(xhr.responseText);
-				}
-	     	}
-		};
-		xhr.send(null);
-	
-}
+
 
 function RenderHighScores(scoresStr){
 	var scores = eval('(' + scoresStr + ')');
@@ -406,3 +434,77 @@ function RenderGolfQuestions(statementsStr){
 		$("table#golfQuestions").append(html);
 	}
 }
+
+function RenderLocationData(statementsStr){
+	var statements = eval('(' + statementsStr + ')');
+	
+	var html = "<table><tr class='labels'>";
+	html += "<td class='name'>Learner</td>";
+	html += "<td class='completion'>Completion</td>";
+	html += "</tr>";
+	
+	var learners = new Array();
+	var learnerObjs = new Object();
+	
+	var i;
+	for (i = 0; i < statements.length ; i++){
+		var l;
+		var mbox = statements[i].actor.mbox;
+		if (learnerObjs[mbox] == undefined){
+			learners.push(mbox);
+			learnerObjs[mbox] = new Object()
+			learnerObjs[mbox].complete = 'incomplete';
+		}
+		if (learnerObjs[mbox].name == undefined || learnerObjs[mbox].name == mbox)
+			learnerObjs[mbox].name = (statements[i].actor.name != undefined) ? statements[i].actor.name : mbox;
+	
+		if (statements[i].verb == "completed"){
+			learnerObjs[mbox].complete = 'complete';
+		}
+	
+	}
+	for (var j in learners){
+		var l = learnerObjs[learners[j]];
+		html += "<tr>";
+		html += "<td class='name'>" + l.name + "</td>";
+		html += "<td class='completion " + l.complete + "'>" + l.complete + "</td>";
+		
+		html += "<tr>";
+		
+	}
+	html += "</table>";
+	
+	$("#locationCourseData").append(html);
+	
+}
+
+function RequestLocations(){
+	var locations = ["scorm.com/Course/NashvilleMuseums/Parthenon",
+					"scorm.com/Course/NashvilleMuseums/CountryMusicHallofFame",
+					"scorm.com/Course/NashvilleMuseums/TheFrist",
+					"scorm.com/Course/NashvilleMuseums/AdventureScienceCenter",
+					"scorm.com/Course/NashvilleMuseums/Cheekwood"];
+	
+	for (var i = 0; i < locations.length ; i++){
+		TC_GetStatements(0,null,locations[i],RenderLocations);
+	}
+	
+}
+function RenderLocations(statementsStr){
+	var statements = eval('(' + statementsStr + ')');
+	
+	if (statements.length > 0){
+		var html = "<tr class='locationRow'>";
+	
+		var q = statements[0];
+		html += "<td class='location'>" + q.object.definition.name + "<br/>";
+		html += "<span class='description'>" + q.object.definition.description + "</span></td>";
+	
+		html += "<td class='metric'>" + statements.length + "</td>";
+		
+		html += "</tr>";
+	
+		$("table#courseLocations").append(html);
+	}
+}
+

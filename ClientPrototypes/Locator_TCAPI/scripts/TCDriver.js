@@ -57,7 +57,7 @@ function TCDriver_SendState (lrs, activityId, stateKey, stateVal) {
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
 		var xhr = new XMLHttpRequest();
@@ -78,7 +78,7 @@ function TCDriver_GetState (lrs, activityId, stateKey) {
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<actor>',encodeURIComponent(JSON.stringify(lrs.actor)));
+		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
 		var xhr = new XMLHttpRequest();
@@ -86,7 +86,7 @@ function TCDriver_GetState (lrs, activityId, stateKey) {
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Authorization", lrs.auth);
 		xhr.send(null);
-		if(xhr.status == 404 ) {
+		if(xhr.status != 200 ) {
              return "";
 		} else {
 			return xhr.responseText;

@@ -60,6 +60,8 @@
 			$('title').text(COURSE_NAME);
 			$('div.title').text(COURSE_NAME);
 			
+			SendCourseInit();
+			
 			InitLocationsState();
 			Scavenger.onCurrentPlacemarkCallback = onPlacemark;
 			Scavenger.onNoPlacemarksCallback = noPlacemarks;
@@ -188,7 +190,7 @@
 			var Placemarks = Scavenger.config.Placemarks;
 			var idx = 0;
 			
-	        for (itm in Placemarks) {
+			for (itm in Placemarks) {
 				idx++;
 				var visited = "";
 				var stmts = eval( '(' + TCDriver_GetStatements(tc_lrs, true,"experienced",Placemarks[itm].tc_id) + ')');
@@ -213,6 +215,19 @@
 			
 		}
 		
+		function SendCourseInit(){
+			
+			var tcCourseObj = new TCObject().SetValue('id',COURSE_ID)
+				.SetValue("definition",new TCObject()
+					.SetValue("name",COURSE_NAME)
+					.SetValue("type","Course")
+					.SetValue("description",COURSE_DESC));
+			var stmt = new TCStatement(tc_lrs).SetValue("verb","attempted")
+				.SetValue("inprogress",true)
+				.SetValue("object",tcCourseObj)
+				.Send();
+			
+		}
 
 	</script>
 </body>

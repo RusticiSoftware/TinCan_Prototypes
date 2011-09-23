@@ -23,7 +23,7 @@ tr.statement {cursor:pointer;}
 
 .heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
 
-
+.lrsUtils a {color:#888888;}
 
 .highScoreRow .scoreRank{width:25px;}
 .highScoreRow .actor{padding:0 5px;}
@@ -46,3 +46,17 @@ table#golfQuestions td.question {text-align:left;}
 table#golfQuestions td.correctAnswer {}
 table#golfQuestions td.metric {}
 
+#locationCourseData table {width:300px;}
+#locationCourseData tr.labels td {font-size:.8em;text-decoration:underline;}
+#locationCourseData td {padding:3px 0;}
+#locationCourseData td.name {}
+#locationCourseData td.completion {text-align:right;}
+#locationCourseData td.completion.complete {color:green;}
+#locationCourseData td.completion.incomplete {color:red;}
+
+table#courseLocations {}
+table#courseLocations tr.labels td {font-size:.8em;text-decoration:underline;}
+table#courseLocations td {padding:3px;text-align:right;}
+table#courseLocations td.location {text-align:left;width:80%;}
+table#courseLocations td.location .description {font-size:.8em;color:#888888;}
+table#courseLocations td.metric {}

@@ -1,7 +1,7 @@
 //config holds locations to visit
 // 
 var COURSE_NAME = "Nashville Museums Tour";
-var COURSE_ID = "scorm.com/Course/NashvilleMuseums";
+var COURSE_ID = "scorm.com/Course/NashvilleMuseumsTour";
 var COURSE_DESC = "An exploration of museums in the greater Nashville TN area.";
 
 var config = {
