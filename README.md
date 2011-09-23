@@ -5,12 +5,12 @@ Contact:
 
 ##Overview
 
-This package contains server and client prototypes for the Tin Can API.
+###This package contains server and client prototypes for the Tin Can API.
 * Client prototypes (see ClientPrototypes/index.html for details)
-** GolfExample_TCAPI : a converted SCORM course
-** JsTetris_TCAPI : Tetris
-** Locator_TCAPI : a location based activity
-** TinCanViewer : basic, and activity-specific reporting
+	* GolfExample_TCAPI : a converted SCORM course
+	* JsTetris_TCAPI : Tetris
+	* Locator_TCAPI : a location based activity
+	* TinCanViewer : basic, and activity-specific reporting
 * LRS server prototype -- provides LRS functionality, except as described in known issues section
 
 ##Client Samples Installation
@@ -38,14 +38,11 @@ This is the url you will launch in your browser to run the client prototypes.
 	DB 'local' Initialized
 
 ### Client
-*If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
+* If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
 and set PROTOTYPE_ENDPOINT to use hostname and port to reference where you have installed the LRS.
-
-*Verify the LRS endpoint in your browser by navigating to the URL: <endpoint>/statements?limit=1
-
-*You should be prompted to log in, the credentials are: test/password
-
-*You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
+* Verify the LRS endpoint in your browser by navigating to the URL: <endpoint>/statements?limit=1
+* You should be prompted to log in, the credentials are: test/password
+* You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
 
 ## Known Issues
 * LRS only has one login: test/password. It trusts this login to report any statement, about any user.
