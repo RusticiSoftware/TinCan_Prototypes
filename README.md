@@ -39,11 +39,12 @@ This is the url you will launch in your browser to run the client prototypes.
 		* DB 'local' Initialized
 
 ### Client
-* If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
+ * If you will not be running the prototypes locally on the machine the LRS is installed on, then edit ClientPrototypes/prototypeConfig.js
 and set PROTOTYPE_ENDPOINT to use hostname and port to reference where you have installed the LRS.
-* Verify the LRS endpoint in your browser by navigating to the URL: &lt;endpoint&gt;/statements?limit=1
-* You should be prompted to log in, the credentials are: test/password
-* You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
+ * Verify the LRS endpoint in your browser by navigating to the URL: &lt;endpoint&gt;/statements?limit=1
+	* You should be prompted to log in, the credentials are: test/password
+	* You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
+ * Launch: ClientPrototypes/index.html (from your web server in your browser, not from the file system) 
 
 ## Known Issues
 * LRS only has one login: test/password. It trusts this login to report any statement, about any user.
