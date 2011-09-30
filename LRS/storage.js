@@ -778,12 +778,12 @@ function getActorId(actor, callback) {
 	});
 }
 
-function init(initCallback) {
+function init(dbName, initCallback) {
 	"use strict";
 	var db, storage, mongoserver;
 
 	mongoserver = new mongodb.Server('localhost', mongodb.Connection.DEFAULT_PORT);
-	db = new mongodb.Db('local', mongoserver);
+	db = new mongodb.Db(dbName, mongoserver);
 	storage = exports;
 
 	db.open(function (err, db) {

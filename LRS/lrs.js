@@ -50,10 +50,10 @@ function handleRequest(request, response, storage) {
 	}
 }
 
-function main() {
+function main(dbName) {
 	"use strict";
 
-	storage.init(function (error) {
+	storage.init(dbName, function (error) {
 		if (error) {
 			throw error;
 		}
@@ -64,4 +64,4 @@ function main() {
 	});
 }
 
-main();
+main('local');

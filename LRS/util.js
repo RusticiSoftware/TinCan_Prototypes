@@ -105,10 +105,10 @@ function parseJSONRequest(request, callback) {
 		} else {
 			try {
 				result = JSON.parse(data);
+				callback(null, result);
 			} catch (ex) {
 				callback(ex);
 			}
-			callback(null, result);
 		}
 	});
 
