@@ -6,17 +6,22 @@ util = require('./util.js');
 async = require('async');
 
 
-function parseStateRequest(methodParts) {
+function parseStateRequest(storage, methodParts, callback) {
 	"use strict";
-	var key = {};
+	var key = {},
+		qsParameters;
 
+	qsParameters = util.extractQS(methodParts);
 	key.activity = decodeURIComponent(methodParts[0]);
 	key.actor = JSON.parse(decodeURIComponent(methodParts[2]));
 	if (methodParts.length > 3) {
-		key.stateId = decodeURIComponent(methodParts[3]);
+		key.key = decodeURIComponent(methodParts[3]);
 	}
 
-	return key;
+	storage.getActorID(key.actor, function (error, actorId) {
+		key.actor = actorId;
+		callback(error, key, qsParameters);
+	});
 }
 
 function clearState(requestContext, key, collection) {
@@ -37,8 +42,9 @@ function clearState(requestContext, key, collection) {
 
 function handleActivityRequest(requestContext) {
 	"use strict";
-	var request, parts, key, collections;
+	var request, response, parts, collections;
 	request = requestContext.request;
+	response = requestContext.response;
 	collections = requestContext.storage.collections;
 
 	if (request.method !== 'PUT' && request.method !== 'GET' && request.method !== 'DELETE') {
@@ -49,10 +55,32 @@ function handleActivityRequest(requestContext) {
 		return false;
 	}
 	parts = request.url.toLowerCase().substring(method.length + 1).split('/');
-	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && request.method === 'DELETE'))) {
+	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && (request.method === 'DELETE' || request.method === 'GET')))) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
-		key = parseStateRequest(parts);
-		requestContext.storage.handleKVPRequest(requestContext, key, parts.length === 3, collections.state);
+		parseStateRequest(requestContext.storage, parts, function (error, key, qsParameters) {
+			if (qsParameters.registration !== undefined || (request.method === 'GET' && key.key !== undefined)) {
+				key.registration = qsParameters.registration;
+			}
+			if (util.checkError(error, requestContext.request, response, "parse state request")) {
+				requestContext.storage.handleKVPRequest(requestContext, key, parts.length === 3, collections.state);
+			}
+		});
+		return true;
+	} else if (request.method === 'GET' && (parts.length === 1 || (parts.length === 2 && parts[1] === ""))) {
+		// get activity definition
+		collections.activities.find({ id : decodeURIComponent(parts[0])}).toArray(function (error, result) {
+			if (util.checkError(error, requestContext.request, response, "GET activity definition")) {
+				if (result.length === 0) {
+					response.statusCode = 404;
+				} else if (result.length === 1) {
+					response.write(JSON.stringify(result[0], null, 4));
+				} else {
+					response.statusCode = 500;
+					response.write('Unexpected activity count: ' + JSON.stringify(result, null, 4));
+				}
+				response.end();
+			}
+		});
 		return true;
 	} else {
 		return false;

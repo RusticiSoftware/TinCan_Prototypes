@@ -218,6 +218,20 @@ function parseProps(obj) {
 	}
 }
 
+function extractQS(urlParts) {
+	"use strict";
+	var last, qsParts;
+
+	last = urlParts.length - 1;
+	qsParts = urlParts[last].split('?');
+	urlParts[last] = qsParts[0];
+	if (qsParts.length === 2) {
+		return require('querystring').parse(qsParts[1]);
+	} else {
+		return {};
+	}
+}
+
 exports.ruuid = ruuid;
 exports.inList = inList;
 exports.toBool = toBool;
@@ -234,3 +248,4 @@ exports.addStatementActivities = addStatementActivities;
 exports.addStatementActors = addStatementActors;
 exports.hasElementWithProperty = hasElementWithProperty;
 exports.parseProps = parseProps;
+exports.extractQS = extractQS;

@@ -733,6 +733,8 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 		} else {
 			// then get
 			collection.find(query(key)).toArray(function (error, result) {
+				var ids = [],
+					ii;
 				if (util.checkError(error, requestContext.request, response, "loading " + collectionName + " object")) {
 					response.statusCode = 200;
 					if (result.length === 0) {
@@ -741,7 +743,10 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 					} else if (result.length === 1 && !multirow) {
 						response.end(result[0].data);
 					} else if (multirow) {
-						response.end(JSON.stringify(result, null, 4));
+						for (ii = 0; ii < result.length; ii++) {
+							ids.push(result[ii]._id.key);
+						}
+						response.end(JSON.stringify(ids, null, 4));
 					} else {
 						util.checkError(new Error('Unexpected object count: ' + result.length), requestContext.request, response, "loading " + collectionName + " object");
 					}
@@ -862,6 +867,21 @@ function dropDBHandler(requestContext) {
 	return true;
 }
 
+function getActorID(actor, callback) {
+	"use strict";
+	async.series([exports.storeActors([actor], callback),
+		exports.findActorMatches([actor], callback)],
+		function (error, results) {
+			if (error !== null && error !== undefined) {
+				callback(error);
+			} else if (results.length === 1) {
+				callback(null, results[0]._id);
+			} else {
+				callback(new Error("Failed to find ID for actor: " + JSON.stringify(actor, null, 4)));
+			}
+		});
+}
+
 exports.storeActivities = storeActivities;
 exports.storeActors = storeActors;
 exports.storeProcessedStatements = storeProcessedStatements;
@@ -871,3 +891,5 @@ exports.handleKVPRequest = handleKVPRequest;
 exports.getActorId = getActorId;
 exports.init = init;
 exports.dropDBHandler = dropDBHandler;
+exports.findActorMatches = findActorMatches;
+exports.getActorID = getActorID;

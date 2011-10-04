@@ -14,7 +14,7 @@ function parseProfileRequest(parts, requestContext, callback) {
 	operation.collection = parts[1].toLowerCase() === 'activities' ? requestContext.storage.collections.activity_profile : requestContext.storage.collections.actor_profile;
 
 	if (parts[4] !== undefined) {
-		key.key = decodeURIComponent(parts[3]);
+		key.key = decodeURIComponent(parts[4]);
 	}
 
 	if (parts[1].toLowerCase() === 'actors') {
@@ -48,7 +48,7 @@ function handleProfile(requestContext) {
 
 	if (parts === null) {
 		return false;
-	} else if (parts[4] === undefined && request.method !== 'DELETE') {
+	} else if (parts[4] === undefined && (request.method !== 'DELETE' && request.method !== 'GET')) {
 		return false;
 	} else {
 		parseProfileRequest(parts, requestContext, function (error, operation) {

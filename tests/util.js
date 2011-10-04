@@ -40,7 +40,18 @@ Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity",
 
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback) {
 	"use strict";
-	var xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest(),
+		actorKey;
+
+	if (method === 'GET') {
+		actorKey = JSON.parse(JSON.stringify(this.actor)); // "clone"
+		delete actorKey.name; // remove name since it doesn't have the reverse functional property (not useful as part of the ID)
+	} else {
+		actorKey = this.actor;
+	}
+
+	url = url.replace('<activity ID>', encodeURIComponent(this.activity.id));
+	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(actorKey)));
 
 	if (method !== 'PUT' && method !== 'POST' && data !== null) {
 		throw new Error('data not valid for method: ' + method);
@@ -53,8 +64,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	}
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {
-			equal(xhr.status, expectedStatus, method + ': ' + url + ' (status)');
-			equal(xhr.statusText, expectedStatusText, method + ': ' + url + ' (status)');
+			equal(xhr.status.toString() + ' : ' + xhr.statusText, expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
 			callback(xhr);
 		}
 	};
@@ -63,7 +73,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
 Util.prototype.validateStatement = function (responseText, statement, id) {
 	"use strict";
-	var responseObj = JSON.parse(responseText);
+	var responseObj = this.tryJSONParse(responseText);
 
 	ok(responseObj.authority !== undefined, "LRS expected to add authority");
 	equal(responseObj.id, id, "LRS expected to use specified ID");
@@ -84,7 +94,6 @@ Util.prototype.getMultipleTest = function (env, url, queryString) {
 		testText = 'test test text : ' + env.id,
 		urlKey;
 
-	url = this.buildURL(env, url);
 	urlKey = url.addFS() + env.id;
 
 	if (queryString === undefined) {
@@ -95,11 +104,7 @@ Util.prototype.getMultipleTest = function (env, url, queryString) {
 		env.util.request('PUT', urlKey + '[2]' + queryString, testText, true, 204, 'No Content', function () {
 			env.util.request('GET', url + queryString, null, true, 200, 'OK', function (xhr) {
 				var ii, keys, found1, found2;
-				try {
-					keys = JSON.parse(xhr.responseText);
-				} catch (ex) {
-					keys = {};
-				}
+				keys = env.util.tryJSONParse(xhr.responseText);
 				found1 = found2 = false;
 				for (ii = 0; ii < keys.length; ii++) {
 					if (keys[ii] === env.id + '[1]') {
@@ -108,7 +113,7 @@ Util.prototype.getMultipleTest = function (env, url, queryString) {
 						found2 = true;
 					}
 				}
-				ok(found1 && found2, 'Failed to return keys just added');
+				ok(found1 && found2, 'Return keys just added');
 				start();
 			});
 		});
@@ -117,16 +122,15 @@ Util.prototype.getMultipleTest = function (env, url, queryString) {
 
 Util.prototype.putGetDeleteStateTest = function (env, url) {
 	"use strict";
-	var testText = 'profile / state test text : ' + env.id;
+	var testText = 'profile / state test text : ' + env.id,
+		urlKey = url.addFS() + env.id;
 
-	url = this.buildURL(env, url);
-
-	env.util.request('GET', url, null, true, 404, 'Not Found', function () {
-		env.util.request('PUT', url, testText, true, 204, 'No Content', function () {
-			env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+	env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
+		env.util.request('PUT', urlKey, testText, true, 204, 'No Content', function () {
+			env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
 				equal(xhr.responseText, testText);
-				env.util.request('DELETE', url, null, true, 204, 'No Content', function () {
-					env.util.request('GET', url, null, true, 404, 'Not Found', function () {
+				env.util.request('DELETE', urlKey, null, true, 204, 'No Content', function () {
+					env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
 						start();
 					});
 				});
@@ -135,14 +139,15 @@ Util.prototype.putGetDeleteStateTest = function (env, url) {
 	});
 };
 
-Util.prototype.buildURL = function (env, url) {
+Util.prototype.tryJSONParse = function (text) {
 	"use strict";
-	url = url.replace('<activity ID>', encodeURIComponent(env.util.activity.id));
-	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(env.util.actor)));
-
-	return url;
+	try {
+		return JSON.parse(text);
+	} catch (ex) {
+		ok(false, ex.message + ' : ' + text);
+		return {};
+	}
 };
-
 
 String.prototype.addFS = function () {
 	"use strict";

@@ -10,31 +10,25 @@ module('Actors', {
 });
 
 //PUT | GET | DELETE http://example.com/TCAPI/actors/<actor>/profile/<profile object key>
-asyncTest('Profile',function () {
+asyncTest('Profile', function () {
 	"use strict";
 	actorEnv.util.putGetDeleteStateTest(actorEnv, '/actors/<actor>/profile/');
 });
 
 //GET http://example.com/TCAPI/actors/<actor>
-asyncTest('Definition', 3, function () {
+asyncTest('Definition', function () {
 	"use strict";
 	var env = actorEnv,
-		url = env.util.buildURL(env, '/actors/<actor>');
+		url = '/actors/<actor>';
 
 	env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
-		var profile;
-		try {
-			profile = JSON.parse(xhr.responseText);
-		} catch (ex) {
-			profile = {};
-		}
-		equal(profile.mbox, env.util.actor.mbox, 'actor mbox');
+		equal(env.util.tryJSONParse(xhr.responseText).mbox, env.util.actor.mbox, 'actor mbox');
 		start();
 	});
 });
 
 //GET http://example.com/TCAPI/actors/<actor>/profile[?since=<timestamp>]
-asyncTest('Profile, multiple', function() {
+asyncTest('Profile, multiple', function () {
 	"use strict";
 	actorEnv.util.getMultipleTest(actorEnv, '/actors/<actor>/profile');
 });

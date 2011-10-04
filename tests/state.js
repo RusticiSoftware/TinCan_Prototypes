@@ -24,22 +24,23 @@ function putGetStateTest(env, useRegistration) {
 	"use strict";
 	var url = '/activities/<activity ID>/state/<actor>/' + env.id,
 		reg = '',
+		wrongReg = '',
 		stateText = 'state test text : ' + env.id;
 
 	if (useRegistration) {
 		reg = '?registration=autoTestReg1';
+		wrongReg = '?registration=autoTestRegWRONG';
 	}
-
-	url = url.replace('<activity ID>', encodeURIComponent(env.util.activity.id));
-	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(env.util.actor)));
 
 	env.util.request('GET', url + reg, null, true, 404, 'Not Found', function () {
 		env.util.request('PUT', url + reg, stateText, true, 204, 'No Content', function () {
-			env.util.request('GET', url + reg, null, true, 200, 'OK', function (xhr) {
-				equal(xhr.responseText, stateText);
-				env.util.request('DELETE', url + reg, null, true, 204, 'No Content', function () {
-					env.util.request('GET', url + reg, null, true, 404, 'Not Found', function () {
-						start();
+			env.util.request('GET', url + wrongReg, null, true, useRegistration ? 404 : 200, useRegistration ? 'Not Found' : 'OK', function () {
+				env.util.request('GET', url + reg, null, true, 200, 'OK', function (xhr) {
+					equal(xhr.responseText, stateText);
+					env.util.request('DELETE', url + reg, null, true, 204, 'No Content', function () {
+						env.util.request('GET', url + reg, null, true, 404, 'Not Found', function () {
+							start();
+						});
 					});
 				});
 			});
@@ -58,9 +59,6 @@ function clearStateTest(env, useRegistration) {
 		reg = '?registration=autoTestReg1';
 	}
 
-	url = url.replace('<activity ID>', encodeURIComponent(env.util.activity.id));
-	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(env.util.actor)));
-
 	env.util.request('GET', urlKey + reg, null, true, 404, 'Not Found', function () {
 		env.util.request('PUT', urlKey + reg, stateText, true, 204, 'No Content', function () {
 			env.util.request('GET', urlKey, null, true, useRegistration ? 404 : 200, useRegistration ? 'Not Found' : 'OK', function () {
@@ -78,15 +76,15 @@ function clearStateTest(env, useRegistration) {
 }
 
 
-asyncTest('PUT/GET/DELETE', 11, function () { "use strict"; putGetStateTest(stateEnv, false); });
-asyncTest('PUT/GET/DELETE (with registration)', 11, function () { "use strict"; putGetStateTest(stateEnv, true); });
-asyncTest('clear state', 14, function () { "use strict"; clearStateTest(stateEnv, false); });
-asyncTest('clear state (registration)', 14, function () { "use strict"; clearStateTest(stateEnv, true); });
-asyncTest('GET multiple state keys (with registration)', 7, function () { 
+asyncTest('PUT/GET/DELETE', function () { "use strict"; putGetStateTest(stateEnv, false); });
+asyncTest('PUT/GET/DELETE (with registration)', function () { "use strict"; putGetStateTest(stateEnv, true); });
+asyncTest('clear state', function () { "use strict"; clearStateTest(stateEnv, false); });
+asyncTest('clear state (registration)', function () { "use strict"; clearStateTest(stateEnv, true); });
+asyncTest('GET multiple state keys', function () {
 	"use strict";
 	stateEnv.util.getMultipleTest(stateEnv, '/activities/<activity ID>/state/<actor>');
 });
-asyncTest('GET multiple state keys (with registration)', 7, function () { 
+asyncTest('GET multiple state keys (with registration)', function () {
 	"use strict";
-	stateEnv.util.getMultipleTest(stateEnv, '/activities/<activity ID>/state/<actor>', '?registration=autoTestReg1'); 
+	stateEnv.util.getMultipleTest(stateEnv, '/activities/<activity ID>/state/<actor>', '?registration=autoTestReg1');
 });

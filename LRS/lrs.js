@@ -9,6 +9,7 @@ config = require('./config.js');
 requestHandlers = [require('./statement_handler.js').handleRequest,
 	require('./activity_handler.js').handleRequest,
 	require('./profile_handler.js').handleProfile,
+	require('./actor_handler.js').handleRequest,
 	storage.dropDBHandler];
 util = require('./util.js');
 
