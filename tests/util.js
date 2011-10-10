@@ -1,3 +1,5 @@
+//globals: equal, responseText, statement, ok, deepEqual, QUnit, module, asyncTest, Util, start, golfStatements, console
+/*jslint bitwise: true, browser: true, plusplus: true, maxerr: 50, indent: 4 */
 function Util() {
 	"use strict";
 	var ii;
@@ -64,11 +66,19 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	}
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {
-			equal(xhr.status.toString() + ' : ' + xhr.statusText, expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
+			if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
+				equal(xhr.status.toString() + ' : ' + xhr.statusText, expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
+			}
 			callback(xhr);
 		}
 	};
-	xhr.send(data);
+	try {
+		xhr.send(data);
+	} catch (ex) {
+		ok(false, ex.toString());
+		console.error(ex.toString());
+		start();
+	}
 };
 
 Util.prototype.validateStatement = function (responseText, statement, id) {
@@ -90,8 +100,7 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 
 Util.prototype.getMultipleTest = function (env, url, queryString) {
 	"use strict";
-	var reg = '',
-		testText = 'test test text : ' + env.id,
+	var testText = 'test test text : ' + env.id,
 		urlKey;
 
 	urlKey = url.addFS() + env.id;
@@ -101,22 +110,49 @@ Util.prototype.getMultipleTest = function (env, url, queryString) {
 	}
 
 	env.util.request('PUT', urlKey + '[1]' + queryString, testText, true, 204, 'No Content', function () {
-		env.util.request('PUT', urlKey + '[2]' + queryString, testText, true, 204, 'No Content', function () {
-			env.util.request('GET', url + queryString, null, true, 200, 'OK', function (xhr) {
-				var ii, keys, found1, found2;
-				keys = env.util.tryJSONParse(xhr.responseText);
-				found1 = found2 = false;
-				for (ii = 0; ii < keys.length; ii++) {
-					if (keys[ii] === env.id + '[1]') {
-						found1 = true;
-					} else if (keys[ii] === env.id + '[2]') {
-						found2 = true;
+		env.util.getServerTime(null, function (error, timestamp) {
+			env.util.request('PUT', urlKey + '[2]' + queryString, testText, true, 204, 'No Content', function () {
+				queryString += (queryString === "" ? '?' : '&') + 'since=' + timestamp.toString();
+				env.util.request('GET', url + queryString, null, true, 200, 'OK', function (xhr) {
+					var ii, keys, found1, found2;
+					keys = env.util.tryJSONParse(xhr.responseText);
+					found1 = found2 = false;
+					for (ii = 0; ii < keys.length; ii++) {
+						if (keys[ii] === env.id + '[1]') {
+							found1 = true;
+						} else if (keys[ii] === env.id + '[2]') {
+							found2 = true;
+						}
 					}
-				}
-				ok(found1 && found2, 'Return keys just added');
-				start();
+					ok(found2, 'Key added after timestamp returned');
+					ok(!found1, 'Key added before timestamp not returned');
+					start();
+				});
 			});
 		});
+	});
+};
+
+// get the server time, based on when the statement with the specified ID was stored.
+// if no ID specified, store a new statement and get its time.
+Util.prototype.getServerTime = function (id, callback) {
+	"use strict";
+	var statement = {},
+		util = this;
+
+	// if ID not specified, 
+	if (id === null || id === undefined) {
+		id = this.ruuid();
+		statement.verb = 'imported';
+		statement.object = { id: "about:blank" };
+		this.request('PUT', '/Statements/' + id, JSON.stringify(statement), true, null, null, function (xhr) {
+			util.getServerTime(id, callback);
+		});
+		return;
+	}
+
+	this.request('GET', '/Statements/' + id, null, true, null, null, function (xhr) {
+		callback(null, util.tryJSONParse(xhr.responseText).stored);
 	});
 };
 
@@ -129,9 +165,14 @@ Util.prototype.putGetDeleteStateTest = function (env, url) {
 		env.util.request('PUT', urlKey, testText, true, 204, 'No Content', function () {
 			env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
 				equal(xhr.responseText, testText);
-				env.util.request('DELETE', urlKey, null, true, 204, 'No Content', function () {
-					env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
-						start();
+				env.util.request('PUT', urlKey, testText + '_modified', true, 204, 'No Content', function () {
+					env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
+						equal(xhr.responseText, testText + '_modified');
+						env.util.request('DELETE', urlKey, null, true, 204, 'No Content', function () {
+							env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
+								start();
+							});
+						});
 					});
 				});
 			});
@@ -158,6 +199,11 @@ String.prototype.addFS = function () {
 	}
 };
 
+Util.prototype.clone = function (a) {
+	"use strict";
+	return JSON.parse(JSON.stringify(a));
+};
+
 /*!
 Modified from: Math.uuid.js (v1.4)
 http://www.broofa.com
@@ -169,7 +215,7 @@ Dual licensed under the MIT and GPL licenses.
 Util.prototype.ruuid = function () {
 	"use strict";
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-		var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
 		return v.toString(16);
 	});
-}
+};

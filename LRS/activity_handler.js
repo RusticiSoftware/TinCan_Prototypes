@@ -8,10 +8,8 @@ async = require('async');
 
 function parseStateRequest(storage, methodParts, callback) {
 	"use strict";
-	var key = {},
-		qsParameters;
+	var key = {};
 
-	qsParameters = util.extractQS(methodParts);
 	key.activity = decodeURIComponent(methodParts[0]);
 	key.actor = JSON.parse(decodeURIComponent(methodParts[2]));
 	if (methodParts.length > 3) {
@@ -20,7 +18,7 @@ function parseStateRequest(storage, methodParts, callback) {
 
 	storage.getActorID(key.actor, function (error, actorId) {
 		key.actor = actorId;
-		callback(error, key, qsParameters);
+		callback(error, key);
 	});
 }
 
@@ -42,7 +40,7 @@ function clearState(requestContext, key, collection) {
 
 function handleActivityRequest(requestContext) {
 	"use strict";
-	var request, response, parts, collections;
+	var request, response, parts, collections, qsParameters;
 	request = requestContext.request;
 	response = requestContext.response;
 	collections = requestContext.storage.collections;
@@ -51,16 +49,15 @@ function handleActivityRequest(requestContext) {
 		return false;
 	}
 
-	if (request.url.toLowerCase().indexOf(method) !== 0) {
+	if (requestContext.path.toLowerCase().indexOf(method) !== 0) {
 		return false;
 	}
-	parts = request.url.toLowerCase().substring(method.length + 1).split('/');
+	parts = requestContext.path.toLowerCase().substring(method.length + 1).split('/');
 	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && (request.method === 'DELETE' || request.method === 'GET')))) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
-		parseStateRequest(requestContext.storage, parts, function (error, key, qsParameters) {
-			if (qsParameters.registration !== undefined || (request.method === 'GET' && key.key !== undefined)) {
-				key.registration = qsParameters.registration;
-			}
+		parseStateRequest(requestContext.storage, parts, function (error, key) {
+			// always use provided registration (even undefined -- only select state with no defined registration in that case)
+			key.registration = requestContext.queryString.registration;
 			if (util.checkError(error, requestContext.request, response, "parse state request")) {
 				requestContext.storage.handleKVPRequest(requestContext, key, parts.length === 3, collections.state);
 			}

@@ -1,10 +1,11 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb;
+var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb, dbName;
 util = require('./util.js');
 mongodb = require('mongodb');
 async = require('async');
 collections = {};
+dbName = "";
 
 collectionNames = ['statements', 'actors', 'activities', 'state', 'activity_profile', 'actor_profile'];
 actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
@@ -691,9 +692,11 @@ function buildStatementQuery(parameters, callback) {
 
 function handleKVPRequest(requestContext, key, multirow, collection) {
 	"use strict";
-	var method, response, collectionName;
+	var method, response, collectionName, now, since;
 	method = requestContext.request.method;
 	response = requestContext.response;
+	now = new Date();
+	since = requestContext.queryString.since;
 
 	function query(key) {
 		var queryExp, prop;
@@ -704,6 +707,12 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 			}
 		}
 
+		if (since !== null && since !== undefined) {
+			queryExp.updated = { $gt : new Date(since)};
+		}
+
+		console.log(JSON.stringify(queryExp, null, 4));
+
 		return queryExp;
 	}
 
@@ -711,12 +720,10 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 		collectionName = collection.collectionName;
 		if (method === 'PUT') {
 			util.loadRequestBody(requestContext.request, function (error, data) {
-				console.log('load request');
 				if (!util.checkError(error, requestContext.request, response, "parsing request to store " + collectionName + " object")) {
 					return;
 				}
-				collection.save({_id : key, data : data}, { safe : true }, function (error) {
-					console.log(collectionName + ' ' + JSON.stringify({_id : key, data : data}, null, 4));
+				collection.save({_id : key, data : data, updated: now}, { safe : true }, function (error) {
 					if (util.checkError(error, requestContext.request, response, "storing " + collectionName + " object")) {
 						response.statusCode = 204;
 						response.end('');
@@ -724,7 +731,7 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 				});
 			});
 		} else if (method === 'DELETE') {
-			collection.remove(query(key), { safe : true }, function (error) {
+			collection.remove(query(key, since), { safe : true }, function (error) {
 				if (util.checkError(error, requestContext.request, response, "clearing " + collectionName + " object")) {
 					response.statusCode = 204;
 					response.end('');
@@ -732,7 +739,7 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 			});
 		} else {
 			// then get
-			collection.find(query(key)).toArray(function (error, result) {
+			collection.find(query(key, since)).toArray(function (error, result) {
 				var ids = [],
 					ii;
 				if (util.checkError(error, requestContext.request, response, "loading " + collectionName + " object")) {
@@ -783,10 +790,11 @@ function getActorId(actor, callback) {
 	});
 }
 
-function init(dbName, initCallback) {
+function init(dbNameParam, initCallback) {
 	"use strict";
 	var db, storage, mongoserver;
 
+	dbName = dbNameParam;
 	mongoserver = new mongodb.Server('localhost', mongodb.Connection.DEFAULT_PORT);
 	db = new mongodb.Db(dbName, mongoserver);
 	storage = exports;
@@ -846,7 +854,7 @@ function dropDatabase(callback) {
 function dropDBHandler(requestContext) {
 	"use strict";
 
-	if (requestContext.request.method !== 'DELETE' || !requestContext.request.url.match(/^\/tcapi\/?$/i)) {
+	if (requestContext.request.method !== 'DELETE' || !requestContext.requestContext.path.match(/^\/tcapi\/?$/i)) {
 		return false;
 	}
 	console.log('*** Dropping Database! ***');
@@ -855,7 +863,7 @@ function dropDBHandler(requestContext) {
 			console.log(result);
 
 			// re-initialize, re-create DB
-			requestContext.storage.init(function (error) {
+			requestContext.storage.init(dbName, function (error) {
 				if (error) {
 					throw error;
 				}

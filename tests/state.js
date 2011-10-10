@@ -64,7 +64,7 @@ function clearStateTest(env, useRegistration) {
 			env.util.request('GET', urlKey, null, true, useRegistration ? 404 : 200, useRegistration ? 'Not Found' : 'OK', function () {
 				env.util.request('GET', urlKey + reg, null, true, 200, 'OK', function (xhr) {
 					equal(xhr.responseText, stateText);
-					env.util.request('DELETE', url, null, true, 204, 'No Content', function () {
+					env.util.request('DELETE', url + reg, null, true, 204, 'No Content', function () {
 						env.util.request('GET', urlKey + reg, null, true, 404, 'Not Found', function () {
 							start();
 						});

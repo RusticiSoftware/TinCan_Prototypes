@@ -15,7 +15,8 @@ util = require('./util.js');
 
 function handleRequest(request, response, storage) {
 	"use strict";
-	var handled, ii, requestContext;
+	var handled, ii, requestContext, urlParts, path,
+		queryString = {};
 
 	response.setHeader('Content-Type', 'text/plain');
 	response.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,7 +33,17 @@ function handleRequest(request, response, storage) {
 			response.end();
 		} else {
 			handled = false;
-			requestContext = {request : request, response : response, storage: storage};
+			urlParts = request.url.split('?');
+			path = urlParts[0];
+			if (urlParts.length === 2) {
+				queryString = require('querystring').parse(urlParts[1]);
+			} else if (urlParts.length > 2) {
+				console.error('Unexpected request: ' + request.method + " : " + request.url);
+				response.statusCode = 405;
+				response.end();
+				return;
+			}
+			requestContext = {request : request, response : response, storage: storage, path: path, queryString: queryString};
 			for (ii = 0; ii < requestHandlers.length; ii++) {
 				if (requestHandlers[ii](requestContext)) {
 					handled = true;

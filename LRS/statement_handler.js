@@ -131,6 +131,16 @@ function processStatements(statements, storage, request, callback) {
 	});
 }
 
+function validateId(id, response) {
+	"use strict";
+	if (!id.match(/^\{?[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}\}?$/)) {
+		response.statusCode = 400;
+		response.end('Bad ID: "' + id + '", expected UUID as 32 hex digits, optionally grouped 8-4-4-4-12 with hyphens.');
+		return false;
+	}
+	return true;
+}
+
 function handleStatementGetRequest(requestContext) {
 	"use strict";
 	var query, limit, request, methodDetail, parameters, sparse, offset;
@@ -142,27 +152,23 @@ function handleStatementGetRequest(requestContext) {
 	query = {};
 	parameters = {};
 
-	if (request.url.length > method.length) {
-		methodDetail = request.url.substring(method.length);
+	if (requestContext.path.length > method.length) {
+		methodDetail = requestContext.path.substring(method.length);
 
-		// statements?query or statements/?query are both valid, 
-		if ('/' === methodDetail.charAt(0)) {
-			methodDetail = methodDetail.substring(1);
-		} else if ('?' !== methodDetail.charAt(0)) {
-			throw new Error('Invalid request, expected "?" or "/" after statements');
+		if ('/' !== methodDetail.charAt(0)) {
+			return false;
+		}
+		methodDetail = methodDetail.substring(1);
+
+		parameters = { id : methodDetail };
+		if (!validateId(parameters.id, requestContext.response)) {
+			return true;
 		}
 
-		if (methodDetail.indexOf('/') >= 0) {
-			throw new Error('Invalid request, "/" not expected in method detail');
-		}
-
-		if (methodDetail.charAt(0) === '?') {
-			parameters = require('querystring').parse(methodDetail.substring(1));
-			util.parseProps(parameters);
-		} else if (methodDetail.length > 0) {
-			parameters = { id : methodDetail };
-			sparse = false;
-		}
+		sparse = false;
+	} else if (requestContext.queryString !== '') {
+		parameters = require('querystring').parse(requestContext.queryString);
+		util.parseProps(parameters);
 		if (parameters.limit !== undefined) {
 			limit = parseInt(parameters.limit, 10);
 		}
@@ -199,20 +205,28 @@ function handleStatementGetRequest(requestContext) {
 			}
 		});
 	});
+	return true;
 }
 
 function handleStatementSetRequest(requestContext) {
 	"use strict";
-	var responseText, ii, request, response;
+	var responseText, ii, request, response, id;
 
 	request = requestContext.request;
 	response = requestContext.response;
+
+	if (request.method === 'PUT') {
+		id = requestContext.path.substring(method.length + 1);
+		if (!validateId(id, requestContext.response)) {
+			return true;
+		}
+	}
 
 	util.parseJSONRequest(request, function (error, data) {
 		//console.log('data: ' + JSON.stringify(data, null, 4));
 		if (util.checkError(error, request, response, "parsing request body")) {
 			if (request.method === 'PUT') {
-				data.id = request.url.substring(method.length + 1);
+				data.id = id;
 				// wrap statement in an array since processStatements expects multiple statements
 				processStatements([data], requestContext.storage, request, function (error) {
 					if (util.checkError(error, request, response, "storing statements")) {
@@ -243,6 +257,7 @@ function handleStatementSetRequest(requestContext) {
 			}
 		}
 	});
+	return true;
 }
 
 function handleStatementRequest(requestContext) {
@@ -250,12 +265,10 @@ function handleStatementRequest(requestContext) {
 	var request;
 	request = requestContext.request;
 
-	if (request.url.toLowerCase().indexOf(method) === 0 && (request.method === 'GET')) {
-		handleStatementGetRequest(requestContext);
-		return true;
-	} else if (request.url.toLowerCase().indexOf(method) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
-		handleStatementSetRequest(requestContext);
-		return true;
+	if (requestContext.path.toLowerCase().indexOf(method) === 0 && (request.method === 'GET')) {
+		return handleStatementGetRequest(requestContext);
+	} else if (requestContext.path.toLowerCase().indexOf(method) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
+		return handleStatementSetRequest(requestContext);
 	} else {
 		return false;
 	}

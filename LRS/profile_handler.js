@@ -44,7 +44,7 @@ function handleProfile(requestContext) {
 	}
 
 	//actor/activity profile
-	parts = /tcapi\/(actors|activities)\/([^\/]+)\/profile(\/([^\/]+)\/?)?/i.exec(request.url);
+	parts = /tcapi\/(actors|activities)\/([^\/]+)\/profile(\/([^\/]+)\/?)?/i.exec(requestContext.path);
 
 	if (parts === null) {
 		return false;

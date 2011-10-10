@@ -94,6 +94,98 @@ asyncTest('Reject Actor Modification', function () {
 	});
 });
 
+asyncTest('Bad Verb', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/Statements/' + util.ruuid(),
+		statement = util.clone(env.statement);
+
+	statement.verb = 'not a valid verb';
+	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr) {
+		// should return an error message, can't validatate content, but make sure it's there
+		ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+		util.request('GET', url, null, true, 404, 'Not Found', function () {
+			start();
+		});
+	});
+});
+
+asyncTest('Bad ID', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/Statements/' + util.ruuid() + 'bad_id',
+		statement = util.clone(env.statement);
+
+	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr) {
+		// should return an error message, can't validatate content, but make sure it's there
+		ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+		util.request('GET', url, null, true, 400, 'Bad Request', function () {
+			start();
+		});
+	});
+});
+
+asyncTest('pass special handling', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/Statements/' + util.ruuid(),
+		statement = util.clone(env.statement);
+
+	statement.verb = 'passed';
+
+	util.request('PUT', url, JSON.stringify(statement), true, 204, 'No Content', function (xhr) {
+		util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			var response = JSON.parse(xhr.responseText);
+			equal(response.verb, 'passed', 'verb');
+			equal(response.result.success, true, 'success');
+			equal(response.result.completion, true, 'completion');
+			start();
+		});
+	});
+});
+
+asyncTest('fail special handling', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/Statements/' + util.ruuid(),
+		statement = util.clone(env.statement);
+
+	statement.verb = 'failed';
+
+	util.request('PUT', url, JSON.stringify(statement), true, 204, 'No Content', function (xhr) {
+		util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			var response = JSON.parse(xhr.responseText);
+			equal(response.verb, 'failed', 'verb');
+			equal(response.result.success, false, 'success');
+			equal(response.result.completion, true, 'completion');
+			start();
+		});
+	});
+});
+
+asyncTest('completed special handling', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/Statements/' + util.ruuid(),
+		statement = util.clone(env.statement);
+
+	statement.verb = 'completed';
+
+	util.request('PUT', url, JSON.stringify(statement), true, 204, 'No Content', function (xhr) {
+		util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			var response = JSON.parse(xhr.responseText);
+			equal(response.verb, 'completed', 'verb');
+			equal(response.result.completion, true, 'completion');
+			start();
+		});
+	});
+});
+
 
 asyncTest('POST', function () {
 	"use strict";
