@@ -6,8 +6,11 @@ function Util() {
 
 	this.golfStatements = JSON.parse(JSON.stringify(golfStatements)); // "clone"
 	for (ii = 0; ii < this.golfStatements.length; ii++) {
-		this.golfStatements[ii].actor.mbox = this.actor.mbox;
-		this.golfStatements[ii].actor.name = this.actor.name;
+		if (this.golfStatements[ii].actor) {
+			this.golfStatements[ii].actor.mbox = this.actor.mbox;
+			this.golfStatements[ii].actor.name = this.actor.name;
+		}
+		this.golfStatements[ii].id = this.ruuid();
 	}
 }
 
@@ -39,6 +42,33 @@ Util.prototype.auth = "Basic dGVzdDpwYXNzd29yZA==";
 Util.prototype.actor = { mbox : "mailto:auto_tests@example.scorm.com", name : "Auto Test Learner"};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { title : 'Tin Can Auto Test Activity' } };
+Util.prototype.actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
+
+Util.prototype.areActorsEqual = function (source, target) {
+	"use strict";
+	var prop;
+
+	for (prop in source) {
+		if (source.hasOwnProperty(prop) && this.inList(prop, this.actorUniqueProps)) {
+			if (source[prop] === target[prop] || JSON.stringify(source[prop]) === JSON.stringify(target[prop])) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+};
+
+Util.prototype.inList = function (test, list) {
+	"use strict";
+	var ii;
+	for (ii = 0; ii < list.length; ii++) {
+		if (test === list[ii] || (typeof test === 'object' && (JSON.stringify(test) === JSON.stringify(list[ii])))) {
+			return true;
+		}
+	}
+	return false;
+};
 
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback) {
 	"use strict";
@@ -83,7 +113,17 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
 Util.prototype.validateStatement = function (responseText, statement, id) {
 	"use strict";
-	var responseObj = this.tryJSONParse(responseText);
+	var responseObj;
+
+	if (responseText.id !== undefined) {
+		responseObj = responseText;
+	} else {
+		responseObj = this.tryJSONParse(responseText);
+	}
+
+	if (responseObj.id === undefined) {
+		ok(false, 'statement ID missing');
+	}
 
 	ok(responseObj.authority !== undefined, "LRS expected to add authority");
 	equal(responseObj.id, id, "LRS expected to use specified ID");
@@ -91,9 +131,14 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 
 
 	// since LRS adds these values, comparison will fail if included
-	delete responseObj.id;
+	if (statement.id === undefined) {
+		delete responseObj.id;
+	}
 	delete responseObj.authority;
 	delete responseObj.stored;
+	if (responseObj.context !== undefined && responseObj.context.activity !== undefined) {
+		delete responseObj.context.activity.definition;
+	}
 
 	deepEqual(responseObj, statement, "statement");
 };

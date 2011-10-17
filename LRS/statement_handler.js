@@ -4,6 +4,7 @@ var exports, method, util, async, verbs;
 method = '/tcapi/statements';
 util = require('./util.js');
 async = require('async');
+
 verbs = ["experienced", "read", "watched", "witnessed", "studied", "reviewed", "learned", "attended",
 	"heard", "attempted", "performed", "played", "simulated", "completed", "passed", "mastered",
 	"failed", "answered", "interacted", "drove", "piloted", "used", "achieved", "participated",
@@ -71,22 +72,25 @@ function prepareStatement(statement, request) {
 accepts object consisting of either a statement, or an array of statements
 validates and stores statements, calls back with error, array of IDs
 */
-function processStatements(statements, storage, request, callback) {
+function processStatements(postedStatements, storage, request, callback) {
 	"use strict";
-	var actors, activities, statement, processedStatements, context, ii, error, validationError;
+	var actors, activities, statement, processedStatements, context, ii, error, validationError, statements;
 
 	actors = [];
 	activities = [];
 	processedStatements = [];
+	statements = [];
 
-	for (ii = 0; ii < statements.length; ii++) {
-		validationError = isValidStatement(statements[ii], request);
+	for (ii = 0; ii < postedStatements.length; ii++) {
+		validationError = isValidStatement(postedStatements[ii], request);
 		if (validationError !== '') {
 			error = new Error(validationError);
 			error.HTTPStatus = 400;
 			callback(error);
 			return;
 		}
+		// copy while validating, to avoid modifying the contents of the array of posted statemets passed in
+		statements.push(postedStatements[ii]);
 	}
 
 	// statements are stored in their entierty as sent, but actors and activities used in the statement
@@ -146,15 +150,14 @@ function handleStatementGetRequest(requestContext) {
 	var query, limit, request, methodDetail, parameters, sparse, offset;
 
 	request = requestContext.request;
-	limit = 0;
+	limit = 50;
 	offset = 0;
 	sparse = true;
 	query = {};
 	parameters = {};
 
-	if (requestContext.path.length > method.length) {
+	if (requestContext.path.length > method.length + 1) {
 		methodDetail = requestContext.path.substring(method.length);
-
 		if ('/' !== methodDetail.charAt(0)) {
 			return false;
 		}
@@ -166,8 +169,8 @@ function handleStatementGetRequest(requestContext) {
 		}
 
 		sparse = false;
-	} else if (requestContext.queryString !== '') {
-		parameters = require('querystring').parse(requestContext.queryString);
+	} else if (requestContext.queryString !== {}) {
+		parameters = requestContext.queryString;
 		util.parseProps(parameters);
 		if (parameters.limit !== undefined) {
 			limit = parseInt(parameters.limit, 10);
@@ -210,7 +213,7 @@ function handleStatementGetRequest(requestContext) {
 
 function handleStatementSetRequest(requestContext) {
 	"use strict";
-	var responseText, ii, request, response, id;
+	var ii, request, response, id;
 
 	request = requestContext.request;
 	response = requestContext.response;
@@ -239,39 +242,57 @@ function handleStatementSetRequest(requestContext) {
 				if (!(data instanceof Array)) {
 					data = [data];
 				}
-
 				// process/store statements as a set
 				processStatements(data, requestContext.storage, request, function (error) {
+					var ids = [];
+
 					if (util.checkError(error, request, response, "storing statements")) {
 						response.statusCode = 200;
-						responseText = "";
 						for (ii = 0; ii < data.length; ii++) {
-							responseText += data[ii]._id + "\n";
+							ids.push(data[ii]._id);
 						}
-
-						response.end(responseText);
+						response.end(JSON.stringify(ids, null, 4));
 					}
 				});
 			} else {
-				throw "unexpected statement request";
+				util.checkError(new Error("unexpected statement request"), request, response);
 			}
 		}
 	});
 	return true;
 }
 
-function handleStatementRequest(requestContext) {
+exports.handleRequest = function (requestContext) {
 	"use strict";
-	var request;
-	request = requestContext.request;
+	var request = requestContext.request;
 
-	if (requestContext.path.toLowerCase().indexOf(method) === 0 && (request.method === 'GET')) {
-		return handleStatementGetRequest(requestContext);
-	} else if (requestContext.path.toLowerCase().indexOf(method) === 0 && (request.method === 'PUT' || request.method === 'POST')) {
-		return handleStatementSetRequest(requestContext);
-	} else {
-		return false;
+	if (requestContext.path.toLowerCase().indexOf(method) !== 0) {
+		return false; // not a statement request
 	}
-}
 
-exports.handleRequest = handleStatementRequest;
+	util.loadRequestBody(request, function (error, body) {
+		var handled = false;
+		if (util.checkError(error, request, requestContext.response)) {
+			if (request.method === 'GET') {
+				handled = handleStatementGetRequest(requestContext);
+			} else if (request.method === 'POST' && body.length > 0 && !body.match(/^\s*[\[{]/)) {
+				/* logical "GET" requests may use a post if necessary to work around URL limit lengths.
+				the body of such requests would not be JSON (and therefore not start with { or [, 
+				but the body would exist, as if there were no querystring parameters to pass the querystring would not
+				generate a long URL, and the GET method could be used. */
+
+				requestContext.queryString = require('querystring').parse(body);
+
+				handled = handleStatementGetRequest(requestContext);
+			} else if (request.method === 'PUT' || (request.method === 'POST' && requestContext.path.length <= (method.length + 1))) {
+				handled = handleStatementSetRequest(requestContext);
+			}
+		}
+
+		if (!handled) {
+			util.unexpectedRequest(request, requestContext.response);
+		}
+	});
+
+	return true;
+};

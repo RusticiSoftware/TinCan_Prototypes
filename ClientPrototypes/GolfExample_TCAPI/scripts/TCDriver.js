@@ -39,7 +39,7 @@ function TCDriver_SendStatement (lrs,stmt) {
 function TCDriver_SendMultiStatements (lrs,stmtArray) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", lrs.endpoint+"statements/"+_ruuid(), true);
+		xhr.open("POST", lrs.endpoint+"statements/", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Authorization", lrs.auth);
 		xhr.onreadystatechange = function() {

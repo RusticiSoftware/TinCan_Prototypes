@@ -69,6 +69,13 @@ function checkError(error, request, response, text) {
 	return true;
 }
 
+function unexpectedRequest(request, response) {
+	"use strict";
+	console.error('Unexpected request: ' + request.method + " : " + request.url);
+	response.statusCode = 405;
+	response.end();
+}
+
 function storeRequestBody(request) {
 	"use strict";
 	request.data = '';
@@ -149,10 +156,11 @@ function hasAllProperties(object, properties, name) {
 
 function areActorsEqual(source, target) {
 	"use strict";
-	var prop;
+	var prop,
+		actorUniqueProps = require('./storage.js').actorUniqueProps;
 
 	for (prop in source) {
-		if (source.hasOwnProperty(prop)) {
+		if (source.hasOwnProperty(prop) && inList(prop, actorUniqueProps)) {
 			if (source[prop] === target[prop] || JSON.stringify(source[prop]) === JSON.stringify(target[prop])) {
 				return true;
 			}
@@ -234,3 +242,4 @@ exports.addStatementActivities = addStatementActivities;
 exports.addStatementActors = addStatementActors;
 exports.hasElementWithProperty = hasElementWithProperty;
 exports.parseProps = parseProps;
+exports.unexpectedRequest = unexpectedRequest;

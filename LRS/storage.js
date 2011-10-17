@@ -1,7 +1,8 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb, dbName;
+var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb, dbName, sys;
 util = require('./util.js');
+sys = require('sys');
 mongodb = require('mongodb');
 async = require('async');
 collections = {};
@@ -12,6 +13,17 @@ actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'home
 activityIdProps = ['id', 'platform', 'revision'];
 
 exports.collections = collections;
+
+function errorCallback(message, status, callback) {
+	"use strict";
+	var error = new Error(message);
+	error.HTTPStatus = status;
+	if (callback) {
+		callback(error);
+	} else {
+		throw error;
+	}
+}
 
 // merges source into target, returns true if target is updated.
 // exception if source and target contain contradictary information
@@ -32,6 +44,48 @@ function mergeActivities(source, target, onlyEmpty) {
 	}
 
 	return modified;
+}
+
+function getDescendantActivityIds(ids, callback) {
+	"use strict";
+	var ii, jj, id, definition,
+		childIds = [];
+
+	collections.activities.find({ id : {$in : ids } }).toArray(function (error, results) {
+		if (error) {
+			callback(error);
+		} else if (results.length > 0) {
+			for (ii = 0; ii < results.length; ii++) {
+				definition = results[ii].definition;
+				if (definition !== undefined && definition.children !== undefined && definition.children.length > 0) {
+					for (jj = 0; jj < definition.children.length; jj++) {
+						id = definition.children[jj].id;
+						if (!util.inList(id, childIds)) {
+							childIds.push(id);
+						}
+					}
+				}
+			}
+			if (childIds.length > 0) {
+				getDescendantActivityIds(childIds, function (error, results) {
+					if (error) {
+						callback(error);
+					} else if (results.length > 0) {
+						for (ii = 0; ii < results.length; ii++) {
+							if (!util.inList(results[ii], childIds)) {
+								childIds.push(results[ii]);
+							}
+						}
+					}
+					callback(null, childIds);
+				});
+			} else {
+				callback(null, []);
+			}
+		} else {
+			callback(null, []);
+		}
+	});
 }
 
 function hasActorUniqueProperty(actor) {
@@ -144,7 +198,6 @@ function storeActivities(activities, callback) {
 		updates = [];
 
 		if (error !== null) {
-			console.error(error);
 			callback(error);
 		} else {
 			dbActivityMap = {};
@@ -373,9 +426,7 @@ function storeProcessedStatements(statements, callback) {
 				if (dbStatementMap[statement._id] === undefined) {
 					newStatements.push(statement);
 				} else if (!areStatementsEqual(statement, dbStatementMap[statement._id])) {
-					error = new Error('Attempt to redefine statement: ' + statement._id);
-					error.HTTPStatus = 409;
-					callback(error);
+					errorCallback('Attempt to redefine statement: ' + statement._id, 409, callback);
 					return;
 				}
 			}
@@ -588,6 +639,8 @@ function addQueryActorConditions(actorConditions, query, callback) {
 			if (actorConditions.hasOwnProperty(conditionName)) {
 				found = false;
 				for (ii = 0; ii < dbActors.length; ii++) {
+					console.log('actor source: ' + JSON.stringify(actorConditions[conditionName], null, 4));
+
 					if (util.areActorsEqual(actorConditions[conditionName], dbActors[ii])) {
 						if (found === true) {
 							callback(new Error('Inconsistant data, multiple actors match ' + JSON.stringify(actorConditions[conditionName], null, 4)));
@@ -634,9 +687,12 @@ function buildStatementObjectQuery(parameters, actorConditions, query) {
 
 function buildStatementQuery(parameters, callback) {
 	"use strict";
-	var query, parameter, actorConditions;
+	var query, parameter, actorConditions, descendants;
 	query = {};
 	actorConditions = {};
+	descendants = false;
+
+	console.log('Get statements parameters--: ' + sys.inspect(parameters));
 
 	for (parameter in parameters) {
 		if (parameters.hasOwnProperty(parameter) && !util.inList(parameter, ['limit', 'sparse', 'offset'])) {
@@ -648,7 +704,12 @@ function buildStatementQuery(parameters, callback) {
 				query.verb = parameters.verb.toLowerCase();
 				break;
 			case 'object':
-				buildStatementObjectQuery(parameters, actorConditions, query);
+				try {
+					buildStatementObjectQuery(parameters, actorConditions, query);
+				} catch (ex) {
+					callback(ex);
+					return;
+				}
 				break;
 			case 'registration':
 				query.registration = parameters.registration.toLowerCase();
@@ -672,21 +733,56 @@ function buildStatementQuery(parameters, callback) {
 				actorConditions['context.team'] = parameters.team;
 				break;
 			case 'descendants':
-				throw new Error('Not Implemented -- get statements parameter: ' + parameter);
+				if (parameters.descendants === 'true') {
+					descendants = true;
+				} else if (parameters.descendants === 'false') {
+					descendants = false;
+				} else {
+					errorCallback('Unexpected value for "descendants" parameter: ' + parameters.descendants, 400, callback);
+					return;
+				}
+				break;
 			default:
-				throw new Error('Unexpected get statements parameter: ' + parameter);
+				errorCallback('Unexpected get statements parameter: ' + parameter, 400, callback);
+				return;
 			}
 		}
 	}
 
 	addQueryActorConditions(actorConditions, query, function (error) {
+		var activityId;
+
 		if (error !== null && error !== undefined) {
 			callback(error);
 		}
-		console.log('Get statements parameters: ' + JSON.stringify(parameters, null, 4));
-		console.log('query: ' + JSON.stringify(query, null, 4));
 
-		callback(null, query);
+		if (descendants) {
+			if (query["object.id"] === undefined) {
+				errorCallback('Descendants flag used but no activity is specified.', 400, callback);
+				return;
+			}
+			activityId = query["object.id"];
+			delete query["object.id"];
+
+			getDescendantActivityIds([activityId], function (error, ids) {
+				if (error) {
+					callback(error);
+					return;
+				}
+
+				ids.push(activityId);
+				if (query.$or === undefined) {
+					query.$or = [];
+				}
+				query.$or.push({ "object.id" : { $in : ids }});
+				query.$or.push({ "context.activity.id" : { $in : ids }});
+				console.log('query: ' + sys.inspect(query));
+				callback(null, query);
+			});
+		} else {
+			console.log('query: ' + sys.inspect(query));
+			callback(null, query);
+		}
 	});
 }
 
@@ -854,7 +950,7 @@ function dropDatabase(callback) {
 function dropDBHandler(requestContext) {
 	"use strict";
 
-	if (requestContext.request.method !== 'DELETE' || !requestContext.requestContext.path.match(/^\/tcapi\/?$/i)) {
+	if (requestContext.request.method !== 'DELETE' || !requestContext.path.match(/^\/tcapi\/?$/i)) {
 		return false;
 	}
 	console.log('*** Dropping Database! ***');
@@ -901,3 +997,4 @@ exports.init = init;
 exports.dropDBHandler = dropDBHandler;
 exports.findActorMatches = findActorMatches;
 exports.getActorID = getActorID;
+exports.actorUniqueProps = actorUniqueProps;

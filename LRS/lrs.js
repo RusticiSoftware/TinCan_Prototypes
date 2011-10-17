@@ -52,9 +52,7 @@ function handleRequest(request, response, storage) {
 				}
 			}
 			if (!handled) {
-				console.error('Unexpected request: ' + request.method + " : " + request.url);
-				response.statusCode = 405;
-				response.end();
+				util.unexpectedRequest(request, response);
 			}
 		}
 	} catch (ex) {

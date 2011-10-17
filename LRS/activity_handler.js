@@ -22,25 +22,9 @@ function parseStateRequest(storage, methodParts, callback) {
 	});
 }
 
-function clearState(requestContext, key, collection) {
-	"use strict";
-	var response, query;
-	response = requestContext.response;
-
-	query = {"_id.activity" : key.activity, "_id.actor" : key.actor };
-
-	collection.remove(query, { safe : true }, function (error) {
-		error = new Error("doesn't work yet");
-		if (util.checkError(error, requestContext.request, response, "clearing state")) {
-			response.statusCode = 204;
-			response.end('');
-		}
-	});
-}
-
 function handleActivityRequest(requestContext) {
 	"use strict";
-	var request, response, parts, collections, qsParameters;
+	var request, response, parts, collections;
 	request = requestContext.request;
 	response = requestContext.response;
 	collections = requestContext.storage.collections;
@@ -52,8 +36,8 @@ function handleActivityRequest(requestContext) {
 	if (requestContext.path.toLowerCase().indexOf(method) !== 0) {
 		return false;
 	}
-	parts = requestContext.path.toLowerCase().substring(method.length + 1).split('/');
-	if (parts[1] === 'state' && (parts.length === 4 || (parts.length === 3 && (request.method === 'DELETE' || request.method === 'GET')))) {
+	parts = requestContext.path.substring(method.length + 1).split('/');
+	if (parts[1].toLowerCase() === 'state' && (parts.length === 4 || (parts.length === 3 && (request.method === 'DELETE' || request.method === 'GET')))) {
 		//state API: PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/state/<actor>/<State ID>
 		parseStateRequest(requestContext.storage, parts, function (error, key) {
 			// always use provided registration (even undefined -- only select state with no defined registration in that case)
