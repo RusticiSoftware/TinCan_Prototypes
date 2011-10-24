@@ -16,7 +16,7 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 500;
+	QUnit.config.testTimeout = 1000;
 
 	if (env.id === undefined) {
 		// set up test to be shared accross tests (only once)
@@ -38,7 +38,6 @@ Util.init = function (env) {
 };
 
 Util.prototype.endpoint = "http://localhost:8080/TCAPI";
-Util.prototype.auth = "Basic dGVzdDpwYXNzd29yZA==";
 Util.prototype.actor = { mbox : "mailto:auto_tests@example.scorm.com", name : "Auto Test Learner"};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { title : 'Tin Can Auto Test Activity' } };
@@ -92,7 +91,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	xhr.open(method, this.endpoint + url, true);
 	if (useAuth) {
 		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", this.auth);
+		xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
 	}
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {

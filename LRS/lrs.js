@@ -15,7 +15,7 @@ util = require('./util.js');
 
 function handleRequest(request, response, storage) {
 	"use strict";
-	var handled, ii, requestContext, urlParts, path,
+	var handled, ii, requestContext, urlParts, path, authUser,
 		queryString = {};
 
 	response.setHeader('Content-Type', 'text/plain');
@@ -25,9 +25,10 @@ function handleRequest(request, response, storage) {
 
 	try {
 		util.storeRequestBody(request);
+		authUser = util.getAuthenticatedUser(request);
 		if (request.method === 'OPTIONS') {
 			response.end();
-		} else if (!util.isAuthorized(request)) {
+		} else if (!authUser) {
 			response.statusCode = 401;
 			response.setHeader('WWW-Authenticate', 'Basic realm="LRS demo"');
 			response.end();
@@ -38,16 +39,16 @@ function handleRequest(request, response, storage) {
 			if (urlParts.length === 2) {
 				queryString = require('querystring').parse(urlParts[1]);
 			} else if (urlParts.length > 2) {
-				console.error('Unexpected request: ' + request.method + " : " + request.url);
+				console.log('Unexpected request: ' + request.method + " : " + request.url);
 				response.statusCode = 405;
 				response.end();
 				return;
 			}
-			requestContext = {request : request, response : response, storage: storage, path: path, queryString: queryString};
+			requestContext = {request : request, response : response, storage: storage, path: path, queryString: queryString, user: authUser};
 			for (ii = 0; ii < requestHandlers.length; ii++) {
 				if (requestHandlers[ii](requestContext)) {
 					handled = true;
-					console.log(request.method + ' ' + request.url);
+					console.log(JSON.stringify(new Date()) + ' ' + request.method + ' ' + request.url + ' (' + authUser.mbox + ')');
 					break;
 				}
 			}
@@ -74,4 +75,4 @@ function main(dbName) {
 	});
 }
 
-main('local');
+main('local')

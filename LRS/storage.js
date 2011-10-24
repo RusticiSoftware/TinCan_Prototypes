@@ -1,8 +1,9 @@
 /*jslint node: true, white: false, continue: true, passfail: false, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
 
-var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb, dbName, sys;
+var exports, util, async, collections, actorUniqueProps, activityIdProps, collectionNames, mongodb, dbName, sys, config;
 util = require('./util.js');
-sys = require('sys');
+config = require('./config.js');
+sys = require('util');
 mongodb = require('mongodb');
 async = require('async');
 collections = {};
@@ -216,7 +217,9 @@ function storeActivities(activities, callback) {
 
 			if (updates.length > 0) {
 				async.map(updates, function (update, callback) {
-					console.log('saving activity: ' + JSON.stringify(update, null, 4));
+					if (config.verbose) {
+						console.log('saving activity: ' + JSON.stringify(update, null, 4));
+					}
 					collections.activities.save(update, { safe : true, upsert : true},  callback);
 				}, callback);
 			} else {
@@ -237,7 +240,7 @@ function mergeActors(source, target) {
 				if (target[prop] === undefined) {
 					target[prop] = source[prop];
 				} else if (target[prop] !== source[prop] && JSON.stringify(target[prop]) !== JSON.stringify(source[prop])) {
-					console.error('Actor redifines "' + prop + '" : ' + JSON.stringify(source, null, 4));
+					console.log('Actor redefines "' + prop + '" : ' + JSON.stringify(source, null, 4));
 				}
 			}
 		}
@@ -283,7 +286,9 @@ function storeUniqueActors(actors, callback) {
 			for (ii = 0; ii < actors.length; ii++) {
 				if (!util.inList(ii, duplicates)) {
 					updates.push(actors[ii]);
-					console.log('storing new actor: ' + JSON.stringify(actors[ii]));
+					if (config.verbose) {
+						console.log('storing new actor: ' + JSON.stringify(actors[ii]));
+					}
 				}
 			}
 
@@ -383,7 +388,7 @@ function areStatementsEqual(statement1, statement2) {
 				if (prop === 'stored') {continue; }
 
 				if (statement2[prop] === undefined || JSON.stringify(statement1[prop]) !== JSON.stringify(statement2[prop])) {
-					console.error('Statement mismatch on "' + prop + '", statement : ' + JSON.stringify(statement1));
+					console.log('Statement mismatch on "' + prop + '", statement : ' + JSON.stringify(statement1));
 					return false;
 				}
 			}
@@ -634,12 +639,10 @@ function addQueryActorConditions(actorConditions, query, callback) {
 			return;
 		}
 
-		//console.log(JSON.stringify(actorConditions, null, 4));
 		for (conditionName in actorConditions) {
 			if (actorConditions.hasOwnProperty(conditionName)) {
 				found = false;
 				for (ii = 0; ii < dbActors.length; ii++) {
-					console.log('actor source: ' + JSON.stringify(actorConditions[conditionName], null, 4));
 
 					if (util.areActorsEqual(actorConditions[conditionName], dbActors[ii])) {
 						if (found === true) {
@@ -692,7 +695,9 @@ function buildStatementQuery(parameters, callback) {
 	actorConditions = {};
 	descendants = false;
 
-	console.log('Get statements parameters--: ' + sys.inspect(parameters));
+	if (config.verbose) {
+		console.log('Get statements parameters: ' + sys.inspect(parameters));
+	}
 
 	for (parameter in parameters) {
 		if (parameters.hasOwnProperty(parameter) && !util.inList(parameter, ['limit', 'sparse', 'offset'])) {
@@ -721,7 +726,7 @@ function buildStatementQuery(parameters, callback) {
 				addQueryCondition('stored', { $lte : new Date(parameters.until)}, query);
 				break;
 			case 'authoritative':
-				console.log("\nWARNING: this LRS considers all statements to be authoritative!\n");
+				console.error("\nWARNING: this LRS considers all statements to be authoritative!\n");
 				break;
 			case 'actor':
 				actorConditions.actor = parameters.actor;
@@ -776,11 +781,15 @@ function buildStatementQuery(parameters, callback) {
 				}
 				query.$or.push({ "object.id" : { $in : ids }});
 				query.$or.push({ "context.activity.id" : { $in : ids }});
-				console.log('query: ' + sys.inspect(query));
+				if (config.verbose) {
+					console.log('query: ' + sys.inspect(query));
+				}
 				callback(null, query);
 			});
 		} else {
-			console.log('query: ' + sys.inspect(query));
+			if (config.verbose) {
+				console.log('query: ' + sys.inspect(query));
+			}
 			callback(null, query);
 		}
 	});
@@ -807,7 +816,9 @@ function handleKVPRequest(requestContext, key, multirow, collection) {
 			queryExp.updated = { $gt : new Date(since)};
 		}
 
-		console.log(JSON.stringify(queryExp, null, 4));
+		if (config.verbose) {
+			console.log(JSON.stringify(queryExp, null, 4));
+		}
 
 		return queryExp;
 	}

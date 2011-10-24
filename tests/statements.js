@@ -13,13 +13,13 @@ module('Statements', {
 asyncTest('empty statement PUT', function () {
 	// empty statement should fail w/o crashing the LRS (error response shoudl be received)
 	"use strict";
-	statementsEnv.util.request('PUT', '/Statements/' + statementsEnv.id, null, true, 500, 'Internal Server Error', start);
+	statementsEnv.util.request('PUT', '/Statements/' + statementsEnv.id, null, true, 400, 'Bad Request', start);
 });
 
 asyncTest('empty statement POST', function () {
 	// empty statement should fail w/o crashing the LRS (error response shoudl be received)
 	"use strict";
-	statementsEnv.util.request('POST', '/Statements/', null, true, 500, 'Internal Server Error', start);
+	statementsEnv.util.request('POST', '/Statements/', null, true, 400, 'Bad Request', start);
 });
 
 asyncTest('PUT / GET', function () {

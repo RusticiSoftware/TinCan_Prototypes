@@ -9,6 +9,7 @@ Dual licensed under the MIT and GPL licenses.
 */
 
 var exports; // placate jsl
+var config = require('./config.js');
 
 function ruuid() {
 	"use strict";
@@ -57,11 +58,12 @@ function checkError(error, request, response, text) {
 	if (error !== null && error !== undefined) {
 		errString = 'ERROR: ' + request.method + " : " + request.url + context;
 		errString += (error.stack === undefined ? "\n" + error.toString() :  "\n" + error.stack);
-		console.error(errString);
 		if (error.HTTPStatus !== undefined) {
 			response.writeHead(error.HTTPStatus);
+			console.log(errString);
 		} else {
 			response.writeHead(500);
+			console.error(errString);
 		}
 		response.end(errString);
 		return false;
@@ -71,7 +73,7 @@ function checkError(error, request, response, text) {
 
 function unexpectedRequest(request, response) {
 	"use strict";
-	console.error('Unexpected request: ' + request.method + " : " + request.url);
+	console.log('Unexpected request: ' + request.method + " : " + request.url);
 	response.statusCode = 405;
 	response.end();
 }
@@ -114,6 +116,7 @@ function parseJSONRequest(request, callback) {
 				result = JSON.parse(data);
 				callback(null, result);
 			} catch (ex) {
+				ex.HTTPStatus = 400;
 				callback(ex);
 			}
 		}
@@ -121,16 +124,29 @@ function parseJSONRequest(request, callback) {
 
 }
 
-function isAuthorized(request) {
-	"use strict";
-	// expect: user: test, password: password
-	return request.headers.authorization === 'Basic dGVzdDpwYXNzd29yZA==';
-}
-
 function getAuthenticatedUser(request) {
 	"use strict";
-	// only test user can authenticate, so...
-	return { 'mbox' : 'mailto:test.user@example.scorm.com' };
+	var userPass, authorized, auth = request.headers.authorization;
+	authorized = false;
+
+	if (!auth) {
+		return null;
+	}
+
+	if (auth.indexOf('Basic ') === 0) {
+		// expect: user: <any>, password: password
+		userPass = (new Buffer(auth.split(' ')[1], 'base64')).toString().split(':');
+		if (userPass.length === 2 && userPass[1] === 'password') {
+			if (userPass[0] === 'test') {
+				return { 'mbox' : 'mailto:test.user@example.scorm.com' };
+			} else if (userPass[0].indexOf('@') > 0) {
+				return { 'mbox' : 'mailto:' + userPass[0] };
+			}
+		}
+	}
+
+	console.error('Unauthorized: ' + auth);
+	return null;
 }
 
 function hasAllProperties(object, properties, name) {
@@ -234,7 +250,6 @@ exports.checkError = checkError;
 exports.parseJSONRequest = parseJSONRequest;
 exports.storeRequestBody = storeRequestBody;
 exports.loadRequestBody = loadRequestBody;
-exports.isAuthorized = isAuthorized;
 exports.getAuthenticatedUser = getAuthenticatedUser;
 exports.hasAllProperties = hasAllProperties;
 exports.areActorsEqual = areActorsEqual;
