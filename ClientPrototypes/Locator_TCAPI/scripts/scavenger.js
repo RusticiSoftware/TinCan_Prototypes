@@ -55,10 +55,17 @@ window.Scavenger = (function() {
     };
 
     scavenger.showLocation = function(position) {
-        scavenger.currentPosition = position;
+    	if (scavenger.useLocationCheat ) {
+			for(pmrk in scavenger.config.Placemarks){
+				if (!scavenger.config.Placemarks[pmrk].visited) {
+					position = {coords : {latitude: scavenger.config.Placemarks[pmrk].lat, longitude: scavenger.config.Placemarks[pmrk].lng}};
+					break;
+				}
+			}
+    	}
+    	scavenger.currentPosition = position;
 
-		var thisCheat = scavenger.useLocationCheat;
-        if (scavenger.lastdist > scavenger.cachedist || thisCheat) {
+        if (scavenger.lastdist > scavenger.cachedist) {
 			//refresh the mapview
             scavenger.showMap(position.coords.latitude, position.coords.longitude);
 			//update the location properties
@@ -67,17 +74,15 @@ window.Scavenger = (function() {
             scavenger.lastloc = newloc;
 			//check to see if we're close to a Placemark
 			scavenger.currentPlacemark = null;
-			
-			
+
 			for(pmrk in scavenger.config.Placemarks){
 				
 				var pmrkLoc = new google.maps.LatLng(scavenger.config.Placemarks[pmrk].lat, scavenger.config.Placemarks[pmrk].lng);
 				
-				if(scavenger.getStraightLineDistance(newloc, pmrkLoc) < scavenger.config.Placemarks[pmrk].visitrange || (thisCheat && !scavenger.config.Placemarks[pmrk].visited)) {
+				if(scavenger.getStraightLineDistance(newloc, pmrkLoc) < scavenger.config.Placemarks[pmrk].visitrange) {
 					scavenger.config.Placemarks[pmrk].gmarker.setIcon((scavenger.config.Placemarks[pmrk].visited) ? scavenger.currentVisitedIcon : scavenger.currentNotVisitedIcon); 
 					scavenger.currentPlacemark = scavenger.config.Placemarks[pmrk];
 					scavenger.onCurrentPlacemarkCallback();
-					thisCheat = false;			
 				} else {
 					scavenger.config.Placemarks[pmrk].gmarker.setIcon((scavenger.config.Placemarks[pmrk].visited) ? scavenger.visitedIcon : scavenger.notVisitedIcon); 
 				}
@@ -112,7 +117,6 @@ window.Scavenger = (function() {
     };
 
     scavenger.showMap = function(lat, lng) {
-
         var latlng = new google.maps.LatLng(lat, lng);
         var myOptions = {
             zoom: 10,

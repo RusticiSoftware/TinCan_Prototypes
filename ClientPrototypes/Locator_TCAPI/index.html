@@ -22,7 +22,7 @@
 		
 		
 		<div class="title"></div>
-		<div id="enableLocButtonDiv"><button id="WatchingLocationAction">Enable Location Tracking</button></div>
+		<div id="enableLocButtonDiv"><button id="WatchingLocationAction">Disable Location Tracking</button></div>
 		
 		<div class='clear'></div>
 		
@@ -63,13 +63,14 @@
 			SendCourseInit();
 			
 			InitLocationsState();
+			Scavenger.startWatchingLocation();
 			Scavenger.onCurrentPlacemarkCallback = onPlacemark;
 			Scavenger.onNoPlacemarksCallback = noPlacemarks;
 			
 			$('.btnSaveLocationToLRS').click(function(){
 				SaveLocationToLRS();
 			});
-			
+
 			$('#WatchingLocationAction').click(function(){
 				if(Scavenger.watching){
 					Scavenger.stopWatchingLocation();	
@@ -94,7 +95,6 @@
 		function onPlacemark(){
 			$('.loc').removeClass('onPlacemark');
 			$('.loc[name="' + Scavenger.currentPlacemark.name + '"]').addClass('onPlacemark');
-			
 		}
 		
 		function noPlacemarks(){
@@ -129,11 +129,11 @@
 				$('.loc[name="' + pmrk.name + '"]').addClass('visited'); 
 				
 				CheckForAllVisited();	
-				
+
 				if (Scavenger.useLocationCheat){
 					Scavenger.showLocation(position);
-				}
-				
+
+				}				
 			} /*else {
 			
 		        //write the current location to the screen
@@ -167,7 +167,6 @@
 				}
 			}
 			if (allVisited){
-				
 				var tcCourseObj = new TCObject().SetValue('id',COURSE_ID)
 					.SetValue("definition",new TCObject()
 						.SetValue("name",COURSE_NAME)

@@ -15,7 +15,7 @@ var config = {
 		lat: "36.1499",
 		lng: "-86.812935",
 		visited: false,
-		visitrange: 1,
+		visitrange: .25,
 		tc_id: "scorm.com/Course/NashvilleMuseums/Parthenon"
 	},
 	{
@@ -26,7 +26,7 @@ var config = {
 		lat: "36.158589",
 		lng: "-86.776505",
 		visited: false,
-		visitrange: 1,
+		visitrange: .25,
 		tc_id: "scorm.com/Course/NashvilleMuseums/CountryMusicHallofFame"
 	},
 	{
@@ -37,7 +37,7 @@ var config = {
 		lat: "36.157974",
 		lng: "-86.783924",
 		visited: false,
-		visitrange: 1,
+		visitrange: .25,
 		tc_id: "scorm.com/Course/NashvilleMuseums/TheFrist"
 	},
 	{
@@ -48,7 +48,7 @@ var config = {
 		lat: "36.146677",
 		lng: "-86.775620",
 		visited: false,
-		visitrange: 1,
+		visitrange: .25,
 		tc_id: "scorm.com/Course/NashvilleMuseums/AdventureScienceCenter"
 	},
 	{
@@ -59,7 +59,7 @@ var config = {
 		lat: "36.086841",
 		lng: "-86.874014",
 		visited: false,
-		visitrange: 1,
+		visitrange: .25,
 		tc_id: "scorm.com/Course/NashvilleMuseums/Cheekwood"
 	}
 	]
