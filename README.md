@@ -29,6 +29,26 @@ This is the url you will launch in your browser to run the client prototypes.
 ###LRS installation
 * Place the LRS folder in the location you want to run the LRS
 
+###Tips for Installation on Windows
+* DL and unpack mongo as per current github instructions
+	* add /bin full path to %Path% env variable
+* DL and unpack node as per current github instructions
+	* add node.exe full path to %Path% env variable
+	* make folder c:\node_modules
+* download async https://github.com/caolan/async
+	* unpack into c:\node_modules\async
+* download mongodb driver https://github.com/christkv/node-mongodb-native
+	* unpack into c:\node_modules\mongodb
+* copy 'ClientPrototypes' folder to web server root (wwwroot for IIS)
+	* Launch MongoDB
+	* open cmd line
+	* > mongod
+* Run LRS
+	* open cmd line
+	* navigate to /LRS folder in project
+	* > node LRS.js
+* Launch http://localhost/ClientPrototypes
+
 ## Configuration
 ### LRS
 * By default the LRS runs on port 8080 and is accessable from other machines. If you wish to use a different port, or restrict access to the local machine or a specific IP, edit LRS/config.js.
