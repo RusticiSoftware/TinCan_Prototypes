@@ -8,7 +8,7 @@ h1 {
 	/*line-height: .2em;*/
 	padding: 5px;
 	}
-body:before
+/*body:before
 {
    content: "";
    position: fixed;
@@ -20,7 +20,7 @@ body:before
    -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,.8);
    -moz-box-shadow: 0px 0px 10px rgba(0,0,0,.8);
    box-shadow: 0px 0px 10px rgba(0,0,0,.8);
-   }
+   }*/
 
 	body {
 		font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -131,20 +131,21 @@ div.title {font-size:2.5em;font-weight:bold;text-align:center;}
 /* High Resolution (iPhone 4) */
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+	#enableLocButtonDiv {float:none;}
+	.headerDiv {width:100%;}
 	body {
 		font-family: 'Changa One', sans-serif;
-		font-size: 32px;
+		font-size: 14px;
 		height: 100%; 
 		margin: 0; 
 		padding: 0;
-		background-color: gray;
 		padding: 2px;
 	}
 	
 	button
 	{
 	    display: inline-block;
-	    white-space: nowrap;
+	    /*white-space: nowrap;*/
 	    background-color: #ccc;
 	    background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
 	    background-image: -webkit-linear-gradient(top, #eee, #ccc);
@@ -154,9 +155,9 @@ div.title {font-size:2.5em;font-weight:bold;text-align:center;}
 	    background-image: linear-gradient(top, #eee, #ccc);
 	    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eeeeee', EndColorStr='#cccccc');
 	    border: 1px solid #777;
-	    padding: 1.5em 1.5em;
-	    margin: 0.5em;
-	    font: bold 1em/2em Arial, Helvetica;
+	    padding: 5px 5px;
+	    margin: 0.2em;
+	    font: bold .8em/1em Arial, Helvetica;
 	    text-decoration: none;
 	    color: #333;
 	    text-shadow: 0 1px 0 rgba(255,255,255,.8);
@@ -184,9 +185,11 @@ div.title {font-size:2.5em;font-weight:bold;text-align:center;}
 }
 
 @media only screen and (max-device-width: 480px) {
+	#enableLocButtonDiv {float:none;margin:0 auto;}
+        .headerDiv {width:100%;}
 	body {
 		font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		font-size: 32px;
+		font-size: 14px;
 		height: 100%; 
 		margin: 0; 
 		padding: 0;
@@ -206,9 +209,9 @@ div.title {font-size:2.5em;font-weight:bold;text-align:center;}
 	    background-image: linear-gradient(top, #eee, #ccc);
 	    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eeeeee', EndColorStr='#cccccc');
 	    border: 1px solid #777;
-	    padding: .5em 1.5em;
-	    margin: 0.5em;
-	    font: bold 1em/2em Arial, Helvetica;
+	    padding: 10px 10px;
+            margin: 10px 2px;
+            font: bold .8em/1em Arial, Helvetica;  
 	    text-decoration: none;
 	    color: #333;
 	    text-shadow: 0 1px 0 rgba(255,255,255,.8);

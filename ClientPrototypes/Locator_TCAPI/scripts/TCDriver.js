@@ -17,7 +17,7 @@ function TCDriver_GetLRSObject(){
 
 function TCDriver_CheckStatus(xhr){
 	if(xhr.status!=204 && xhr.status!=200){
-		alert("There was a problem sending data back to the Learning Record Store.");
+		alert("There was a problem sending data back to the Learning Record Store. (" + xhr.status + ")");
     }
 }
 
