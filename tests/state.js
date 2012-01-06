@@ -22,14 +22,14 @@ GET http://example.com/TCAPI/activities/<activity ID>/state/<actor>[/<registrati
 
 function putGetStateTest(env, useRegistration) {
 	"use strict";
-	var url = '/activities/<activity ID>/state/<actor>/' + env.id,
+	var url = '/activities/state?activityId=<activity ID>&actor=<actor>&stateId=' + env.id,
 		reg = '',
 		wrongReg = '',
 		stateText = 'state test text : ' + env.id;
 
 	if (useRegistration) {
-		reg = '?registration=autoTestReg1';
-		wrongReg = '?registration=autoTestRegWRONG';
+		reg = '&registration=autoTestReg1';
+		wrongReg = '&registration=autoTestRegWRONG';
 	}
 
 	env.util.request('GET', url + reg, null, true, 404, 'Not Found', function () {
@@ -51,12 +51,12 @@ function putGetStateTest(env, useRegistration) {
 function clearStateTest(env, useRegistration) {
 	"use strict";
 	var reg = '',
-		url = '/activities/<activity ID>/state/<actor>',
-		urlKey = url + '/' + env.id,
+		url = '/activities/state?activityId=<activity ID>&actor=<actor>',
+		urlKey = url + '&stateId=' + env.id,
 		stateText = 'state test text : ' + env.id;
 
 	if (useRegistration) {
-		reg = '?registration=autoTestReg1';
+		reg = '&registration=autoTestReg1';
 	}
 
 	env.util.request('GET', urlKey + reg, null, true, 404, 'Not Found', function () {
@@ -82,9 +82,9 @@ asyncTest('clear state', function () { "use strict"; clearStateTest(stateEnv, fa
 asyncTest('clear state (registration)', function () { "use strict"; clearStateTest(stateEnv, true); });
 asyncTest('GET multiple state keys', function () {
 	"use strict";
-	stateEnv.util.getMultipleTest(stateEnv, '/activities/<activity ID>/state/<actor>');
+	stateEnv.util.getMultipleTest(stateEnv, '/activities/state?activityId=<activity ID>&actor=<actor>','stateId');
 });
 asyncTest('GET multiple state keys (with registration)', function () {
 	"use strict";
-	stateEnv.util.getMultipleTest(stateEnv, '/activities/<activity ID>/state/<actor>', '?registration=autoTestReg1');
+	stateEnv.util.getMultipleTest(stateEnv, '/activities/state?activityId=<activity ID>&actor=<actor>&registration=autoTestReg1','stateId' );
 });

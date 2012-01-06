@@ -158,22 +158,19 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	deepEqual(responseObj, statement, "statement");
 };
 
-Util.prototype.getMultipleTest = function (env, url, queryString) {
+Util.prototype.getMultipleTest = function (env, url, idParamName) {
 	"use strict";
 	var testText = 'test test text : ' + env.id,
 		urlKey;
 
-	urlKey = url.addFS() + env.id;
+    var sep = (url.indexOf('?') == -1 ? '?' : '&');
+	urlKey = url + sep + idParamName + '=' + encodeURIComponent(env.id);
 
-	if (queryString === undefined) {
-		queryString = '';
-	}
-
-	env.util.request('PUT', urlKey + '[1]' + queryString, testText, true, 204, 'No Content', function () {
+	env.util.request('PUT', urlKey + '[1]', testText, true, 204, 'No Content', function () {
 		env.util.getServerTime(null, function (error, timestamp) {
-			env.util.request('PUT', urlKey + '[2]' + queryString, testText, true, 204, 'No Content', function () {
-				queryString += (queryString === "" ? '?' : '&') + 'since=' + timestamp.toString();
-				env.util.request('GET', url + queryString, null, true, 200, 'OK', function (xhr) {
+			env.util.request('PUT', urlKey + '[2]', testText, true, 204, 'No Content', function () {
+				url += '&since=' + timestamp.toString();
+				env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
 					var ii, keys, found1, found2;
 					keys = env.util.tryJSONParse(xhr.responseText);
 					found1 = found2 = false;

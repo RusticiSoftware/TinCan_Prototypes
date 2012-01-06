@@ -12,13 +12,13 @@ module('Activities', {
 //PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/profile/<profile object key>
 asyncTest('Profile', function () {
 	"use strict";
-	activityEnv.util.putGetDeleteStateTest(activityEnv, '/activities/<activity ID>/profile/');
+	activityEnv.util.putGetDeleteStateTest(activityEnv, '/activities/profile?activityId=<activity ID>')
 });
 
 //GET http://example.com/TCAPI/activities/<activity ID>
 asyncTest('Definition', function () {
 	"use strict";
-	var url = '/activities/<activity ID>/',
+	var url = '/activities?activityId=<activity ID>',
 		env = activityEnv;
 
 	env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
@@ -31,5 +31,5 @@ asyncTest('Definition', function () {
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
 asyncTest('Profile, multiple', function () {
 	"use strict";
-	activityEnv.util.getMultipleTest(activityEnv, '/activities/<activity ID>/profile');
+	activityEnv.util.getMultipleTest(activityEnv, '/activities/profile?activityId=<activity ID>','profileId');
 });
