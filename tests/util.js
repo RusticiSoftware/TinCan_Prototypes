@@ -33,14 +33,15 @@ Util.init = function (env) {
 				definition: {}
 			}
 		};
-		env.statement.object.definition.title = env.util.activity.definition.title;
+		env.statement.object.definition.name = env.util.activity.definition.name;
 	}
 };
 
-Util.prototype.endpoint = "http://localhost:8080/TCAPI";
+//Util.prototype.endpoint = "http://localhost:8080/TCAPI";
+Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
 Util.prototype.actor = { mbox : "mailto:auto_tests@example.scorm.com", name : "Auto Test Learner"};
 Util.prototype.verb = "experienced";
-Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { title : 'Tin Can Auto Test Activity' } };
+Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
 Util.prototype.actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
 
 Util.prototype.areActorsEqual = function (source, target) {
@@ -88,9 +89,23 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 		throw new Error('data not valid for method: ' + method);
 	}
 
+    var contentType = "application/json";
+    var contentLength = 0;
+    if(data !== null){
+        var isFormData = false;
+	    try { JSON.parse(data); } 
+        catch (ex) { isFormData = true; }
+
+        contentType = isFormData ? "application/x-www-form-urlencoded" : "application/json";
+        contentLength = data.length;
+    }
+
 	xhr.open(method, this.endpoint + url, true);
+	xhr.setRequestHeader("Content-Type", contentType);
+    if(contentLength > 0){
+        xhr.setRequestHeader("Content-Length", contentLength);
+    }
 	if (useAuth) {
-		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
 	}
 	xhr.onreadystatechange = function () {
@@ -138,6 +153,7 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	if (responseObj.context !== undefined && responseObj.context.activity !== undefined) {
 		delete responseObj.context.activity.definition;
 	}
+    delete responseObj.inprogress;
 
 	deepEqual(responseObj, statement, "statement");
 };
@@ -189,13 +205,13 @@ Util.prototype.getServerTime = function (id, callback) {
 		id = this.ruuid();
 		statement.verb = 'imported';
 		statement.object = { id: "about:blank" };
-		this.request('PUT', '/Statements/' + id, JSON.stringify(statement), true, null, null, function (xhr) {
+		this.request('PUT', '/statements?statementId=' + encodeURIComponent(id), JSON.stringify(statement), true, null, null, function (xhr) {
 			util.getServerTime(id, callback);
 		});
 		return;
 	}
 
-	this.request('GET', '/Statements/' + id, null, true, null, null, function (xhr) {
+	this.request('GET', '/statements?statementId=' + encodeURIComponent(id), null, true, null, null, function (xhr) {
 		callback(null, util.tryJSONParse(xhr.responseText).stored);
 	});
 };
@@ -203,7 +219,8 @@ Util.prototype.getServerTime = function (id, callback) {
 Util.prototype.putGetDeleteStateTest = function (env, url) {
 	"use strict";
 	var testText = 'profile / state test text : ' + env.id,
-		urlKey = url.addFS() + env.id;
+		urlKey = url + "&profileId=" + encodeURIComponent(env.id);
+		//urlKey = url.addFS() + env.id;
 
 	env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
 		env.util.request('PUT', urlKey, testText, true, 204, 'No Content', function () {
@@ -262,4 +279,14 @@ Util.prototype.ruuid = function () {
 		var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
 		return v.toString(16);
 	});
+};
+
+Util.prototype.ISODateString = function(d){
+ function pad(n){return n<10 ? '0'+n : n}
+ return d.getUTCFullYear()+'-'
+      + pad(d.getUTCMonth()+1)+'-'
+      + pad(d.getUTCDate())+'T'
+      + pad(d.getUTCHours())+':'
+      + pad(d.getUTCMinutes())+':'
+      + pad(d.getUTCSeconds())+'Z'
 };

@@ -13,19 +13,19 @@ module('Statements', {
 asyncTest('empty statement PUT', function () {
 	// empty statement should fail w/o crashing the LRS (error response shoudl be received)
 	"use strict";
-	statementsEnv.util.request('PUT', '/Statements/' + statementsEnv.id, null, true, 400, 'Bad Request', start);
+	statementsEnv.util.request('PUT', '/statements?statementId=' + statementsEnv.id, null, true, 400, 'Bad Request', start);
 });
 
 asyncTest('empty statement POST', function () {
 	// empty statement should fail w/o crashing the LRS (error response shoudl be received)
 	"use strict";
-	statementsEnv.util.request('POST', '/Statements/', null, true, 400, 'Bad Request', start);
+	statementsEnv.util.request('POST', '/statements/', null, true, 400, 'Bad Request', start);
 });
 
 asyncTest('PUT / GET', function () {
 	"use strict";
 	var env = statementsEnv,
-		url = '/Statements/' + env.id;
+		url = '/statements?statementId=' + env.id;
 
 	env.util.request('PUT', url, JSON.stringify(env.statement), true, 204, 'No Content', function () {
 		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
@@ -38,7 +38,7 @@ asyncTest('PUT / GET', function () {
 asyncTest('POST /w ID', function () {
 	"use strict";
 	var env = statementsEnv,
-		url = '/Statements/' + env.id;
+		url = '/statements?statementId=' + env.id;
 
 	env.util.request('POST', url, JSON.stringify(env.util.golfStatements), true, 405, 'Method Not Allowed', function () {
 		start();
@@ -49,7 +49,7 @@ asyncTest('POST /w ID', function () {
 asyncTest('Authentication', function () {
 	"use strict";
 	var env = statementsEnv,
-		url = '/Statements/' + env.id,
+		url = '/statements?statementId=' + env.id,
 		util = env.util;
 
 
@@ -66,7 +66,7 @@ asyncTest('Reject Modification', function () {
 	var env = statementsEnv,
 		util = env.util,
 		id = util.ruuid(),
-		url = '/Statements/' + id;
+		url = '/statements?statementId=' + id;
 
 	util.request('PUT', url, JSON.stringify(env.statement), true, 204, 'No Content', function () {
 		util.request('PUT', url, JSON.stringify(env.statement).replace('experienced', 'passed'), true, 409, 'Conflict', function () {
@@ -83,7 +83,7 @@ asyncTest('Reject Actor Modification', function () {
 	var env = statementsEnv,
 		util = env.util,
 		otherId = util.ruuid(),
-		url = '/Statements/',
+		url = '/statements?statementId=',
 		modLearnerName = 'Renamed Auto Test Learner';
 
 	util.request('PUT', url + util.ruuid(), JSON.stringify(env.statement), true, null, null, function () {
@@ -97,7 +97,7 @@ asyncTest('Reject Actor Modification', function () {
 				response.actor.name = env.statement.actor.name;
 				util.validateStatement(JSON.stringify(response), env.statement, otherId);
 
-				util.request('GET', '/actors/<actor>/', null, true, 200, 'OK', function (xhr) {
+				util.request('GET', '/actors?actor=<actor>', null, true, 200, 'OK', function (xhr) {
 					equal(util.tryJSONParse(xhr.responseText).name, env.statement.actor.name, 'Actor should not have been renamed based on statement.');
 					start();
 				});
@@ -110,7 +110,7 @@ asyncTest('Bad Verb', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/' + util.ruuid(),
+		url = '/statements?statementId=' + util.ruuid(),
 		statement = util.clone(env.statement);
 
 	statement.verb = 'not a valid verb';
@@ -127,7 +127,7 @@ asyncTest('Bad ID', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/' + util.ruuid() + 'bad_id',
+		url = '/statements?statementId=' + encodeURIComponent(util.ruuid() + 'bad_id'),
 		statement = util.clone(env.statement);
 
 	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr) {
@@ -143,7 +143,7 @@ asyncTest('pass special handling', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/' + util.ruuid(),
+		url = '/statements?statementId=' + util.ruuid(),
 		statement = util.clone(env.statement);
 
 	statement.verb = 'passed';
@@ -163,7 +163,7 @@ asyncTest('fail special handling', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/' + util.ruuid(),
+		url = '/statements?statementId=' + util.ruuid(),
 		statement = util.clone(env.statement);
 
 	statement.verb = 'failed';
@@ -183,7 +183,7 @@ asyncTest('completed special handling', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/' + util.ruuid(),
+		url = '/statements?statementId=' + util.ruuid(),
 		statement = util.clone(env.statement);
 
 	statement.verb = 'completed';
@@ -202,7 +202,7 @@ asyncTest('POST multiple', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/',
+		url = '/statements/',
 		golfStatements = util.golfStatements;
 
 	util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function (xhr) {
@@ -243,7 +243,7 @@ asyncTest('GET statements', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/';
+		url = '/statements/';
 
 
 	util.request('GET', url + '?limit=1', null, true, 200, 'OK', function (xhr) {
@@ -259,13 +259,13 @@ asyncTest('GET statements (via POST)', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/';
+		url = '/statements/';
 
 
 	util.request('POST', url, 'limit=1', true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText);
 		console.log(JSON.stringify(result, null, 4));
-		equal(result.length, 1, 'GET limit 1');
+		equal(result.length, 1, 'POST limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
 	});
@@ -276,7 +276,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/';
+		url = '/statements/';
 
 
 	util.request('POST', url, 'limit=10', true, 200, 'OK', function (xhr) {
@@ -291,12 +291,12 @@ asyncTest('GET statements (via POST), all filters', function () {
 			statement = statements[5];
 
 			// add filters which match the selected statement
-			filters.since = (new Date(new Date(statement.stored).getTime() - 1)).toString();
+			filters.since = util.ISODateString(new Date(new Date(statement.stored).getTime() - 1));
 			filters.until = statement.stored;
 			filters.verb = statement.verb;
 			filters.object = JSON.stringify(statement.object, null, 4);
-			if (statement.registration !== undefined) {
-				filters.registration = statement.registraiton;
+			if (statement.context !== undefined && statement.context.registration !== undefined) {
+				filters.registration = statement.context.registraiton;
 			}
 			filters.actor = JSON.stringify(statement.actor, null, 4);
 
@@ -324,8 +324,8 @@ asyncTest('GET statements (via POST), all filters', function () {
 						// object is an actor
 						ok(util.areActorsEqual(results[ii].object, statement.object), 'object');
 					}
-					if (statement.registration !== undefined) {
-						equal(results[ii].registration, statement.registration, 'registration');
+					if (statement.context !== undefined && statement.context.registration !== undefined) {
+						equal(results[ii].context.registration, statement.context.registration, 'registration');
 					}
 					// actor comparison
 					ok(util.areActorsEqual(results[ii].actor, statement.actor), 'actor');
@@ -356,7 +356,7 @@ function verifyGolfDescendants(callback) {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/',
+		url = '/statements/',
 		testActivity = { id : 'scorm.com/GolfExample_TCAPI' };
 
 	util.request('GET', url + '?verb=imported&limit=1&object=' + encodeURIComponent(JSON.stringify(testActivity)), null, true, null, null, function (xhr) {
@@ -372,7 +372,7 @@ asyncTest('Statements, descendants filter', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
-		url = '/Statements/',
+		url = '/statements',
 		statement,
 		testActivity = { id: 'com.scorm.golfsamples.interactions.playing_1'},
 		ancestorId = 'scorm.com/GolfExample_TCAPI',
@@ -381,25 +381,27 @@ asyncTest('Statements, descendants filter', function () {
 	// add statement to find
 	statement = util.clone(getGolfStatement(testActivity.id));
 	statement.id = util.ruuid();
-	statement.registration = statement.id;
+	statement.context.registration = statement.id;
 
 	//?limit=1&activity=' + encodeURIComponent(JSON.stringify(testActivity))
 	// statement not found by ancestor w/o using 'descendant' flag
-	util.request('PUT', url + statement.id, JSON.stringify(statement, null, 4), true, 204, 'No Content', function () {
-		util.request('GET', url + '?registration=' + statement.registration + '&object=' + ancestorFilter, null, true, 200, 'OK', function (xhr) {
-			equal(JSON.parse(xhr.responseText).length, 0, 'response, find by ancestor no descendants flag');
-			util.request('GET', url + '?registration=' + statement.registration + '&descendants=true&object=' + ancestorFilter, null, true, 200, 'OK', function (xhr) {
-				var resultStatements = util.tryJSONParse(xhr.responseText),
-					resultStatement = resultStatements[0];
-				if (resultStatement === undefined) {
-					ok(false, 'statement not found using descendant filter');
-				} else {
-					equal(resultStatement.id, statement.id, 'correct statement found using descendant filter');
-				}
-				start();
-			});
-		});
-	});
+	util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function (xhr) {
+	    util.request('PUT', url + "?statementId=" + statement.id, JSON.stringify(statement, null, 4), true, 204, 'No Content', function () {
+	    	util.request('GET', url + '?registration=' + statement.context.registration + '&object=' + ancestorFilter, null, true, 200, 'OK', function (xhr) {
+	    		equal(JSON.parse(xhr.responseText).length, 0, 'response, find by ancestor no descendants flag');
+	    		util.request('GET', url + '?registration=' + statement.context.registration + '&descendants=true&object=' + ancestorFilter, null, true, 200, 'OK', function (xhr) {
+	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    				resultStatement = resultStatements[0];
+	    			if (resultStatement === undefined) {
+	    				ok(false, 'statement not found using descendant filter');
+	    			} else {
+	    				equal(resultStatement.id, statement.id, 'correct statement found using descendant filter');
+	    			}
+	    			start();
+	    		});
+	    	});
+	    });
+    });
 
 	/*util.request('POST', url, 'limit=10', true, 200, 'OK', function (xhr) {
 		var statements = util.tryJSONParse(xhr.responseText),
