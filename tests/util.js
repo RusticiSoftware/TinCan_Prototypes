@@ -37,8 +37,8 @@ Util.init = function (env) {
 	}
 };
 
-//Util.prototype.endpoint = "http://localhost:8080/TCAPI";
-Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
+Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
+//Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
 Util.prototype.actor = { mbox : "mailto:auto_tests@example.scorm.com", name : "Auto Test Learner"};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
@@ -169,7 +169,7 @@ Util.prototype.getMultipleTest = function (env, url, idParamName) {
 	env.util.request('PUT', urlKey + '[1]', testText, true, 204, 'No Content', function () {
 		env.util.getServerTime(null, function (error, timestamp) {
 			env.util.request('PUT', urlKey + '[2]', testText, true, 204, 'No Content', function () {
-				url += '&since=' + timestamp.toString();
+				url += '&since=' + encodeURIComponent(timestamp.toString());
 				env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
 					var ii, keys, found1, found2;
 					keys = env.util.tryJSONParse(xhr.responseText);
@@ -279,11 +279,24 @@ Util.prototype.ruuid = function () {
 };
 
 Util.prototype.ISODateString = function(d){
- function pad(n){return n<10 ? '0'+n : n}
+ function pad(val, n){
+    if(n == null){
+        n = 2;
+    }
+    var padder = Math.pow(10, n-1);
+    var tempVal = val.toString();
+    while(val < padder){        
+        tempVal = '0' + tempVal;
+        padder = padder / 10;
+    }
+    return tempVal;
+ }
+
  return d.getUTCFullYear()+'-'
       + pad(d.getUTCMonth()+1)+'-'
       + pad(d.getUTCDate())+'T'
       + pad(d.getUTCHours())+':'
       + pad(d.getUTCMinutes())+':'
-      + pad(d.getUTCSeconds())+'Z'
+      + pad(d.getUTCSeconds())+'.'
+      + pad(d.getUTCMilliseconds(), 3)+'Z';
 };

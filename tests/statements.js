@@ -296,7 +296,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 			filters.verb = statement.verb;
 			filters.object = JSON.stringify(statement.object, null, 4);
 			if (statement.context !== undefined && statement.context.registration !== undefined) {
-				filters.registration = statement.context.registraiton;
+				filters.registration = statement.context.registration;
 			}
 			filters.actor = JSON.stringify(statement.actor, null, 4);
 
