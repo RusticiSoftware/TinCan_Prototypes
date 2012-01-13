@@ -60,7 +60,7 @@ asyncTest('Authentication', function () {
 	});
 });
 
-asyncTest('Reject Modification', function () {
+asyncTest('Reject Statement Modification', function () {
 	"use strict";
 
 	var env = statementsEnv,

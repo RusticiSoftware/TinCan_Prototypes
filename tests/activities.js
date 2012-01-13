@@ -111,6 +111,42 @@ asyncTest('Definition, extensions', function () {
     });
 });
 
+asyncTest('Definition, reject modification', function () {
+	"use strict";
+    var env = activityEnv;
+
+    var myActivityId = env.util.ruuid();
+    var myActivity = { "id":myActivityId };
+    var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
+    var myActivity_Rev1_Plat1 = { "id":myActivityId, "revision":"1.0.1", "platform":"WIN32" };
+
+    var myActivity_AltDef = { "id":myActivityId, "definition":{"description":"One thing"} };
+
+    //These should all be fine
+    var myActivities = [myActivity, myActivity_Rev1, myActivity_Rev1_Plat1];
+    var myStatements = new Array();
+    for(var i = 0; i < myActivities.length; i++){
+        myStatements[i] = { "verb":"imported", "object":myActivities[i] };
+    }
+
+    //Import the activities
+    env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
+	    env.util.request('GET', "/activities?activityId=" + myActivityId, null, true, 200, 'OK', function (xhr) {
+	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
+            ok(activity_list.length == myActivities.length, "Correct number of original activities returned");
+
+            //Now try to redefine the original activity, should fail
+            var redefineStatement = { id:env.util.ruuid(), verb:"imported", object:myActivity_AltDef };
+            var url = '/statements?statementId=' + redefineStatement.id;
+            env.util.request('PUT', url, JSON.stringify(redefineStatement), true, 409, 'Conflict', function(){
+
+	        	start();
+
+	        });
+        });
+    })
+});
+
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
 asyncTest('Profile, multiple', function () {
 	"use strict";
