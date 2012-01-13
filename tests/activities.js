@@ -39,10 +39,8 @@ asyncTest('Definition, multiple', function () {
     var myActivity = { "id":myActivityId };
     var myActivity_Plat1 = { "id":myActivityId, "platform":"iOS 5" };
     var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
-    var myActivity_Rev1_AltDesc = { "id":myActivityId, "revision":"1.0.1", "definition":{"description":"I have a description"} };
     var myActivity_Plat1_Rev2 = { "id":myActivityId, "platform":"WIN32", "revision":"2.0.1" };
-    //var myActivities = [myActivity, myActivity_Plat1, myActivity_Rev1, myActivity_Rev1_AltDesc, myActivity_Plat1_Rev2];
-    var myActivities = [myActivity, myActivity_Plat1];
+    var myActivities = [myActivity, myActivity_Plat1, myActivity_Rev1, myActivity_Plat1_Rev2];
 
     var myStatements = new Array();
     for(var i = 0; i < myActivities.length; i++){
@@ -56,8 +54,7 @@ asyncTest('Definition, multiple', function () {
 	    var url = '/activities?activityId=' + myActivityId;
 	    env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
 	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
-            //ok(activity_list.length == 5, "Correct number of activities returned");
-            ok(activity_list.length == 2, "Correct number of activities returned");
+            ok(activity_list.length == myActivities.length, "Correct number of activities returned");
 
             for(var i = 0; i < myActivities.length; i++){
                 var found = false;
@@ -78,6 +75,40 @@ asyncTest('Definition, multiple', function () {
 	    	start();
 	    });
     })
+});
+
+//GET http://example.com/TCAPI/activities/<activity ID>
+asyncTest('Definition, extensions', function () {
+	"use strict";
+	var env = activityEnv;
+
+    var myActivityId = env.util.ruuid();
+    var myActivity = { 
+        id:myActivityId, 
+        definition:{
+            description:"Extensions Activity", 
+            extensions:{
+                extension_1:1,
+                extension_2:{
+                    obj:"test"} 
+            }
+        }
+    };
+
+    var myStatements = [{ verb: "imported", object: myActivity }];
+
+    //Import activity through statement
+    env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
+        //Get it
+	    env.util.request('GET', "/activities?activityId=" + myActivityId, null, true, 200, 'OK', function (xhr) {
+	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
+            ok(activity_list.length > 0, "At least one activity returned");
+            var activity = activity_list[0];
+            //Is is the same as we sent?
+	    	deepEqual(activity, myActivity, 'persisted activity');
+	    	start();
+	    });
+    });
 });
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]

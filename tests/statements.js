@@ -78,6 +78,41 @@ asyncTest('Reject Modification', function () {
 	});
 });
 
+asyncTest('PUT / GET w/ Extensions', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myRegId = env.util.ruuid();
+    var myStatement = {
+        id: myStatementId,
+        actor: env.statement.actor,
+        verb: "passed",
+        object: env.statement.object,
+        context: {
+            registration: myRegId,
+            extensions: {
+                ctx_extension_1: 1234
+            }
+        },
+        result: {
+            score: { scaled: 87.0 },
+            success: true,
+            completion: true,
+            extensions: {
+                extension_1: "some value"
+            }
+        }
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
+		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			env.util.validateStatement(xhr.responseText, myStatement, myStatementId);
+			start();
+		});
+	});
+        
+});
+
 asyncTest('Reject Actor Modification', function () {
 	"use strict";
 	var env = statementsEnv,
