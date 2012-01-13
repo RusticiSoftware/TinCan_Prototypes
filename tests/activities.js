@@ -22,10 +22,62 @@ asyncTest('Definition', function () {
 		env = activityEnv;
 
 	env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
-		var profile = env.util.tryJSONParse(xhr.responseText);
-		equal(profile.id, env.util.activity.id, 'activity id');
+		var activity_list = env.util.tryJSONParse(xhr.responseText);
+        ok(activity_list.length > 0, "At least one activity returned");
+        var activity = activity_list[0];
+		equal(activity.id, env.util.activity.id, 'activity id');
 		start();
 	});
+});
+
+//GET http://example.com/TCAPI/activities/<activity ID>
+asyncTest('Definition, multiple', function () {
+	"use strict";
+    var env = activityEnv;
+
+    var myActivityId = env.util.ruuid();
+    var myActivity = { "id":myActivityId };
+    var myActivity_Plat1 = { "id":myActivityId, "platform":"iOS 5" };
+    var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
+    var myActivity_Rev1_AltDesc = { "id":myActivityId, "revision":"1.0.1", "definition":{"description":"I have a description"} };
+    var myActivity_Plat1_Rev2 = { "id":myActivityId, "platform":"WIN32", "revision":"2.0.1" };
+    //var myActivities = [myActivity, myActivity_Plat1, myActivity_Rev1, myActivity_Rev1_AltDesc, myActivity_Plat1_Rev2];
+    var myActivities = [myActivity, myActivity_Plat1];
+
+    var myStatements = new Array();
+    for(var i = 0; i < myActivities.length; i++){
+        myStatements[i] = { "verb":"imported", "object":myActivities[i] };
+    }
+
+    //Import the activities
+    env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
+
+        //Find the activities
+	    var url = '/activities?activityId=' + myActivityId;
+	    env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
+            //ok(activity_list.length == 5, "Correct number of activities returned");
+            ok(activity_list.length == 2, "Correct number of activities returned");
+
+            for(var i = 0; i < myActivities.length; i++){
+                var found = false;
+                for(var j = 0; j < activity_list.length; j++){
+
+                    /*alert(JSON.stringify(myActivities[i]));
+                    alert(JSON.stringify(activity_list[j]));
+                    alert(activitiesAreEqual(myActivities[i], activity_list[j]));*/
+
+                    if(activitiesAreEqual(myActivities[i], activity_list[j])){
+                        found = true;
+                        break;
+                    }
+                }
+                ok(found, "Activity " + JSON.stringify(myActivities[i]) + " was in results");
+            }
+
+	    	start();
+	    });
+    })
 });
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
@@ -33,3 +85,25 @@ asyncTest('Profile, multiple', function () {
 	"use strict";
 	activityEnv.util.getMultipleTest(activityEnv, '/activities/profile?activityId=<activity ID>','profileId');
 });
+
+function activitiesAreEqual(activity1, activity2){
+    if (activity1 == null && activity2 == null)
+        return true;
+    if (activity1 == null || activity2 == null)
+        return false;
+
+    return (activity1.id == activity2.id
+               && activity1.revision == activity2.revision
+               && activity1.platform == activity2.platform
+               && activityDefinitionsAreEqual(activity1.definition, activity2.definition));
+}
+
+function activityDefinitionsAreEqual(def1, def2){
+    return true;
+    if(def1 == null && def2 == null)
+        return true;
+    if(def1 == null || def2 == null)
+        return false;
+
+    return def1.description == def2.description; //TODO: More to check for equality here...*/
+}
