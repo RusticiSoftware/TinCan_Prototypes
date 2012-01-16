@@ -116,11 +116,11 @@ asyncTest('Definition, reject modification', function () {
     var env = activityEnv;
 
     var myActivityId = env.util.ruuid();
-    var myActivity = { "id":myActivityId };
+    var myActivity = { "id":myActivityId, "definition":{"description":"Modification Test 1"} };
     var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
     var myActivity_Rev1_Plat1 = { "id":myActivityId, "revision":"1.0.1", "platform":"WIN32" };
 
-    var myActivity_AltDef = { "id":myActivityId, "definition":{"description":"One thing"} };
+    var myActivity_AltDef = { "id":myActivityId, "definition":{"description":"Modificationz Test 2"} };
 
     //These should all be fine
     var myActivities = [myActivity, myActivity_Rev1, myActivity_Rev1_Plat1];
