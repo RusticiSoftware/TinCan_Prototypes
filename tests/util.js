@@ -154,6 +154,18 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 		delete responseObj.context.activity.definition;
 	}
     delete responseObj.inprogress;
+    if(statement.object.type === undefined){
+        delete responseObj.object.type;
+    }
+    if(statement.context !== undefined && statement.context.activity !== undefined){
+        var ctxact = statement.context.activity;
+        if(ctxact.type === undefined){
+            delete responseObj.context.activity.type;
+        }
+    }
+    if(statement.actor !== undefined && statement.actor.type === undefined){
+        delete responseObj.actor.type;
+    }
 
 	deepEqual(responseObj, statement, "statement");
 };

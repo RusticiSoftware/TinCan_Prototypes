@@ -105,6 +105,9 @@ asyncTest('Definition, extensions', function () {
             ok(activity_list.length > 0, "At least one activity returned");
             var activity = activity_list[0];
             //Is is the same as we sent?
+            if(myActivity.type === undefined){
+                delete activity.type;
+            }
 	    	deepEqual(activity, myActivity, 'persisted activity');
 	    	start();
 	    });
