@@ -84,7 +84,15 @@ asyncTest('GET multiple state keys', function () {
 	"use strict";
 	stateEnv.util.getMultipleTest(stateEnv, '/activities/state?activityId=<activity ID>&actor=<actor>','stateId');
 });
+
 asyncTest('GET multiple state keys (with registration)', function () {
 	"use strict";
 	stateEnv.util.getMultipleTest(stateEnv, '/activities/state?activityId=<activity ID>&actor=<actor>&registration=autoTestReg1','stateId' );
+});
+
+asyncTest('Concurrency Rules', function(){
+    "use strict";
+    var env = stateEnv;
+    var url = "/activities/state?activityId=<activity ID>&actor=<actor>&stateId=" + env.util.ruuid();
+    env.util.concurrencyRulesTest(env, url, false);
 });

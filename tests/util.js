@@ -16,7 +16,7 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 1000;
+	QUnit.config.testTimeout = 5000;
 
 	if (env.id === undefined) {
 		// set up test to be shared accross tests (only once)
@@ -70,7 +70,11 @@ Util.prototype.inList = function (test, list) {
 	return false;
 };
 
-Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback) {
+Util.prototype.requestWithHeaders = function (method, url, headers, data, useAuth, expectedStatus, expectedStatusText, callback){
+    this.request(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, headers);
+}
+
+Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders) {
 	"use strict";
 	var xhr = new XMLHttpRequest(),
 		actorKey;
@@ -102,12 +106,18 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
 	xhr.open(method, this.endpoint + url, true);
 	xhr.setRequestHeader("Content-Type", contentType);
-    if(contentLength > 0){
+    /*if(contentLength > 0){
         xhr.setRequestHeader("Content-Length", contentLength);
-    }
+    }*/
 	if (useAuth) {
 		xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
 	}
+    if(extraHeaders !== null){
+        for(var headerName in extraHeaders){
+            xhr.setRequestHeader(headerName, extraHeaders[headerName]);
+        }
+    }
+
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4) {
 			if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
@@ -234,8 +244,13 @@ Util.prototype.putGetDeleteStateTest = function (env, url) {
 	env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
 		env.util.request('PUT', urlKey, testText, true, 204, 'No Content', function () {
 			env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
+
 				equal(xhr.responseText, testText);
-				env.util.request('PUT', urlKey, testText + '_modified', true, 204, 'No Content', function () {
+                var digestBytes = Crypto.SHA1(xhr.responseText, { asBytes: true });
+                var digest = Crypto.util.bytesToHex(digestBytes);
+                var headers = {"If-Matches":'"'+digest+'"'};
+
+				env.util.requestWithHeaders('PUT', urlKey, headers, testText + '_modified', true, 204, 'No Content', function () {
 					env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
 						equal(xhr.responseText, testText + '_modified');
 						env.util.request('DELETE', urlKey, null, true, 204, 'No Content', function () {
@@ -248,6 +263,69 @@ Util.prototype.putGetDeleteStateTest = function (env, url) {
 			});
 		});
 	});
+};
+
+Util.prototype.concurrencyRulesTest = function(env, url, failOnIgnore) {
+    "use strict";
+	var testText = 'profile / state concurrency test : ' + env.id;
+    var digest = null;
+
+    async.waterfall([
+	    function(cb){ 
+            //Normal get, shouldn't exist
+            env.util.request('GET', url, null, true, 404, 'Not Found', function(){cb()}); 
+        },
+        function(cb){ 
+            //Normal put, nothing exists, no concurrency headers needed
+            env.util.request('PUT', url, testText, true, 204, 'No Content', function(){cb()}); 
+        },
+		function(cb){ 
+            //Make sure it's there, and determine correct etag (SHA1 hash of content)
+            env.util.request('GET', url, null, true, 200, 'OK', 
+                function(xhr){
+                    equal(xhr.responseText, testText);
+                    var digestBytes = Crypto.SHA1(xhr.responseText, { asBytes: true });
+                    digest = Crypto.util.bytesToHex(digestBytes);
+                    cb();
+                });
+        },
+		function(cb){
+            //Try to put assuming nothing is there, should fail
+            var headers = {"If-None-Matches":"*"};
+			env.util.requestWithHeaders('PUT', url, headers, testText + '_modified', true, 
+                                        412, 'Precondition Failed', function(){cb()});
+        },
+        function(cb){
+            //Try to put using a bad etag, should also fail
+            var headers = {"If-Matches":'"XYZ"'};
+    	    env.util.requestWithHeaders('PUT', url, headers, testText + '_modified', true, 
+                                        412, 'Precondition Failed', function(){cb()});
+        },
+        function(cb){
+            //Put with bad headers, but same content. Same content means all is well regardless.
+            var headers = {"If-Matches":'"XYZ"'};
+    	    env.util.requestWithHeaders('PUT', url, headers, testText, true, 
+                                        204, 'No Content', function(){cb()});
+        },
+        function(cb){
+            //Try to put with a good etag, should succeed
+            var headers = {"If-Matches":'"'+digest+'"'};
+    	    env.util.requestWithHeaders('PUT', url, headers, testText + '_modified', true, 
+                                        204, 'No Content', function(){cb()});
+        },
+        function(cb){
+            if(failOnIgnore === false){
+                //Put with no headers, different content. For state API only, this is accepted.
+    	        env.util.request('PUT', url, testText + '_modified_2', true, 204, 'No Content', function(){cb()});
+            } else {
+                //Put with no headers, different content. For profile APIs, should be conflict.
+    	        env.util.request('PUT', url, testText + '_modified_2', true, 409, 'Conflict', function(){cb()});
+            }
+        },
+        function(cb){ 
+            start(); 
+        },
+	]);
 };
 
 Util.prototype.tryJSONParse = function (text) {

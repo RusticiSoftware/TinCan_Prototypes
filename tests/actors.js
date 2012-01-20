@@ -32,3 +32,10 @@ asyncTest('Profile, multiple', function () {
 	"use strict";
 	actorEnv.util.getMultipleTest(actorEnv, '/actors/profile?actor=<actor>','profileId');
 });
+
+asyncTest('Profile, Concurrency Rules', function(){
+    "use strict";
+    var env = actorEnv;
+    var url = "/actors/profile?actor=<actor>&profileId=" + env.util.ruuid();
+    env.util.concurrencyRulesTest(env, url, true);
+});

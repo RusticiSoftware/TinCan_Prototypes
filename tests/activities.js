@@ -9,14 +9,15 @@ module('Activities', {
 	}
 });
 
+
 //PUT | GET | DELETE http://example.com/TCAPI/activities/<activity ID>/profile/<profile object key>
-asyncTest('Profile', function () {
+asyncTest('Profile ', function () {
 	"use strict";
 	activityEnv.util.putGetDeleteStateTest(activityEnv, '/activities/profile?activityId=<activity ID>')
 });
 
 //GET http://example.com/TCAPI/activities/<activity ID>
-asyncTest('Definition', function () {
+asyncTest('Definition ', function () {
 	"use strict";
 	var url = '/activities?activityId=<activity ID>',
 		env = activityEnv;
@@ -143,6 +144,7 @@ asyncTest('Definition, reject modification', function () {
             var url = '/statements?statementId=' + redefineStatement.id;
             env.util.request('PUT', url, JSON.stringify(redefineStatement), true, 409, 'Conflict', function(){
 
+                //Fire off next test
 	        	start();
 
 	        });
@@ -155,6 +157,14 @@ asyncTest('Profile, multiple', function () {
 	"use strict";
 	activityEnv.util.getMultipleTest(activityEnv, '/activities/profile?activityId=<activity ID>','profileId');
 });
+
+asyncTest('Profile, Concurrency Rules', function(){
+    "use strict";
+    var env = activityEnv;
+    var url = "/activities/profile?activityId=<activity ID>&profileId=" + env.util.ruuid();
+    env.util.concurrencyRulesTest(env, url, true);
+});
+
 
 function activitiesAreEqual(activity1, activity2){
     if (activity1 == null && activity2 == null)
@@ -177,3 +187,4 @@ function activityDefinitionsAreEqual(def1, def2){
 
     return def1.description == def2.description; //TODO: More to check for equality here...*/
 }
+
