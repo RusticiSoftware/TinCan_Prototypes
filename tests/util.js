@@ -24,6 +24,7 @@ Util.init = function (env) {
 		env.id = env.util.ruuid();
 		env.statement = {
 			actor: {
+                "type": "Person",
 				"mbox": env.util.actor.mbox,
 				"name": env.util.actor.name
 			},

@@ -113,6 +113,25 @@ asyncTest('PUT / GET w/ Extensions', function() {
         
 });
 
+asyncTest('PUT / GET Actor as Object', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myStatement = {
+        id: myStatementId,
+        verb: "imported",
+        object: env.statement.actor
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
+		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			env.util.validateStatement(xhr.responseText, myStatement, myStatementId);
+			start();
+		});
+	});
+        
+});
+
 asyncTest('Reject Actor Modification', function () {
 	"use strict";
 	var env = statementsEnv,
