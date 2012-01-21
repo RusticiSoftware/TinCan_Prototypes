@@ -113,6 +113,31 @@ asyncTest('PUT / GET w/ Extensions', function() {
         
 });
 
+asyncTest('PUT / GET w/ Revision and Platform', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myRegId = env.util.ruuid();
+    var myStatement = {
+        id: myStatementId,
+        actor: env.statement.actor,
+        verb: "experienced",
+        object: env.statement.object,
+        context: {
+            registration: myRegId,
+            revision:"3",
+            platform:"iOS"
+        },
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
+		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			env.util.validateStatement(xhr.responseText, myStatement, myStatementId);
+			start();
+		});
+	});
+});
+
 asyncTest('PUT / GET Actor as Object', function() {
     var env = statementsEnv;
     var myStatementId = env.util.ruuid();
@@ -422,7 +447,7 @@ function verifyGolfDescendants(callback) {
 	});
 }
 
-asyncTest('Statements, descendants filter', function () {
+/*asyncTest('Statements, descendants filter', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -518,4 +543,4 @@ asyncTest('Statements, descendants filter', function () {
 			start();
 		}
 	});*/
-});
+/*});*/

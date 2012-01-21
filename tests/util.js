@@ -164,14 +164,15 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	if (responseObj.context !== undefined && responseObj.context.activity !== undefined) {
 		delete responseObj.context.activity.definition;
 	}
-    delete responseObj.inprogress;
+    delete responseObj.inProgress;
     if(statement.object.type === undefined){
         delete responseObj.object.type;
     }
-    if(statement.context !== undefined && statement.context.activity !== undefined){
-        var ctxact = statement.context.activity;
-        if(ctxact.type === undefined){
-            delete responseObj.context.activity.type;
+    if(statement.context !== undefined && statement.context.contextActivities !== undefined){
+        var ctxacts = statement.context.contextActivities;
+        var ctxparent = ctxacts["parent"];
+        if(ctxparent !== undefined && ctxparent.type === undefined){
+            delete responseObj.context.contextActivities["parent"].type;
         }
     }
     if(statement.actor !== undefined && statement.actor.type === undefined){

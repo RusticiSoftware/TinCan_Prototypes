@@ -218,9 +218,10 @@ golfStatements = [
             "response": "false",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -237,9 +238,10 @@ golfStatements = [
             "response": "false",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -256,9 +258,11 @@ golfStatements = [
             "response": "false",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -275,9 +279,11 @@ golfStatements = [
             "response": "2",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -294,9 +300,11 @@ golfStatements = [
             "response": "0",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -313,9 +321,11 @@ golfStatements = [
             "response": "1",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -332,9 +342,11 @@ golfStatements = [
             "response": "Course Handicap = Handicap index * Slope Rating / 113",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -351,9 +363,11 @@ golfStatements = [
             "response": "First",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -370,9 +384,11 @@ golfStatements = [
             "response": "true",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -389,9 +405,11 @@ golfStatements = [
             "response": "Out of the player's line of sight",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -408,9 +426,11 @@ golfStatements = [
             "response": "3",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -427,9 +447,11 @@ golfStatements = [
             "response": "true",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -446,9 +468,11 @@ golfStatements = [
             "response": "18",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -465,9 +489,11 @@ golfStatements = [
             "response": "eagle",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     },
@@ -484,9 +510,11 @@ golfStatements = [
             "response": "USGA and Royal and Ancient",
             "success": true
         },
-        "context": {
-            "activity": {
-                "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+        "context":{
+            "contextActivities": {
+                "parent": {
+                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
+                }
             }
         }
     }

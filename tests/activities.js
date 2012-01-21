@@ -23,57 +23,48 @@ asyncTest('Definition ', function () {
 		env = activityEnv;
 
 	env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
-		var activity_list = env.util.tryJSONParse(xhr.responseText);
-        ok(activity_list.length > 0, "At least one activity returned");
-        var activity = activity_list[0];
+		var activity = env.util.tryJSONParse(xhr.responseText);
 		equal(activity.id, env.util.activity.id, 'activity id');
 		start();
 	});
 });
 
 //GET http://example.com/TCAPI/activities/<activity ID>
-asyncTest('Definition, multiple', function () {
+asyncTest('Definition, update', function () {
 	"use strict";
     var env = activityEnv;
 
     var myActivityId = env.util.ruuid();
-    var myActivity = { "id":myActivityId };
-    var myActivity_Plat1 = { "id":myActivityId, "platform":"iOS 5" };
-    var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
-    var myActivity_Plat1_Rev2 = { "id":myActivityId, "platform":"WIN32", "revision":"2.0.1" };
-    var myActivities = [myActivity, myActivity_Plat1, myActivity_Rev1, myActivity_Plat1_Rev2];
+    var myActivity = { "id":myActivityId, "definition":{"name":"My Tezzzt Activity"} };
+    var myActivityUpdate = { "id":myActivityId, "definition":{"name":"My Test Activity"} };
+    var myStatement = { "verb":"imported", "object":myActivity };
+    var myStatementUpdate = { "verb":"imported", "object":myActivityUpdate };
 
-    var myStatements = new Array();
-    for(var i = 0; i < myActivities.length; i++){
-        myStatements[i] = { "verb":"imported", "object":myActivities[i] };
-    }
+    //Import the activity
+    env.util.request('POST','/statements',JSON.stringify([myStatement]), true, 200, 'OK', function(){
 
-    //Import the activities
-    env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
-
-        //Find the activities
+        //Find the activity
 	    var url = '/activities?activityId=' + myActivityId;
 	    env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
-	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
-            ok(activity_list.length == myActivities.length, "Correct number of activities returned");
+            //Check result
+		    var activity = env.util.tryJSONParse(xhr.responseText);
+		    equal(activity.id, myActivity.id, 'activity id');
+            equal(activity.definition.name, myActivity.definition.name);
 
-            for(var i = 0; i < myActivities.length; i++){
-                var found = false;
-                for(var j = 0; j < activity_list.length; j++){
+            //Update the definition
+            env.util.request('POST','/statements',JSON.stringify([myStatementUpdate]), true, 200, 'OK', function() {
 
-                    /*alert(JSON.stringify(myActivities[i]));
-                    alert(JSON.stringify(activity_list[j]));
-                    alert(activitiesAreEqual(myActivities[i], activity_list[j]));*/
+                //Find again
+	            env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+                    //Check result
+		            var activity = env.util.tryJSONParse(xhr.responseText);
+		            equal(activity.id, myActivityUpdate.id, 'activity id');
+                    equal(activity.definition.name, myActivityUpdate.definition.name);
 
-                    if(activitiesAreEqual(myActivities[i], activity_list[j])){
-                        found = true;
-                        break;
-                    }
-                }
-                ok(found, "Activity " + JSON.stringify(myActivities[i]) + " was in results");
-            }
-
-	    	start();
+                    //Fire off next test
+	    	        start();
+                });
+            });
 	    });
     })
 });
@@ -102,9 +93,7 @@ asyncTest('Definition, extensions', function () {
     env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
         //Get it
 	    env.util.request('GET', "/activities?activityId=" + myActivityId, null, true, 200, 'OK', function (xhr) {
-	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
-            ok(activity_list.length > 0, "At least one activity returned");
-            var activity = activity_list[0];
+	    	var activity = env.util.tryJSONParse(xhr.responseText);
             //Is is the same as we sent?
             if(myActivity.type === undefined){
                 delete activity.type;
@@ -115,42 +104,6 @@ asyncTest('Definition, extensions', function () {
     });
 });
 
-asyncTest('Definition, reject modification', function () {
-	"use strict";
-    var env = activityEnv;
-
-    var myActivityId = env.util.ruuid();
-    var myActivity = { "id":myActivityId, "definition":{"description":"Modification Test 1"} };
-    var myActivity_Rev1 = { "id":myActivityId, "revision":"1.0.1" };
-    var myActivity_Rev1_Plat1 = { "id":myActivityId, "revision":"1.0.1", "platform":"WIN32" };
-
-    var myActivity_AltDef = { "id":myActivityId, "definition":{"description":"Modificationz Test 2"} };
-
-    //These should all be fine
-    var myActivities = [myActivity, myActivity_Rev1, myActivity_Rev1_Plat1];
-    var myStatements = new Array();
-    for(var i = 0; i < myActivities.length; i++){
-        myStatements[i] = { "verb":"imported", "object":myActivities[i] };
-    }
-
-    //Import the activities
-    env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
-	    env.util.request('GET', "/activities?activityId=" + myActivityId, null, true, 200, 'OK', function (xhr) {
-	    	var activity_list = env.util.tryJSONParse(xhr.responseText);
-            ok(activity_list.length == myActivities.length, "Correct number of original activities returned");
-
-            //Now try to redefine the original activity, should fail
-            var redefineStatement = { id:env.util.ruuid(), verb:"imported", object:myActivity_AltDef };
-            var url = '/statements?statementId=' + redefineStatement.id;
-            env.util.request('PUT', url, JSON.stringify(redefineStatement), true, 409, 'Conflict', function(){
-
-                //Fire off next test
-	        	start();
-
-	        });
-        });
-    })
-});
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
 asyncTest('Profile, multiple', function () {
