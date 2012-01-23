@@ -260,9 +260,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -281,9 +280,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -302,9 +300,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -323,9 +320,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -344,9 +340,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -365,9 +360,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -386,9 +380,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -407,9 +400,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -428,9 +420,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -449,9 +440,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -470,9 +460,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -491,9 +480,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     },
@@ -512,9 +500,8 @@ golfStatements = [
         },
         "context":{
             "contextActivities": {
-                "parent": {
-                    "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html"
-                }
+                "parent": { "id": "scorm.com/GolfExample_TCAPI/GolfAssessment.html" },
+                "grouping": { "id": "scorm.com/GolfExample_TCAPI" }
             }
         }
     }

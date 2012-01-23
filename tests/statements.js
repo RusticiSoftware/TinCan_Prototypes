@@ -358,7 +358,9 @@ asyncTest('GET statements (via POST), all filters', function () {
 		url = '/statements/';
 
 
-	util.request('POST', url, 'limit=10', true, 200, 'OK', function (xhr) {
+    var actorParam = encodeURIComponent(JSON.stringify(env.statement.actor));
+
+	util.request('POST', url, 'limit=10&actor='+actorParam, true, 200, 'OK', function (xhr) {
 		var statements = util.tryJSONParse(xhr.responseText),
 			statement,
 			filters = {},
@@ -377,7 +379,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 			if (statement.context !== undefined && statement.context.registration !== undefined) {
 				filters.registration = statement.context.registration;
 			}
-			filters.actor = JSON.stringify(statement.actor, null, 4);
+			filters.actor = JSON.stringify(env.statement.actor, null, 4);
 
 			for (prop in filters) {
 				if (filters.hasOwnProperty(prop)) {
@@ -446,6 +448,44 @@ function verifyGolfDescendants(callback) {
 		}
 	});
 }
+
+/*asyncTest('Statements, context activities filter', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/statements',
+		statement,
+		testActivity = { id: 'com.scorm.golfsamples.interactions.playing_1'},
+		groupingId = 'scorm.com/GolfExample_TCAPI',
+		groupingFilter = encodeURIComponent(JSON.stringify({id : groupingId}));
+
+	// add statement to find
+	statement = util.clone(getGolfStatement(testActivity.id));
+	statement.id = util.ruuid();
+	statement.context.registration = statement.id;
+
+
+	//?limit=1&activity=' + encodeURIComponent(JSON.stringify(testActivity))
+	// statement not found by context activity w/o using 'context' flag
+	util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function (xhr) {
+	    util.request('PUT', url + "?statementId=" + statement.id, JSON.stringify(statement, null, 4), true, 204, 'No Content', function () {
+	    	util.request('GET', url + '?registration=' + statement.context.registration + '&object=' + groupingFilter, null, true, 200, 'OK', function (xhr) {
+	    		equal(JSON.parse(xhr.responseText).length, 0, 'response, find by ancestor no descendants flag');
+	    		util.request('GET', url + '?registration=' + statement.context.registration + '&context=true&object=' + groupingFilter, null, true, 200, 'OK', function (xhr) {
+	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    				resultStatement = resultStatements[0];
+	    			if (resultStatement === undefined) {
+	    				ok(false, 'statement not found using descendant filter');
+	    			} else {
+	    				equal(resultStatement.id, statement.id, 'correct statement found using descendant filter');
+	    			}
+	    			start();
+	    		});
+	    	});
+	    });
+    });
+});*/
+
 
 /*asyncTest('Statements, descendants filter', function () {
 	"use strict";

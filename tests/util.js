@@ -171,8 +171,12 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
     if(statement.context !== undefined && statement.context.contextActivities !== undefined){
         var ctxacts = statement.context.contextActivities;
         var ctxparent = ctxacts["parent"];
+        var ctxgrouping = ctxacts["grouping"];
         if(ctxparent !== undefined && ctxparent.type === undefined){
             delete responseObj.context.contextActivities["parent"].type;
+        }
+        if(ctxgrouping !== undefined && ctxgrouping.type === undefined){
+            delete responseObj.context.contextActivities["grouping"].type;
         }
     }
     if(statement.actor !== undefined && statement.actor.type === undefined){
