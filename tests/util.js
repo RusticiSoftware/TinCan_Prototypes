@@ -38,12 +38,12 @@ Util.init = function (env) {
 	}
 };
 
-Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
-//Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
-Util.prototype.actor = { mbox : "mailto:auto_tests@example.scorm.com", name : "Auto Test Learner"};
+//Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
+Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
+Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
-Util.prototype.actorUniqueProps = ['mbox', 'account', 'holdsAccount', 'openid', 'weblog', 'homepage', 'yahooChatID', 'aimChatID', 'skypeID', 'mbox_sha1sum'];
+Util.prototype.actorUniqueProps = ['mbox', 'account', 'openid', 'mbox_sha1sum', 'account'];
 
 Util.prototype.areActorsEqual = function (source, target) {
 	"use strict";

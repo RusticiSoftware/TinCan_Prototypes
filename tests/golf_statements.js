@@ -304,8 +304,8 @@ golfStatements = [
 
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -324,8 +324,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -344,8 +344,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -364,8 +364,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -384,8 +384,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -404,8 +404,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -424,8 +424,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -444,8 +444,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -464,8 +464,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -484,8 +484,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -504,8 +504,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -524,8 +524,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -544,8 +544,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -564,8 +564,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {
@@ -584,8 +584,8 @@ golfStatements = [
     },
     {
         "actor": {
-            "mbox": "mailto:tincan@scorm.com",
-            "name": "TinCan User"
+            "mbox": ["mailto:tincan@scorm.com"],
+            "name": ["TinCan User"]
         },
         "verb": "answered",
         "object": {

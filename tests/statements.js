@@ -166,18 +166,19 @@ asyncTest('Reject Actor Modification', function () {
 		modLearnerName = 'Renamed Auto Test Learner';
 
 	util.request('PUT', url + util.ruuid(), JSON.stringify(env.statement), true, null, null, function () {
-		util.request('PUT', url + otherId, JSON.stringify(env.statement).replace(env.statement.actor.name, modLearnerName), true, 204, 'No Content', function () {
+		util.request('PUT', url + otherId, JSON.stringify(env.statement).replace(env.statement.actor.name[0], modLearnerName), true, 204, 'No Content', function () {
 			util.request('GET', url + otherId, null, true, 200, 'OK', function (xhr) {
 				var response;
 				response = util.tryJSONParse(xhr.responseText);
 
 				// verify statement is returned with modified name, but then undo modification for checking the rest of the statement
-				equal(response.actor.name, modLearnerName);
+				equal(response.actor.name[0], modLearnerName);
 				response.actor.name = env.statement.actor.name;
 				util.validateStatement(JSON.stringify(response), env.statement, otherId);
 
 				util.request('GET', '/actors?actor=<actor>', null, true, 200, 'OK', function (xhr) {
-					equal(util.tryJSONParse(xhr.responseText).name, env.statement.actor.name, 'Actor should not have been renamed based on statement.');
+					equal(util.tryJSONParse(xhr.responseText).name[0], env.statement.actor.name[0], 
+                          'Actor should not have been renamed based on statement.');
 					start();
 				});
 			});
