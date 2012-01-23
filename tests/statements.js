@@ -288,7 +288,7 @@ asyncTest('POST multiple', function () {
 		var ids = JSON.parse(xhr.responseText),
 			object,
 			ii,
-			testId = ids[5]; // first few statements aren't good examples, grab the 5th one
+			testId = ids[ids.length - 5]; // first few statements aren't good examples, grab a later one
 
 		for (ii = 0; ii < golfStatements.length; ii++) {
 			if (golfStatements[ii].id === testId) {
@@ -426,7 +426,7 @@ function getGolfStatement(id) {
 	var ii, util = statementsEnv.util;
 
 	for (ii = 0; ii < util.golfStatements.length; ii++) {
-		if (util.golfStatements[ii].object.id === id) {
+		if (util.golfStatements[ii].object.id === id && util.golfStatements[ii].verb != "imported") {
 			return util.golfStatements[ii];
 		}
 	}
@@ -449,42 +449,97 @@ function verifyGolfDescendants(callback) {
 	});
 }
 
-/*asyncTest('Statements, context activities filter', function () {
+asyncTest('Statements, context activities filter', function () {
 	"use strict";
-	var env = statementsEnv,
-		util = env.util,
-		url = '/statements',
-		statement,
-		testActivity = { id: 'com.scorm.golfsamples.interactions.playing_1'},
-		groupingId = 'scorm.com/GolfExample_TCAPI',
-		groupingFilter = encodeURIComponent(JSON.stringify({id : groupingId}));
+	var env = statementsEnv;
+	var util = env.util;
+	var url = '/statements';
+
+	var testActivity = { id: 'com.scorm.golfsamples.interactions.playing_1'};
+
+	var groupingId = 'scorm.com/GolfExample_TCAPI';
+	var groupingFilter = encodeURIComponent(JSON.stringify({id : groupingId}));
+
+    var parentId = 'scorm.com/GolfExample_TCAPI/GolfAssessment.html';
+    var parentFilter = encodeURIComponent(JSON.stringify({id : parentId}));
+
+    var otherId = "com.scorm.golfsamples.context_other";
+    var otherFilter = encodeURIComponent(JSON.stringify({id : otherId}));
 
 	// add statement to find
-	statement = util.clone(getGolfStatement(testActivity.id));
+	var statement = util.clone(getGolfStatement(testActivity.id));
 	statement.id = util.ruuid();
 	statement.context.registration = statement.id;
 
 
-	//?limit=1&activity=' + encodeURIComponent(JSON.stringify(testActivity))
-	// statement not found by context activity w/o using 'context' flag
-	util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function (xhr) {
-	    util.request('PUT', url + "?statementId=" + statement.id, JSON.stringify(statement, null, 4), true, 204, 'No Content', function () {
-	    	util.request('GET', url + '?registration=' + statement.context.registration + '&object=' + groupingFilter, null, true, 200, 'OK', function (xhr) {
-	    		equal(JSON.parse(xhr.responseText).length, 0, 'response, find by ancestor no descendants flag');
-	    		util.request('GET', url + '?registration=' + statement.context.registration + '&context=true&object=' + groupingFilter, null, true, 200, 'OK', function (xhr) {
+    async.waterfall([
+        function(cb){
+            //Post all the golf statements (which include grouping and parent context activities)
+	        util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function(){cb(null);});
+        },
+        function(cb){
+            //Put this extra, specific statement that we'll be looking for...
+	        util.request('PUT', url + "?statementId=" + statement.id, JSON.stringify(statement, null, 4), true, 
+                         204, 'No Content', function(){cb(null);});
+        },
+        function(cb){
+            //Try to find statements on grouping activity, without context flag, should not be found...
+            var thisUrl = url + '?registration=' + statement.context.registration + '&object=' + groupingFilter;
+	    	util.request('GET', thisUrl, null, true, 200, 'OK', 
+                 function (xhr) {
+	    		    equal(JSON.parse(xhr.responseText).length, 0, 'response, find by context, no context flag');
+                    cb(null);
+                 });
+        },
+        function(cb){
+            //Now look for statements w/ grouping activity and context flag
+            var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + groupingFilter;
+	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
+                function (xhr) {
 	    			var resultStatements = util.tryJSONParse(xhr.responseText),
 	    				resultStatement = resultStatements[0];
 	    			if (resultStatement === undefined) {
-	    				ok(false, 'statement not found using descendant filter');
+	    				ok(false, 'statement not found using context filter (grouping activity)');
 	    			} else {
-	    				equal(resultStatement.id, statement.id, 'correct statement found using descendant filter');
+	    				equal(resultStatement.id, statement.id, 'correct statement found using context filter (grouping activity)');
 	    			}
-	    			start();
-	    		});
-	    	});
-	    });
-    });
-});*/
+                    cb(null);
+                });
+        },
+        function(cb){
+            //Now look for statements w/ parent activity and context flag
+            var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + parentFilter;
+	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
+                function (xhr) {
+	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    				resultStatement = resultStatements[0];
+	    			if (resultStatement === undefined) {
+	    				ok(false, 'statement not found using context filter (parent activity)');
+	    			} else {
+	    				equal(resultStatement.id, statement.id, 'correct statement found using context filter (parent activity)');
+	    			}
+                    cb(null);
+                });
+        },
+        function(cb){
+            //Now look for statements w/ "other" activity and context flag
+            var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + otherFilter;
+	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
+                function (xhr) {
+	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    				resultStatement = resultStatements[0];
+	    			if (resultStatement === undefined) {
+	    				ok(false, 'statement not found using context filter (other activity)');
+	    			} else {
+	    				equal(resultStatement.id, statement.id, 'correct statement found using context filter (other activity)');
+	    			}
+                    cb(null);
+                });
+        },
+        //Start the next test
+        start,
+    ]);
+});
 
 
 /*asyncTest('Statements, descendants filter', function () {
