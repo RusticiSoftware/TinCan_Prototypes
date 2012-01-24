@@ -22,7 +22,7 @@ asyncTest('Definition', function () {
 		url = '/actors?actor=<actor>';
 
 	env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
-		deepEqual(env.util.tryJSONParse(xhr.responseText).mbox, env.util.actor.mbox, 'actor mbox');
+		equal(env.util.tryJSONParse(xhr.responseText).mbox[0], env.util.actor.mbox[0], 'actor mbox');
 		start();
 	});
 });

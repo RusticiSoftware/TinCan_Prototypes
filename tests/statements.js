@@ -296,12 +296,12 @@ asyncTest('POST multiple', function () {
 				object = encodeURIComponent(JSON.stringify(golfStatements[ii].object, null, 4));
 
 				env.util.request('GET', url + '?limit=5&sparse=false&object=' + object, null, true, 200, 'OK', function (xhr) {
-					var results = util.tryJSONParse(xhr.responseText),
-						jj;
-					for (jj = 0; jj < results.length; jj++) {
-						if (results[jj].id === golfStatements[ii].id) {
-							delete results[jj].object.definition;
-							env.util.validateStatement(results[jj], golfStatements[ii], testId);
+					var result = util.tryJSONParse(xhr.responseText);
+                    var statements = result.statements;
+					for (var jj = 0; jj < statements.length; jj++) {
+						if (statements[jj].id === golfStatements[ii].id) {
+							delete statements[jj].object.definition;
+							env.util.validateStatement(statements[jj], golfStatements[ii], testId);
 							start();
 							return;
 						}
@@ -319,7 +319,7 @@ asyncTest('POST multiple', function () {
 	});
 });
 
-asyncTest('GET statements', function () {
+asyncTest('GET statements, simple', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -327,7 +327,7 @@ asyncTest('GET statements', function () {
 
 
 	util.request('GET', url + '?limit=1', null, true, 200, 'OK', function (xhr) {
-		var result = util.tryJSONParse(xhr.responseText);
+		var result = util.tryJSONParse(xhr.responseText).statements;
 		console.log(JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'GET limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
@@ -335,7 +335,69 @@ asyncTest('GET statements', function () {
 	});
 });
 
-asyncTest('GET statements (via POST)', function () {
+asyncTest('GET statements, continue token', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/statements/';
+
+    var recordsAtOnce = null;
+    var recordsOverPages = new Array();
+
+    async.waterfall([
+        function(cb){
+            //Normal get, to grab a few record to help verify
+	        util.request('GET', url + '?limit=6', null, true, 200, 'OK', 
+                function (xhr) {
+                    recordsAtOnce = util.tryJSONParse(xhr.responseText).statements;
+                    cb(null);
+            });
+        },
+        function(cb){
+            //Get first page, just two records...
+        	util.request('GET', url + '?limit=2', null, true, 200, 'OK', function (xhr) {
+        		var result = util.tryJSONParse(xhr.responseText);
+                var statements = result.statements;
+        		equal(statements.length, 2, 'GET limit 2');
+                recordsOverPages = recordsOverPages.concat(statements);
+                cb(null, result.more);
+            });
+        },
+        function(moreUrl, cb){
+            //Get next page, two more records...
+            util.request('GET', moreUrl, null, true, 200, 'OK', function(xhr) {
+		        var result = util.tryJSONParse(xhr.responseText);
+                var statements = result.statements;
+		        equal(statements.length, 2, 'GET (more url) limit 2');
+                recordsOverPages = recordsOverPages.concat(statements);
+                cb(null, result.more);
+            });
+        },
+        function(moreUrl, cb){
+            //Get next page, two more records...
+            util.request('GET', moreUrl, null, true, 200, 'OK', function(xhr) {
+		        var result = util.tryJSONParse(xhr.responseText);
+                var statements = result.statements;
+		        equal(statements.length, 2, 'GET (second more url) limit 2');
+                recordsOverPages = recordsOverPages.concat(statements);
+                cb(null);
+            });
+        },
+        function(cb){
+            //Compare all at once results to paged results...
+            equal(recordsAtOnce.length, recordsOverPages.length, 'Paged result same as all at once');
+            for(var i = 0; i < recordsOverPages.length; i++){
+                equal(recordsOverPages[i].id, recordsAtOnce[i].id, 'Statement ' + i + ' has same id in both results');
+            }
+            cb(null);
+        },
+        //Start the test runner again...
+        start
+    ]);
+
+});
+
+asyncTest('GET statements (via POST), simple', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -343,7 +405,7 @@ asyncTest('GET statements (via POST)', function () {
 
 
 	util.request('POST', url, 'limit=1', true, 200, 'OK', function (xhr) {
-		var result = util.tryJSONParse(xhr.responseText);
+		var result = util.tryJSONParse(xhr.responseText).statements;
 		console.log(JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'POST limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
@@ -362,7 +424,7 @@ asyncTest('GET statements (via POST), all filters', function () {
     var actorParam = encodeURIComponent(JSON.stringify(env.statement.actor));
 
 	util.request('POST', url, 'limit=10&actor='+actorParam, true, 200, 'OK', function (xhr) {
-		var statements = util.tryJSONParse(xhr.responseText),
+		var statements = util.tryJSONParse(xhr.responseText).statements,
 			statement,
 			filters = {},
 			prop,
@@ -389,7 +451,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 			}
 
 			util.request('POST', url, queryString.join('&'), true, 200, 'OK', function (xhr) {
-				var results = util.tryJSONParse(xhr.responseText),
+				var results = util.tryJSONParse(xhr.responseText).statements,
 					ii,
 					found = false;
 
@@ -488,7 +550,7 @@ asyncTest('Statements, context activities filter', function () {
             var thisUrl = url + '?registration=' + statement.context.registration + '&object=' + groupingFilter;
 	    	util.request('GET', thisUrl, null, true, 200, 'OK', 
                  function (xhr) {
-	    		    equal(JSON.parse(xhr.responseText).length, 0, 'response, find by context, no context flag');
+	    		    equal(JSON.parse(xhr.responseText).statements.length, 0, 'response, find by context, no context flag');
                     cb(null);
                  });
         },
@@ -497,7 +559,7 @@ asyncTest('Statements, context activities filter', function () {
             var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + groupingFilter;
 	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
                 function (xhr) {
-	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    			var resultStatements = util.tryJSONParse(xhr.responseText).statements,
 	    				resultStatement = resultStatements[0];
 	    			if (resultStatement === undefined) {
 	    				ok(false, 'statement not found using context filter (grouping activity)');
@@ -512,7 +574,7 @@ asyncTest('Statements, context activities filter', function () {
             var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + parentFilter;
 	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
                 function (xhr) {
-	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    			var resultStatements = util.tryJSONParse(xhr.responseText).statements,
 	    				resultStatement = resultStatements[0];
 	    			if (resultStatement === undefined) {
 	    				ok(false, 'statement not found using context filter (parent activity)');
@@ -527,7 +589,7 @@ asyncTest('Statements, context activities filter', function () {
             var thisUrl = url + '?registration=' + statement.context.registration + '&context=true&object=' + otherFilter;
 	   	    util.request('GET', thisUrl, null, true, 200, 'OK', 
                 function (xhr) {
-	    			var resultStatements = util.tryJSONParse(xhr.responseText),
+	    			var resultStatements = util.tryJSONParse(xhr.responseText).statements,
 	    				resultStatement = resultStatements[0];
 	    			if (resultStatement === undefined) {
 	    				ok(false, 'statement not found using context filter (other activity)');
