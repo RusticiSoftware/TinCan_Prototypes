@@ -95,8 +95,8 @@ asyncTest('Definition, extensions', function () {
 	    env.util.request('GET', "/activities?activityId=" + myActivityId, null, true, 200, 'OK', function (xhr) {
 	    	var activity = env.util.tryJSONParse(xhr.responseText);
             //Is is the same as we sent?
-            if(myActivity.type === undefined){
-                delete activity.type;
+            if(myActivity.objectType === undefined){
+                delete activity.objectType;
             }
 	    	deepEqual(activity, myActivity, 'persisted activity');
 	    	start();

@@ -24,7 +24,7 @@ Util.init = function (env) {
 		env.id = env.util.ruuid();
 		env.statement = {
 			actor: {
-                "type": "Person",
+                "objectType": "Person",
 				"mbox": env.util.actor.mbox,
 				"name": env.util.actor.name
 			},
@@ -38,8 +38,8 @@ Util.init = function (env) {
 	}
 };
 
-Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
-//Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
+//Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
+Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
@@ -165,22 +165,22 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 		delete responseObj.context.activity.definition;
 	}
     delete responseObj.inProgress;
-    if(statement.object.type === undefined){
-        delete responseObj.object.type;
+    if(statement.object.objectType === undefined){
+        delete responseObj.object.objectType;
     }
     if(statement.context !== undefined && statement.context.contextActivities !== undefined){
         var ctxacts = statement.context.contextActivities;
         var ctxparent = ctxacts["parent"];
         var ctxgrouping = ctxacts["grouping"];
-        if(ctxparent !== undefined && ctxparent.type === undefined){
-            delete responseObj.context.contextActivities["parent"].type;
+        if(ctxparent !== undefined && ctxparent.objectType === undefined){
+            delete responseObj.context.contextActivities["parent"].objectType;
         }
-        if(ctxgrouping !== undefined && ctxgrouping.type === undefined){
-            delete responseObj.context.contextActivities["grouping"].type;
+        if(ctxgrouping !== undefined && ctxgrouping.objectType === undefined){
+            delete responseObj.context.contextActivities["grouping"].objectType;
         }
     }
-    if(statement.actor !== undefined && statement.actor.type === undefined){
-        delete responseObj.actor.type;
+    if(statement.actor !== undefined && statement.actor.objectType === undefined){
+        delete responseObj.actor.objectType;
     }
 
 	deepEqual(responseObj, statement, "statement");
