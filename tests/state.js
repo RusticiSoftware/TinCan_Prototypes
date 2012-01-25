@@ -32,8 +32,9 @@ function putGetStateTest(env, useRegistration) {
 		wrongReg = '&registration=autoTestRegWRONG';
 	}
 
+    var headers = {"Content-Type":"text/plain"};
 	env.util.request('GET', url + reg, null, true, 404, 'Not Found', function () {
-		env.util.request('PUT', url + reg, stateText, true, 204, 'No Content', function () {
+		env.util.requestWithHeaders('PUT', url + reg, headers, stateText, true, 204, 'No Content', function () {
 			env.util.request('GET', url + wrongReg, null, true, useRegistration ? 404 : 200, useRegistration ? 'Not Found' : 'OK', function () {
 				env.util.request('GET', url + reg, null, true, 200, 'OK', function (xhr) {
 					equal(xhr.responseText, stateText);

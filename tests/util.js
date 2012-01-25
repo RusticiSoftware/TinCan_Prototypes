@@ -38,8 +38,8 @@ Util.init = function (env) {
 	}
 };
 
-//Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
-Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
+Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
+//Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
@@ -106,7 +106,9 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     }
 
 	xhr.open(method, this.endpoint + url, true);
-	xhr.setRequestHeader("Content-Type", contentType);
+    if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
+	    xhr.setRequestHeader("Content-Type", contentType);
+    }
     /*if(contentLength > 0){
         xhr.setRequestHeader("Content-Length", contentLength);
     }*/
@@ -247,14 +249,16 @@ Util.prototype.putGetDeleteStateTest = function (env, url) {
 		urlKey = url + "&profileId=" + encodeURIComponent(env.id);
 		//urlKey = url.addFS() + env.id;
 
+    var headers = {"Content-Type":"text/plain"};
+
 	env.util.request('GET', urlKey, null, true, 404, 'Not Found', function () {
-		env.util.request('PUT', urlKey, testText, true, 204, 'No Content', function () {
+		env.util.requestWithHeaders('PUT', urlKey, headers, testText, true, 204, 'No Content', function () {
 			env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
 
 				equal(xhr.responseText, testText);
                 var digestBytes = Crypto.SHA1(xhr.responseText, { asBytes: true });
                 var digest = Crypto.util.bytesToHex(digestBytes);
-                var headers = {"If-Matches":'"'+digest+'"'};
+                headers["If-Matches"] = '"'+digest+'"';
 
 				env.util.requestWithHeaders('PUT', urlKey, headers, testText + '_modified', true, 204, 'No Content', function () {
 					env.util.request('GET', urlKey, null, true, 200, 'OK', function (xhr) {
