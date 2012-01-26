@@ -99,28 +99,40 @@ function TCDriver_GetLRSObject(){
 			lrs[lrsProps[i]] = getQueryStringParam(lrsProps[i]);
 		}
 	}
+    if(lrs.endpoint === undefined || lrs.endpoint == "" || lrs.auth === undefined || lrs.auth == ""){
+        alert("Configuring TCDriver LRS Object from queryString failed");
+        return null;
+    }
 	return lrs;
 }
 
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SendStatement (lrs, stmt, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		XHR_request(lrs.endpoint+"statements/"+_ruuid(), "PUT", JSON.stringify(stmt), lrs.auth, callback);
+        if(stmt.actor === undefined){
+            stmt.actor = JSON.parse(lrs.actor);
+        }
+		XHR_request(lrs.endpoint+"statements/?statementId="+_ruuid(), "PUT", JSON.stringify(stmt), lrs.auth, callback);
 	}
 }
 
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SendMultiStatements (lrs, stmtArray, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
+        for(var i = 0; i < stmtArray; i++){
+            var stmt = stmtArray[i];
+            if(stmt.actor === undefined){
+                stmt.actor = JSON.parse(lrs.actor);
+            }
+        }
 		XHR_request(lrs.endpoint+"statements/", "POST", JSON.stringify(stmtArray), lrs.auth, callback);
 	}
 }
 
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SendState (lrs, activityId, stateKey, stateVal, callback) {
-	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
+		var url = lrs.endpoint + "activities/state?activityId=<activity ID>&actor=<actor>&stateId=<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
@@ -133,7 +145,7 @@ function TCDriver_SendState (lrs, activityId, stateKey, stateVal, callback) {
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_GetState (lrs, activityId, stateKey, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
+		var url = lrs.endpoint + "activities/state?activityId=<activity ID>&actor=<actor>&stateId=<statekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<actor>',encodeURIComponent(lrs.actor));

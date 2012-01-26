@@ -16,36 +16,29 @@
 </script>
     <title>Course Launch Page</title>
 	<script src="scripts/TCDriver.js" type="text/javascript"></script>
+	<script src="scripts/common.js" type="text/javascript"></script>
     <script type="text/javascript">
     
+        var context = GolfExample.GetContext(GolfExample.CourseActivity);
 
-		var courseObj = new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI")
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Golf Example - Tin Can Course")
-				.SetValue("type","Course")
-				.SetValue("description","An overview of how to play the great game of golf.")
-					.SetValue("children",[
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Playing/Par.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Playing/Scoring.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Playing/OtherScoring.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Playing/RulesOfGolf.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Etiquette/Course.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Etiquette/Distracting.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Etiquette/Play.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/Overview.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/CalculatingHandicap.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/CalculatingScore.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Handicapping/Example.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/HavingFun/HowToHaveFun.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/HavingFun/MakeFriends.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/HavingFun/HowToBeStylish.html"),
-						new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/GolfAssessment.html")	]));
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","attempted")
-			.SetValue("inprogress",true)
-			.SetValue("object",courseObj)
-			.Send();
+		var courseObj = {
+            "id":"scorm.com/GolfExample_TCAPI",
+            "definition":{
+            	"name":"Golf Example - Tin Can Course",
+            	"type":"Course",
+            	"description":"An overview of how to play the great game of golf."
+            }
+        };
+
+        var stmt = {
+            "verb":"attempted",
+            "inprogress":true,
+            "object":courseObj,
+            "context":context
+        };
 
 
+        TCDriver_SendStatement(tc_lrs, stmt);
 	
     /*************************************/
     //functions for sizing the iFrame
@@ -120,7 +113,7 @@
         SetupIFrame();
         		
 //get activity_id bookmark if it exists
-       	var bookmark = TCDriver_GetState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location");
+       	var bookmark = TCDriver_GetState(tc_lrs, "scorm.com/GolfExample_TCAPI", "location");
         
         //if there isn't a stored bookmark, start the user at the first page
         if (bookmark == ""){
@@ -167,10 +160,7 @@
         }
 
         //save the current location as the bookmark
-		TCDriver_SendState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
-
-        
-
+		TCDriver_SetState(tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
         
     }
     
