@@ -38,9 +38,7 @@ Util.init = function (env) {
 	}
 };
 
-Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
-//Util.prototype.endpoint = "http://localhost/ScormEngine/ScormEngineInterface/TCAPI";
-//Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
+Util.prototype.endpoint = Config.endpoint;
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
 Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : 'Tin Can Auto Test Activity' } };
