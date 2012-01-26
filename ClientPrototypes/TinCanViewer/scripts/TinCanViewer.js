@@ -1,6 +1,8 @@
 
-var endpoint = "http://localhost:8080/TCAPI/";
+var endpoint = "http://api.projecttincan.com/";
 var auth = "Basic dGVzdDpwYXNzd29yZA==";
+var firstStored = null;
+var fetched = 0;
 
 google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -12,10 +14,7 @@ $(document).ready(function(){
 		TC_GetStatements(25,null,null,RenderStatements);
 	});
 	$('#showAllStatements').click(function(){
-		if (confirm("Are you sure?\nThis could take a while to load and could even make the system (and your browser) unresponsive. But it's up to you.")){
-			$("#theStatements").empty();
-			TC_GetStatements(0,null,null,RenderStatements);
-		}
+		TC_GetStatements(25,null,null,RenderStatements, true);
 	});
 	
 	TC_GetActivityProfile ("scorm.com/JsTetris_TCAPI", "highscores", RenderHighScores);
@@ -36,7 +35,7 @@ $(document).ready(function(){
 	});
 	
 	
-	TC_GetStatements(0,null,"scorm.com/Course/NashvilleMuseumsTour",RenderLocationData);
+	TC_GetStatements(0,null,"scorm.com/Course/DevLearnLasVegas.2",RenderLocationData);
 	RequestLocations();
 	$('#refreshLocationCourseData').click(function(){
 		$("#locationCourseData").empty();
@@ -62,8 +61,12 @@ $(document).ready(function(){
 
 
 
-function TC_GetStatements (num,verb,activityId,callbackFunction) {
+function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage) {
 	var url = endpoint + "statements/?sparse=false";
+	if (nextPage && firstStored) {
+		url += "&offset=" + fetched;
+		url += "&until=" + firstStored;
+	}
 	if (num > 0){
 		url += "&limit=" + num;
 	}
@@ -74,19 +77,8 @@ function TC_GetStatements (num,verb,activityId,callbackFunction) {
 		var obj = {id:activityId};
 		url += "&object=" + encodeURIComponent(JSON.stringify(obj));
 	}
-	
-	
-	var xhr = new XMLHttpRequest();
-	xhr.open("Get", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.setRequestHeader("Authorization", auth);
-	xhr.onreadystatechange = function() {
-	    if(xhr.readyState == 4 ) {
-             callbackFunction(xhr.responseText);
-		}
-	};
-	xhr.send(null);
-	
+
+	XHR_request(url, "GET", null, auth, callbackFunction);
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
@@ -97,46 +89,36 @@ function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-				if(xhr.status != 404 ) {
-		       		callbackFunction(xhr.responseText);
-				}
-	     	}
-		};
-		xhr.send(null);
-	
+		XHR_request(url, "GET", null, auth, callbackFunction, true);
 }
 
 function TC_DeleteLRS(){
 
 	var url = endpoint;
-	
-	var xhr = new XMLHttpRequest();
-	xhr.open("DELETE", url, false);
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.setRequestHeader("Authorization", auth);
-	xhr.send(null);
-	
-	window.location = window.location;
+	XHR_request(url, "DELETE", null, auth, function () {
+		window.location = window.location;
+	});
 }
 
 function RenderStatements(statementsStr){
 	var statements = eval('(' + statementsStr + ')');
-	
 	var stmtStr = "<table>";
-	
 	var i;
+	var dt;
+	var aDate;
+
+	if (statements.length > 0) {
+		if (!firstStored) {
+			firstStored = statements[0].stored;
+		}
+		fetched += statements.length;
+	}
+
 	for (i = 0; i < statements.length ; i++){
 		stmtStr += "<tr class='statement' tcid='" + statements[i].id + "'>";
-		
-		//var dt = statements[i].stored.substr(0,19).replace("T"," ");//yyyy-MM-ddTHH:mm:ss
-		var dt = new Date(statements[i].stored);
-		stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString() +"</td>";
+		aDate = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(statements[i].stored);
+		dt = new Date(Date.UTC(aDate[1], aDate[2]-1, aDate[3], aDate[4], aDate[5], aDate[6]));  
+		stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString()  +"</td>";
 		
 		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name : statements[i].actor.mbox;
 		stmtStr += "<td > <span class='actor'>"+ name +"</span>";
@@ -479,12 +461,19 @@ function RenderLocationData(statementsStr){
 }
 
 function RequestLocations(){
-	var locations = ["scorm.com/Course/NashvilleMuseums/Parthenon",
+	/*var locations = ["scorm.com/Course/NashvilleMuseums/Parthenon",
 					"scorm.com/Course/NashvilleMuseums/CountryMusicHallofFame",
 					"scorm.com/Course/NashvilleMuseums/TheFrist",
 					"scorm.com/Course/NashvilleMuseums/AdventureScienceCenter",
 					"scorm.com/Course/NashvilleMuseums/Cheekwood"];
-	
+	*/
+	var locations = ["scorm.com/Course/DevLearnLasVegas/DevLearn",
+		"scorm.com/Course/DevLearnLasVegas/Fountains",
+		"scorm.com/Course/DevLearnLasVegas/EiffelTower",
+		"scorm.com/Course/DevLearnLasVegas/HarleyDavidson",
+		"scorm.com/Course/DevLearnLasVegas/NYNY",
+		"scorm.com/Course/DevLearnLasVegas/LeoLion",
+		"scorm.com/Course/DevLearnLasVegas/Airport"];
 	for (var i = 0; i < locations.length ; i++){
 		TC_GetStatements(0,null,locations[i],RenderLocations);
 	}

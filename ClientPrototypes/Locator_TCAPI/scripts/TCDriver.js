@@ -2,6 +2,94 @@ var tc_lrs = TCDriver_GetLRSObject();
 //alert(tc_lrs.actor);
 //alert(JSON.stringify(tc_lrs));
 
+function delay() {
+	var xhr = new XMLHttpRequest();
+	var url = window.location + '?forcenocache='+_ruuid();
+	xhr.open('GET', url, false);
+	xhr.send(null);
+}
+
+// Synchronous if callback is not provided (not recommended)
+function XHR_request(url, method, data, auth, callback, ignore404) {
+	"use strict";
+	var xhr,
+		finished = false,
+		xDomainRequest = false,
+		ieXDomain = false,
+		title,
+		ticks = ['/','-','\\','|'],
+		urlparts = url.toLowerCase().match(/^(.+):\/\/([^:\/]*):?(\d+)?(\/.*)?$/),
+		location = window.location,
+		urlPort,
+		result,
+		until;
+
+		
+	xDomainRequest = (location.protocol.toLowerCase() !== urlparts[1] || location.hostname.toLowerCase() !== urlparts[2]);
+	if (!xDomainRequest) {
+		urlPort = (urlparts[3] === null ? ( urlparts[1] === 'http' ? '80' : '443') : urlparts[3]);
+		xDomainRequest = (urlPort === location.port);
+	}
+	if (!xDomainRequest || typeof(XDomainRequest) === 'undefined') {
+		xhr = new XMLHttpRequest();
+	        xhr.open(method, url, (callback == true));
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("Authorization", auth);
+
+	} else {
+		if ('post,get'.indexOf(method.toLowerCase()) < 0) {
+			alert("Internet Explorer does not support cross domain requests with method: " + method );
+			return "";
+		}
+		ieXDomain = true;
+		xhr = new XDomainRequest();
+	        xhr.open(method, url);
+	}
+	
+	function requestComplete() {
+	    if(!finished ) {
+		// may be in sync or async mode, using XMLHttpRequest or IE XDomainRequest, onreadystatechange or
+		// onload or both might fire depending upon browser, just covering all bases with event hooks and
+		// using 'finished' flag to avoid triggering events multiple times
+	    	finished = true;
+		if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 300)) {
+	    		if (callback) {
+					callback(xhr.responseText);
+	    		} else {
+				result = xhr.responseText;
+	    			return xhr.responseText;
+	    		}
+			} else if (!ignore404 || xhr.status != 404) {
+
+				alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + ")");
+				throw new Error("debugger");
+			}
+		} else {
+			return result;
+		}
+	};
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4) {
+				requestComplete();
+			}
+		}
+	        xhr.onload = requestComplete;
+       		xhr.onerror = requestComplete;
+	xhr.send(data);
+	
+	if (!callback) {
+		// synchronous
+		if (ieXDomain) {
+			// synchronous call in IE, with no asynchronous mode available.
+			until = 1000 + new Date();
+			while (new Date() < until && xhr.readyState !== 4 && !finished) {
+				delay();
+			}
+		}
+		return requestComplete();
+	}
+}
+
 function TCDriver_GetLRSObject(){
 	var lrsProps = ["endpoint","auth","actor","registration","activity_id"];
 	var lrs = new Object();
@@ -14,44 +102,22 @@ function TCDriver_GetLRSObject(){
 	return lrs;
 }
 
-
-function TCDriver_CheckStatus(xhr){
-	if(xhr.status!=204 && xhr.status!=200){
-		alert("There was a problem sending data back to the Learning Record Store. (" + xhr.status + ")");
-    }
-}
-
-function TCDriver_SendStatement (lrs,stmt) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_SendStatement (lrs, stmt, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var xhr = new XMLHttpRequest();
-		xhr.open("PUT", lrs.endpoint+"statements/"+_ruuid(), true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-	             TCDriver_CheckStatus(xhr);
-			}
-		};
-		xhr.send(JSON.stringify(stmt));
+		XHR_request(lrs.endpoint+"statements/"+_ruuid(), "PUT", JSON.stringify(stmt), lrs.auth, callback);
 	}
 }
 
-function TCDriver_SendMultiStatements (lrs,stmtArray) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_SendMultiStatements (lrs, stmtArray, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var xhr = new XMLHttpRequest();
-		xhr.open("POST", lrs.endpoint+"statements/"+_ruuid(), true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-	             TCDriver_CheckStatus(xhr);
-			}
-		};
-		xhr.send(JSON.stringify(stmtArray));
+		XHR_request(lrs.endpoint+"statements/", "POST", JSON.stringify(stmtArray), lrs.auth, callback);
 	}
 }
 
-function TCDriver_SendState (lrs, activityId, stateKey, stateVal) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_SendState (lrs, activityId, stateKey, stateVal, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
@@ -60,20 +126,12 @@ function TCDriver_SendState (lrs, activityId, stateKey, stateVal) {
 		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
-		var xhr = new XMLHttpRequest();
-		xhr.open("PUT", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-	             TCDriver_CheckStatus(xhr);
-			}
-		};
-		xhr.send(stateVal);
+		XHR_request(url, "PUT", JSON.stringify(stateVal), lrs.auth, callback);
 	}
 }
 
-function TCDriver_GetState (lrs, activityId, stateKey) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_GetState (lrs, activityId, stateKey, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/<activity ID>/state/<actor>/<statekey>";
 		
@@ -81,20 +139,12 @@ function TCDriver_GetState (lrs, activityId, stateKey) {
 		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, false);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.send(null);
-		if(xhr.status != 200 ) {
-             return "";
-		} else {
-			return xhr.responseText;
-		}
+		return XHR_request(url, "GET", null, lrs.auth, callback, true);
 	}
 }
 
-function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
@@ -102,20 +152,12 @@ function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr) 
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		var xhr = new XMLHttpRequest();
-		xhr.open("PUT", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.onreadystatechange = function() {
-		    if(xhr.readyState == 4 ) {
-	             TCDriver_CheckStatus(xhr);
-			}
-		};
-		xhr.send(profileStr);
+		XHR_request(url, "PUT", profileStr, lrs.auth, callback);
 	}
 }
 
-function TCDriver_GetActivityProfile (lrs, activityId, profileKey) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_GetActivityProfile (lrs, activityId, profileKey, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
@@ -123,20 +165,12 @@ function TCDriver_GetActivityProfile (lrs, activityId, profileKey) {
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, false);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.send(null);
-		if(xhr.status == 404 ) {
-             return "";
-		} else {
-			return xhr.responseText;
-		}
+		return XHR_request(url, "GET", null, lrs.auth, callback);
 	}
 }
 
-function TCDriver_GetStatements (lrs,sendActor,verb,activityId) {
+// Synchronous if callback is not provided (not recommended)
+function TCDriver_GetStatements (lrs,sendActor,verb,activityId, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		
 		var url = lrs.endpoint + "statements/?sparse=false";
@@ -153,13 +187,7 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId) {
 		}
 	
 	
-		var xhr = new XMLHttpRequest();
-		xhr.open("Get", url, false);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.setRequestHeader("Authorization", lrs.auth);
-		xhr.send(null);
-		return xhr.responseText;
-		
+		return XHR_request(url, "GET", null, lrs.auth, callback);
 	}
 }
 
@@ -239,6 +267,3 @@ function _ruuid() {
                 return v.toString(16);
         });
  }
-
-	
-	

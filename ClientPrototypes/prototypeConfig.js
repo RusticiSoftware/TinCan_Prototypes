@@ -4,7 +4,7 @@ Tin Can Prototype Config settings.
 
 *************************/
 
-var PROTOTYPE_ENDPOINT = "http://localhost:8080/TCAPI/";
+var PROTOTYPE_ENDPOINT = "http://api.projecttincan.com/";
 var PROTOTYPE_AUTH = "Basic dGVzdDpwYXNzd29yZA==";
 
 var PROTOTYPE_DEFAULT_NAME = "TinCan User";

@@ -19,8 +19,7 @@
 </head>
 <body>
 	<div class="headerDiv">
-    		<div style="text-align:center; width:100%;font-size:200%;margin:15px;"><a style="" href="http://scorm.com/tincan">TinCan Home</a>&nbsp;&nbsp;&nbsp; <a style="" href="/ClientPrototypes">Prototypes</a>&nbsp;&nbsp;&nbsp<a href="/LRS/usage">Build Your Own</a></div>
-		
+                <div style="text-align:center; width:100%;font-size:200%;margin:15px;"><a style="" href="http://scorm.com/tincan">TinCan Home</a>&nbsp;&nbsp;&nbsp; <a style="" href="/ClientPrototypes">Prototypes</a>&nbsp;&nbsp;&nbsp<a href="/LRS/usage">Build Your Own</a></div>		
 		
 		<div class="title"></div>
 		<div id="enableLocButtonDiv"><button id="WatchingLocationAction">Disable Location Tracking</button></div>
@@ -126,6 +125,7 @@
 				
 				pmrk.visited = true;
 				pmrk.gmarker.setIcon(Scavenger.currentVisitedIcon);
+				$('.loc[name="' + Scavenger.currentPlacemark.name + '"]').removeClass('onPlacemark');
 				
 				$('.loc[name="' + pmrk.name + '"]').addClass('visited'); 
 				
@@ -133,7 +133,6 @@
 
 				if (Scavenger.useLocationCheat){
 					Scavenger.showLocation(position);
-
 				}				
 			} /*else {
 			
@@ -203,7 +202,7 @@
 				var html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
 				html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
 				if (Placemarks[itm].website != undefined && Placemarks[itm].website != "")
-					html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
+					html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Learn more</a>";
 				html += "</div>";
 				
 				$("#locationListings").append(html);

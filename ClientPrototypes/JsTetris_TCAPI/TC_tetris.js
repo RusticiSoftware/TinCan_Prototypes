@@ -6,7 +6,7 @@ var actorEmail = "";
 var gameId = "";
 
 //DEFAULT ENDPOINT AND AUTH INFO
-tc_lrs.endpoint = "http://localhost:8080/TCAPI/";
+tc_lrs.endpoint = "http://api.projecttincan.com/";
 tc_lrs.auth = "Basic dGVzdDpwYXNzd29yZA==";
 
 var GAME_ID = "scorm.com/JsTetris_TCAPI";
