@@ -39,6 +39,7 @@ Util.init = function (env) {
 };
 
 Util.prototype.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
+//Util.prototype.endpoint = "http://localhost/ScormEngine/ScormEngineInterface/TCAPI";
 //Util.prototype.endpoint = "http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
@@ -77,23 +78,26 @@ Util.prototype.requestWithHeaders = function (method, url, headers, data, useAut
 
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders) {
 	"use strict";
-	var xhr = new XMLHttpRequest(),
-		actorKey;
 
+    //Fill in some stock params if we need to
+    var actorKey = null;
 	if (method === 'GET') {
 		actorKey = JSON.parse(JSON.stringify(this.actor)); // "clone"
 		delete actorKey.name; // remove name since it doesn't have the reverse functional property (not useful as part of the ID)
 	} else {
 		actorKey = this.actor;
 	}
-
 	url = url.replace('<activity ID>', encodeURIComponent(this.activity.id));
 	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(actorKey)));
 
+
+    //Stop if we get data but can't sending it
 	if (method !== 'PUT' && method !== 'POST' && data !== null) {
 		throw new Error('data not valid for method: ' + method);
 	}
 
+
+    //Figure out content type, and content length
     var contentType = "application/json";
     var contentLength = 0;
     if(data !== null){
@@ -105,37 +109,115 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         contentLength = data.length;
     }
 
-	xhr.open(method, this.endpoint + url, true);
-    if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
-	    xhr.setRequestHeader("Content-Type", contentType);
-    }
-    /*if(contentLength > 0){
-        xhr.setRequestHeader("Content-Length", contentLength);
-    }*/
-	if (useAuth) {
-		xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
-	}
-    if(extraHeaders !== null){
-        for(var headerName in extraHeaders){
-            xhr.setRequestHeader(headerName, extraHeaders[headerName]);
-        }
-    }
+    var usingIEMode = false;
 
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState === 4) {
-			if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
-				equal(xhr.status.toString() + ' : ' + xhr.statusText, expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
-			}
-			callback(xhr);
-		}
-	};
-	try {
-		xhr.send(data);
-	} catch (ex) {
-		ok(false, ex.toString());
-		console.error(ex.toString());
-		start();
-	}
+    //Make the request already!
+    //Check to see if we should use "IE" mode
+    if(window.XDomainRequest){
+        usingIEMode = true;
+        this.log("Using alternate IE mode for communication");
+
+        //Everything that was on query string goes into form vars
+        var formData = new Array();
+        var qsIndex = url.indexOf('?');
+        if(qsIndex > 0){
+            formData.push(url.substr(qsIndex+1));
+            url = url.substr(0, qsIndex);
+        }
+
+        //Method has to go on querystring, and nothing else
+        url = url + '?method=' + method;
+
+        //All requests in this mode are POST
+        var xdr = new XDomainRequest();
+        xdr.open("POST", this.endpoint + url);
+        
+        //Headers
+        if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
+	        formData.push("Content-Type=" + encodeURIComponent(contentType));
+        }
+        if(contentLength > 0){
+	        formData.push("Content-Length=" + encodeURIComponent(contentLength));
+        }
+	    if (useAuth) {
+	        formData.push("Authorization=" + encodeURIComponent('Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password')));
+	    }
+        if(extraHeaders !== null){
+            for(var headerName in extraHeaders){
+                formData.push(headerName + "=" + encodeURIComponent(extraHeaders[headerName]));
+            }
+        }
+
+        //The original data is repackaged as "content" form var
+        if(data !== null){
+            formData.push('content=' + encodeURIComponent(data));
+        }
+
+        //Setup callbacks
+	    xdr.onload = function () {
+	    	if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
+	    		equal(expectedStatus.toString().substr(0,1), '2', expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
+	    	}
+	    	callback(xdr, usingIEMode);
+	    };
+	    xdr.onerror = function () {
+	    	if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
+	    		notEqual(expectedStatus.toString().substr(0,1), '2', expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
+	    	}
+	    	callback(xdr, usingIEMode);
+	    };
+
+        //Contact
+	    try {
+	    	xdr.send(formData.join('&'));
+	    } catch (ex) {
+	    	ok(false, ex.toString());
+	    	console.error(ex.toString());
+	    	start();
+	    }
+        
+            
+    } 
+    //Else we're using the normal CORS XHR built into modern browsers
+    else {
+	    var xhr = new XMLHttpRequest();
+	    xhr.open(method, this.endpoint + url, true);
+
+        //Headers
+        if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
+	        xhr.setRequestHeader("Content-Type", contentType);
+        }
+        if(contentLength > 0){
+            xhr.setRequestHeader("Content-Length", contentLength);
+        }
+	    if (useAuth) {
+	    	xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
+	    }
+        if(extraHeaders !== null){
+            for(var headerName in extraHeaders){
+                xhr.setRequestHeader(headerName, extraHeaders[headerName]);
+            }
+        }
+
+        //Setup callback
+	    xhr.onreadystatechange = function () {
+	    	if (xhr.readyState === 4) {
+	    		if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
+	    			equal(xhr.status.toString() + ' : ' + xhr.statusText, expectedStatus.toString() + ' : ' + expectedStatusText, method + ': ' + url + ' (status)');
+	    		}
+	    		callback(xhr);
+	    	}
+	    };
+
+        //Contact
+	    try {
+	    	xhr.send(data);
+	    } catch (ex) {
+	    	ok(false, ex.toString());
+	    	console.error(ex.toString());
+	    	start();
+	    }
+    }
 };
 
 Util.prototype.validateStatement = function (responseText, statement, id) {
@@ -399,4 +481,39 @@ Util.prototype.ISODateString = function(d){
       + pad(d.getUTCMinutes())+':'
       + pad(d.getUTCSeconds())+'.'
       + pad(d.getUTCMilliseconds(), 3)+'Z';
+};
+
+
+Util.prototype.DateFromISOString = function(string) {
+    var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
+        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
+        "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+    var d = string.match(new RegExp(regexp));
+
+    var offset = 0;
+    var date = new Date(d[1], 0, 1);
+
+    if (d[3]) { date.setMonth(d[3] - 1); }
+    if (d[5]) { date.setDate(d[5]); }
+    if (d[7]) { date.setHours(d[7]); }
+    if (d[8]) { date.setMinutes(d[8]); }
+    if (d[10]) { date.setSeconds(d[10]); }
+    if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
+    if (d[14]) {
+        offset = (Number(d[16]) * 60) + Number(d[17]);
+        offset *= ((d[15] == '-') ? 1 : -1);
+    }
+
+    offset -= date.getTimezoneOffset();
+    time = (Number(date) + (offset * 60 * 1000));
+
+    var dateToReturn = new Date();
+    dateToReturn.setTime(Number(time));
+    return dateToReturn;
+};
+
+Util.prototype.log = function(str){
+    if(console !== undefined){
+        console.log(str);
+    }
 };

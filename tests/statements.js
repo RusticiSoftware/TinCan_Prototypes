@@ -127,7 +127,7 @@ asyncTest('PUT / GET w/ Revision and Platform', function() {
             registration: myRegId,
             revision:"3",
             platform:"iOS"
-        },
+        }
     };
 
 	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
@@ -194,9 +194,12 @@ asyncTest('Bad Verb', function () {
 		statement = util.clone(env.statement);
 
 	statement.verb = 'not a valid verb';
-	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr) {
+	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr, usingIEMode) {
 		// should return an error message, can't validatate content, but make sure it's there
-		ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+        util.log(xhr.responseText);
+        if(!usingIEMode){
+		    ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+        }
 		util.request('GET', url, null, true, 404, 'Not Found', function () {
 			start();
 		});
@@ -210,9 +213,11 @@ asyncTest('Bad ID', function () {
 		url = '/statements?statementId=' + encodeURIComponent(util.ruuid() + 'bad_id'),
 		statement = util.clone(env.statement);
 
-	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr) {
+	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr, usingIEMode) {
 		// should return an error message, can't validatate content, but make sure it's there
-		ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+        if(!usingIEMode){
+		    ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
+        }
 		util.request('GET', url, null, true, 400, 'Bad Request', function () {
 			start();
 		});
@@ -328,7 +333,7 @@ asyncTest('GET statements, simple', function () {
 
 	util.request('GET', url + '?limit=1', null, true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText).statements;
-		console.log(JSON.stringify(result, null, 4));
+		util.log(JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'GET limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
@@ -406,7 +411,7 @@ asyncTest('GET statements (via POST), simple', function () {
 
 	util.request('POST', url, 'limit=1', true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText).statements;
-		console.log(JSON.stringify(result, null, 4));
+		util.log(JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'POST limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
@@ -430,12 +435,14 @@ asyncTest('GET statements (via POST), all filters', function () {
 			prop,
 			queryString = [];
 
-		if (statements.length === 10) {
+		if (statements !== undefined && statements.length >= 10) {
 			// pick a statement with statements stored before & after
 			statement = statements[5];
 
 			// add filters which match the selected statement
-			filters.since = util.ISODateString(new Date(new Date(statement.stored).getTime() - 1));
+            util.log(statement.stored);
+            var sinceDate = util.DateFromISOString(statement.stored);
+			filters.since = util.ISODateString(new Date(sinceDate.getTime() - 1));
 			filters.until = statement.stored;
 			filters.verb = statement.verb;
 			filters.object = JSON.stringify(statement.object, null, 4);
