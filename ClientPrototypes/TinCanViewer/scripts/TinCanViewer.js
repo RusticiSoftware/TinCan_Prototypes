@@ -1,6 +1,6 @@
 
-var endpoint = "http://api.projecttincan.com/";
-var auth = "Basic dGVzdDpwYXNzd29yZA==";
+var endpoint = Config.endpoint;
+var auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
 var firstStored = null;
 var fetched = 0;
 
@@ -82,9 +82,7 @@ function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage) {
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
-	
-	
-		var url = endpoint + "activities/<activity ID>/profile/<profilekey>";
+		var url = endpoint + "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
@@ -100,8 +98,9 @@ function TC_DeleteLRS(){
 	});
 }
 
-function RenderStatements(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderStatements(xhr){
+	var statementsResult = JSON.parse(xhr.responseText);
+    var statements = statementsResult.statements;
 	var stmtStr = "<table>";
 	var i;
 	var dt;
@@ -196,8 +195,8 @@ function RenderStatements(statementsStr){
 
 
 
-function RenderHighScores(scoresStr){
-	var scores = eval('(' + scoresStr + ')');
+function RenderHighScores(xhr){
+	var scores = JSON.parse(xhr.responseText);
 	
 	if (scores.length > 0){
 		$("#tetrisHighScoreData").empty();
@@ -225,8 +224,8 @@ function RenderHighScores(scoresStr){
 	$("#tetrisHighScoreData").append(html);
 }
 
-function RenderTetrisScoreChart(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderTetrisScoreChart(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	var playerScores = new Object();
 	var players = new Array();
@@ -302,8 +301,8 @@ function RenderTetrisScoreChart(statementsStr){
 	
 }
 
-function RenderGolfData(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderGolfData(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	var html = "<table><tr class='labels'>";
 	html += "<td class='name'>Learner</td>";
@@ -350,8 +349,8 @@ function RenderGolfData(statementsStr){
 	
 }
 
-function RenderGolfDataScores(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderGolfDataScores(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	var i;
 	for (i = 0; i < statements.length ; i++){
@@ -385,8 +384,8 @@ function RequestGolfQuestions(){
 	}
 	
 }
-function RenderGolfQuestions(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderGolfQuestions(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	if (statements.length > 0){
 		var html = "<tr class='golfQuestion'>";
@@ -417,8 +416,8 @@ function RenderGolfQuestions(statementsStr){
 	}
 }
 
-function RenderLocationData(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderLocationData(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	var html = "<table><tr class='labels'>";
 	html += "<td class='name'>Learner</td>";
@@ -479,8 +478,8 @@ function RequestLocations(){
 	}
 	
 }
-function RenderLocations(statementsStr){
-	var statements = eval('(' + statementsStr + ')');
+function RenderLocations(xhr){
+	var statements = JSON.parse(xhr.responseText).statements;
 	
 	if (statements.length > 0){
 		var html = "<tr class='locationRow'>";
