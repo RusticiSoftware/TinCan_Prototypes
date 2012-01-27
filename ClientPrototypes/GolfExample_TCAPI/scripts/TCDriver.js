@@ -130,7 +130,7 @@ function TCDriver_SendMultiStatements (lrs, stmtArray, callback) {
 }
 
 // Synchronous if callback is not provided (not recommended)
-function TCDriver_SendState (lrs, activityId, stateKey, stateVal, callback) {
+function TCDriver_SetState (lrs, activityId, stateKey, stateVal, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/state?activityId=<activity ID>&actor=<actor>&stateId=<statekey>";
 		

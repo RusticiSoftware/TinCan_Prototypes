@@ -10,7 +10,7 @@ GolfExample.CourseActivity =
     }
 }
 
-GolfExample.GetContext = function(parentActivityId){
+GolfExample.getContext = function(parentActivityId){
     var ctx = {
         "contextActivities":{
             "grouping":{"id":GolfExample.CourseActivity.id}

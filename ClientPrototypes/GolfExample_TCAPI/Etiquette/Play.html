@@ -6,13 +6,26 @@
 		@import url( ../css/style.css );
 	</style>
 	<script src="../scripts/TCDriver.js" type="text/javascript"></script>
+	<script src="../scripts/common.js" type="text/javascript"></script>
 	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		var pageObj = new TCObject().SetValue("id","scorm.com/GolfExample_TCAPI/Etiquette/Play.html")
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Etiquette - Playing")
-				.SetValue("description","An overview of golf etiquette as it pertains to game play."));
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","read").SetValue("object",pageObj).Send();
+
+		var pageObj = {
+                "id":"scorm.com/GolfExample_TCAPI/Etiquette/Play.html",
+			    "definition":{
+				    "name":"Etiquette - Playing",
+				    "description":"An overview of golf etiquette as it pertains to game play."
+                }
+        };
+
+		var stmt = {
+            "verb": "read",
+            "object": pageObj,
+            "context": GolfExample.getContext(
+                            GolfExample.CourseActivity.id)
+        };
+
+        TCDriver_SendStatement(tc_lrs, stmt);
 
 	</script>
 </head>
