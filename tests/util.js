@@ -460,6 +460,9 @@ Util.prototype.ruuid = function () {
 
 Util.prototype.ISODateString = function(d){
  function pad(val, n){
+    if(val == null){
+        val = 0;
+    }
     if(n == null){
         n = 2;
     }

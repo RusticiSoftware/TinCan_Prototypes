@@ -10,7 +10,7 @@ function delay() {
 }
 
 // Synchronous if callback is not provided (not recommended)
-function XHR_request(url, method, data, auth, callback, ignore404) {
+function XHR_request(url, method, data, auth, callback, ignore404, headers) {
 	"use strict";
 	var xhr,
 		finished = false,
@@ -32,9 +32,16 @@ function XHR_request(url, method, data, auth, callback, ignore404) {
 	}
 	if (!xDomainRequest || typeof(XDomainRequest) === 'undefined') {
 		xhr = new XMLHttpRequest();
-	        xhr.open(method, url, (callback == true));
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.setRequestHeader("Authorization", auth);
+        xhr.open(method, url, (callback == true));
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", auth);
+
+        if(headers !== undefined && headers !== null){
+            alert(JSON.stringify(headers));
+            for(var headerName in headers){
+                xhr.setRequestHeader(headerName, headers[headerName]);
+            }
+        }
 
 	} else {
 		if ('post,get'.indexOf(method.toLowerCase()) < 0) {
@@ -48,19 +55,19 @@ function XHR_request(url, method, data, auth, callback, ignore404) {
 	
 	function requestComplete() {
 	    if(!finished ) {
-		// may be in sync or async mode, using XMLHttpRequest or IE XDomainRequest, onreadystatechange or
-		// onload or both might fire depending upon browser, just covering all bases with event hooks and
-		// using 'finished' flag to avoid triggering events multiple times
+		    // may be in sync or async mode, using XMLHttpRequest or IE XDomainRequest, onreadystatechange or
+		    // onload or both might fire depending upon browser, just covering all bases with event hooks and
+		    // using 'finished' flag to avoid triggering events multiple times
 	    	finished = true;
-		if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 300)) {
+            var notFoundOk = (ignore404 || xhr.status != 404);
+		    if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 500 && notFoundOk)) {
 	    		if (callback) {
-					callback(xhr.responseText);
+					callback(xhr);
 	    		} else {
-				result = xhr.responseText;
-	    			return xhr.responseText;
+				    result = xhr;
+	    			return xhr;
 	    		}
-			} else if (!ignore404 || xhr.status != 404) {
-
+			} else {
 				alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + ")");
 				throw new Error("debugger");
 			}
@@ -151,20 +158,27 @@ function TCDriver_GetState (lrs, activityId, stateKey, callback) {
 		url = url.replace('<actor>',encodeURIComponent(lrs.actor));
 		url = url.replace('<statekey>',encodeURIComponent(stateKey));
 		
-		return XHR_request(url, "GET", null, lrs.auth, callback, true);
+		var result = XHR_request(url, "GET", null, lrs.auth, callback, true);
+        return (result === undefined || result.status == 404) ? null : result.responseText;
 	}
 }
 
 // Synchronous if callback is not provided (not recommended)
-function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, callback) {
+function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, currentContent, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
+		var url = lrs.endpoint + "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		XHR_request(url, "PUT", profileStr, lrs.auth, callback);
+        var headers = null;
+        if(currentContent !== null){
+            var digestBytes = Crypto.SHA1(currentContent, { asBytes: true });
+            var digest = Crypto.util.bytesToHex(digestBytes);
+            headers = {"If-Matches":'"'+digest+'"'};
+        }
+		XHR_request(url, "PUT", profileStr, lrs.auth, callback, false, headers);
 	}
 }
 
@@ -172,12 +186,13 @@ function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, 
 function TCDriver_GetActivityProfile (lrs, activityId, profileKey, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-		var url = lrs.endpoint + "activities/<activity ID>/profile/<profilekey>";
+		var url = lrs.endpoint + "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		return XHR_request(url, "GET", null, lrs.auth, callback);
+		var result = XHR_request(url, "GET", null, lrs.auth, callback, true);
+        return (result === undefined || result.status == 404) ? null : result.responseText;
 	}
 }
 
@@ -199,7 +214,7 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId, callback) {
 		}
 	
 	
-		return XHR_request(url, "GET", null, lrs.auth, callback);
+		return XHR_request(url, "GET", null, lrs.auth, callback).responseText;
 	}
 }
 
@@ -279,3 +294,58 @@ function _ruuid() {
                 return v.toString(16);
         });
  }
+
+TCDriver_ISODateString = function(d){
+ function pad(val, n){
+    if(val == null){
+        val = 0;
+    }
+    if(n == null){
+        n = 2;
+    }
+    var padder = Math.pow(10, n-1);
+    var tempVal = val.toString();
+    while(val < padder){        
+        tempVal = '0' + tempVal;
+        padder = padder / 10;
+    }
+    return tempVal;
+ }
+
+ return d.getUTCFullYear()+'-'
+      + pad(d.getUTCMonth()+1)+'-'
+      + pad(d.getUTCDate())+'T'
+      + pad(d.getUTCHours())+':'
+      + pad(d.getUTCMinutes())+':'
+      + pad(d.getUTCSeconds())+'.'
+      + pad(d.getUTCMilliseconds(), 3)+'Z';
+};
+
+
+TCDriver_DateFromISOString = function(string) {
+    var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
+        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
+        "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+    var d = string.match(new RegExp(regexp));
+
+    var offset = 0;
+    var date = new Date(d[1], 0, 1);
+
+    if (d[3]) { date.setMonth(d[3] - 1); }
+    if (d[5]) { date.setDate(d[5]); }
+    if (d[7]) { date.setHours(d[7]); }
+    if (d[8]) { date.setMinutes(d[8]); }
+    if (d[10]) { date.setSeconds(d[10]); }
+    if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
+    if (d[14]) {
+        offset = (Number(d[16]) * 60) + Number(d[17]);
+        offset *= ((d[15] == '-') ? 1 : -1);
+    }
+
+    offset -= date.getTimezoneOffset();
+    time = (Number(date) + (offset * 60 * 1000));
+
+    var dateToReturn = new Date();
+    dateToReturn.setTime(Number(time));
+    return dateToReturn;
+};

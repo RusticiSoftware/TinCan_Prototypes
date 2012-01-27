@@ -5,10 +5,6 @@ var actorEmail = "";
 
 var gameId = "";
 
-//DEFAULT ENDPOINT AND AUTH INFO
-tc_lrs.endpoint = "http://api.projecttincan.com/";
-tc_lrs.auth = "Basic dGVzdDpwYXNzd29yZA==";
-
 var GAME_ID = "scorm.com/JsTetris_TCAPI";
 
 $(document).ready(function(){
@@ -19,6 +15,13 @@ $(document).ready(function(){
 			$('#tc_actorprompt').hide();
 		} else {
 			TCActive = true;
+            if(tc_lrs !== undefined && tc_lrs.actor !== undefined){
+                var actor = JSON.parse(tc_lrs.actor);
+                actorName = actor.name[0];
+                actorEmail = actor.mbox[0];
+			    $('#tc_name').text(actorName);
+			    $('#tc_email').text(actorEmail);
+            }
 			if (actorName == "" || actorEmail == ""){
 				$('#tc_actorprompt').show();
 			} else {
@@ -35,7 +38,7 @@ $(document).ready(function(){
 			actorName = $('#tc_nameInput').val();
 			actorEmail = $('#tc_emailInput').val();
 			
-			tc_lrs.actor = JSON.stringify(new TCObject().SetValue("name",actorName).SetValue("mbox","mailto:" + actorEmail));
+			tc_lrs.actor = JSON.stringify({"name":[actorName], "mbox":["mailto:" + actorEmail]});
 			
 			$('#tc_name').text(actorName);
 			$('#tc_email').text(actorEmail);
@@ -61,103 +64,169 @@ $(document).ready(function(){
 });
 
 
+function tc_getContext(registrationId){
+    return {
+        "contextActivities":{
+            "grouping":{"id":GAME_ID}
+        },
+        "registration":registrationId
+    };
+}
+
+function tc_sendStatementWithContext(stmt){
+    stmt["context"] = tc_getContext(gameId);
+    TCDriver_SendStatement(tc_lrs, stmt);
+}
+
 function tc_sendStatment_StartNewGame(){
 	if (TCActive){
 		gameId = _ruuid();
 	
-		var tcGameObj = new TCObject().SetValue('id',GAME_ID)
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Js Tetris - Tin Can Prototype")
-				.SetValue("type","Game")
-				.SetValue("description","A game of tetris."));
-		var contextObj = new TCObject().SetValue("registration",gameId);
-		var stmt = new TCStatement(tc_lrs)
-			.SetValue("verb","played")
-			.SetValue("object",tcGameObj)
-			.SetValue("context",contextObj)
-			.Send();
+		var tcGameObj = {
+            'id':GAME_ID,
+			"definition":{
+				"name":"Js Tetris - Tin Can Prototype",
+				"type":"Game",
+				"description":"A game of tetris."
+            }
+        };
+
+		var stmt = {
+			"verb":"played",
+			"object":tcGameObj,
+        }
+
+        tc_sendStatementWithContext(stmt);
 	}	
 }
 
 function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
 	if (TCActive){
 		
-		var tcGameObj = new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI/level" + level)
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Js Tetris Level" + level)
-				.SetValue("type","Game")
-				.SetValue("description","Starting at 1, the higher the level, the harder the game."));
-		var contextObj = new TCObject().SetValue("activity",new TCObject().SetValue("id","scorm.com/JsTetris_TCAPI"))
-			.SetValue("registration",gameId);
+		var tcGameObj = {
+            "id":"scorm.com/JsTetris_TCAPI/level" + level,
+			"definition":{
+				"name":"Js Tetris Level" + level,
+				"type":"Game",
+				"description":"Starting at 1, the higher the level, the harder the game."
+            }
+        };
+
+		var resultObj = {
+            "extensions":{
+                "time":time,
+			    "apm":apm,
+			    "lines":lines
+            },
+			"score":{
+			    "raw":score,
+			    "min":0
+            }
+        };
 			
-		var resultObj = new TCObject().SetValue("time",time)
-			.SetValue("apm",apm)
-			.SetValue("lines",lines)
-			.SetValue("score",new TCObject()
-				.SetValue("raw",score)
-				.SetValue("min",0));
-			
-		var stmt = new TCStatement(tc_lrs)
-			.SetValue("verb","achieved")
-			.SetValue("object",tcGameObj)
-			.SetValue("context",contextObj)
-			.SetValue("result",resultObj)
-			.Send();
+		var stmt = {
+			"verb":"achieved",
+			"object":tcGameObj,
+			"result":resultObj
+        };
+
+        tc_sendStatementWithContext(stmt);
 	}	
 }
 
 function tc_sendStatment_EndGame(level,time,apm,lines,score){
 	if (TCActive){
 		
-		var tcGameObj = new TCObject().SetValue("id",GAME_ID)
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Js Tetris - Tin Can Prototype")
-				.SetValue("type","Game")
-				.SetValue("description","A game of tetris."));
-		var contextObj = new TCObject().SetValue("registration",gameId);
-		var resultObj = new TCObject().SetValue("score",new TCObject()
-					.SetValue("raw",score)
-					.SetValue("min",0))
-				.SetValue("level",level)
-				.SetValue("time",time)
-				.SetValue("apm",apm)
-				.SetValue("lines",lines);
-		var stmt = new TCStatement(tc_lrs)
-			.SetValue("verb","completed")
-			.SetValue("object",tcGameObj)
-			.SetValue("context",contextObj)
-			.SetValue("result",resultObj)
-			.Send();
+		var tcGameObj = {
+            "id":GAME_ID,
+			"definition":{
+				"name":"Js Tetris - Tin Can Prototype",
+				"type":"Game",
+				"description":"A game of tetris."
+            }
+        };
+
+		var resultObj = {
+            "score":{
+				"raw":score,
+				"min":0
+            },
+            "extensions":{
+			    "level":level,
+			    "time":time,
+			    "apm":apm,
+			    "lines":lines
+            }
+        };
+
+		var stmt = {
+			"verb":"completed",
+			"object":tcGameObj,
+			"result":resultObj
+        };
+
+        tc_sendStatementWithContext(stmt);
+
 			
 		//update high score
+		var newScoreObj = {
+            "actor":JSON.parse(tc_lrs.actor),
+			"score":score,
+			"date":TCDriver_ISODateString(new Date())
+        };
 		
-		var newScoreObj =  new TCObject().SetValue("actor",eval("(" + tc_lrs.actor + ")"))
-			.SetValue("score",score)
-			.SetValue("date",new Date());
-		
-		tc_InitHighScoresObject();
-		var highScorePos = tc_findScorePosition(HighScoresArray, 0, HighScoresArray.length-1 ,score);
-		if (highScorePos < 15){
-			HighScoresArray.splice(highScorePos,0,newScoreObj);
-			if (HighScoresArray.length>15) HighScoresArray.pop();
-			TCDriver_SendActivityProfile (tc_lrs, GAME_ID, "highscores", JSON.stringify(HighScoresArray));
-		}
-			
+        tc_addScoreToLeaderBoard(newScoreObj, 0);
 	}	
 }
 
+
+var tmpScoreObj = {
+    "actor":JSON.parse(tc_lrs.actor),
+	"score":6784,
+	"date":TCDriver_ISODateString(new Date())
+};
+
+
+function tc_addScoreToLeaderBoard(newScoreObj, attemptCount){
+    if(attemptCount === undefined || attemptCount === null){
+        attemptCount = 0;
+    }
+    if(attemptCount > 3){
+        throw new Error("Could not update leader board");
+    }
+    
+	tc_InitHighScoresObject();
+	var highScorePos = tc_findScorePosition(HighScoresArray, 0, HighScoresArray.length-1, newScoreObj.score);
+	if (highScorePos < 15){
+		HighScoresArray.splice(highScorePos, 0, newScoreObj);
+		if (HighScoresArray.length>15) HighScoresArray.pop();
+
+		TCDriver_SendActivityProfile(
+            tc_lrs, GAME_ID, "highscores", 
+            JSON.stringify(HighScoresArray),
+            LastHighScoresStr,
+            function(xhr){
+                //If we hit a conflict just try this whole thing again...
+                if(xhr.status == 409 || xhr.status == 412){
+                    tc_addScoreToLeaderBoard(newScoreObj, attemptCount+1);
+                }
+            });
+	}
+}
+
 var HighScoresArray;
+var LastHighScoresStr = null;
+
 function tc_InitHighScoresObject(){
 	if (HighScoresArray == undefined){
-		var lrsHighScoresStr = TCDriver_GetActivityProfile (tc_lrs, GAME_ID, "highscores");
-		if (lrsHighScoresStr == ""){
+		var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_lrs, GAME_ID, "highscores");
+		if (lrsHighScoresStr === undefined || lrsHighScoresStr === null || lrsHighScoresStr == ""){
 			HighScoresArray = new Array();
 		} else {
-			HighScoresArray = eval("(" + lrsHighScoresStr + ")");
+            LastHighScoresStr = lrsHighScoresStr;
+			HighScoresArray = JSON.parse(lrsHighScoresStr);
 		}
 	}
-	
-	
 }
 
 
