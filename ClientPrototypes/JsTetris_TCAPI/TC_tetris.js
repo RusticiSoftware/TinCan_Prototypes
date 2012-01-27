@@ -218,14 +218,12 @@ var HighScoresArray;
 var LastHighScoresStr = null;
 
 function tc_InitHighScoresObject(){
-	if (HighScoresArray == undefined){
-		var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_lrs, GAME_ID, "highscores");
-		if (lrsHighScoresStr === undefined || lrsHighScoresStr === null || lrsHighScoresStr == ""){
-			HighScoresArray = new Array();
-		} else {
-            LastHighScoresStr = lrsHighScoresStr;
-			HighScoresArray = JSON.parse(lrsHighScoresStr);
-		}
+	var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_lrs, GAME_ID, "highscores");
+	if (lrsHighScoresStr === undefined || lrsHighScoresStr === null || lrsHighScoresStr == ""){
+		HighScoresArray = new Array();
+	} else {
+        LastHighScoresStr = lrsHighScoresStr;
+		HighScoresArray = JSON.parse(lrsHighScoresStr);
 	}
 }
 
