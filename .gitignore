@@ -1,4 +1,2 @@
 tests/config.js
-ClientPrototypes/GolfExample_TCAPI/scripts/config.js
-ClientPrototypes/JsTetris/config.js
-ClientPrototypes/TinCanViewer/scripts/config.js
+ClientPrototypes/config.js
