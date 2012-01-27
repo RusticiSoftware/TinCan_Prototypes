@@ -2,7 +2,7 @@
 var endpoint = Config.endpoint;
 var auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
 var firstStored = null;
-var fetched = 0;
+var moreStatementsUrl = null;
 
 google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -63,20 +63,20 @@ $(document).ready(function(){
 
 function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage) {
 	var url = endpoint + "statements/?sparse=false";
-	if (nextPage && firstStored) {
-		url += "&offset=" + fetched;
-		url += "&until=" + firstStored;
-	}
-	if (num > 0){
-		url += "&limit=" + num;
-	}
-	if (verb != null){
-		url += "&verb=" + verb;
-	}
-	if (activityId != null){
-		var obj = {id:activityId};
-		url += "&object=" + encodeURIComponent(JSON.stringify(obj));
-	}
+	if (nextPage && moreStatementsUrl !== null){
+		url = endpoint + moreStatementsUrl.substr(1);
+	} else {
+	    if (num > 0){
+	    	url += "&limit=" + num;
+	    }
+	    if (verb != null){
+	    	url += "&verb=" + verb;
+	    }
+	    if (activityId != null){
+	    	var obj = {id:activityId};
+	    	url += "&object=" + encodeURIComponent(JSON.stringify(obj));
+	    }
+    }
 
 	XHR_request(url, "GET", null, auth, callbackFunction);
 }
@@ -101,6 +101,7 @@ function TC_DeleteLRS(){
 function RenderStatements(xhr){
 	var statementsResult = JSON.parse(xhr.responseText);
     var statements = statementsResult.statements;
+    moreStatementsUrl = statementsResult.more;
 	var stmtStr = "<table>";
 	var i;
 	var dt;
@@ -110,7 +111,6 @@ function RenderStatements(xhr){
 		if (!firstStored) {
 			firstStored = statements[0].stored;
 		}
-		fetched += statements.length;
 	}
 
 	for (i = 0; i < statements.length ; i++){
