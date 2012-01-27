@@ -7,15 +7,29 @@
 	</style>
 	
 	<script src="scripts/TCDriver.js" type="text/javascript"></script>
+	<script src="scripts/common.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		var activityId = "scorm.com/GolfExample_TCAPI/GolfAssessment.html";
-		var testObj = new TCObject().SetValue("id",activityId)
-			.SetValue("definition",new TCObject()
-				.SetValue("name","Golf Example Assessment")
-				.SetValue("description","An Assessment for the Golf Example course.")
-				.SetValue("type","Assessment")
-				.SetValue("children",new Array()));
-		
+
+        var activityId = "scorm.com/GolfExample_TCAPI/GolfAssessment.html";
+
+		var testObj = {
+                "id":activityId,
+			    "definition":{
+				    "name":"Golf Example Assessment",
+				    "description":"An Assessment for the Golf Example course.",
+                    "type":"Assessment"
+                }
+        };
+
+
+		var stmt = {
+            "verb": "attempted",
+            "object": testObj,
+            "context": GolfExample.getContext(
+                            GolfExample.CourseActivity.id)
+        };
+
+        TCDriver_SendStatement(tc_lrs, stmt);
 
 	</script>
 	
@@ -45,13 +59,14 @@
 </script>
 
 <script type="text/javascript">
-var queryString = new String(document.location.search);
-queryString = queryString.replace("?", "");
-var includeFiles = queryString.split("&");
-for (var i=0; i<includeFiles.length; i++){
-    var questionsFile = includeFiles[i].replace("questions=", "");
-    document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
-}
+    var queryString = new String(document.location.search);
+    var includeFiles = queryString.split("&");
+    for (var i=0; i<includeFiles.length; i++){
+        if(includeFiles[i].indexOf("questions=") >= 0){
+            var questionsFile = includeFiles[i].replace("questions=", "");
+            document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
+        }
+    }
 </script>
 
 <script type="text/javascript">
@@ -69,7 +84,7 @@ for (var i=0; i<includeFiles.length; i++){
         
         var resultsSummary = "";
 
-		var answerStatments = new Array();
+		var answerStatements = new Array();
         
         for (var i in test.Questions){
             var question = test.Questions[i];
@@ -125,7 +140,7 @@ for (var i=0; i<includeFiles.length; i++){
             if (wasCorrect) {correctCount++;}
             
             if (parent.GetQuestionAnswerStatement){
-                answerStatments.unshift(parent.GetQuestionAnswerStatement(test.Questions[i].Id, 
+                answerStatements.unshift(parent.GetQuestionAnswerStatement(test.Questions[i].Id, 
                                         test.Questions[i].Text, 
                                         test.Questions[i].Type, 
                                         learnerResponse, 
@@ -150,7 +165,7 @@ for (var i=0; i<includeFiles.length; i++){
         document.getElementById("test").innerHTML = resultsSummary;
 		
 		//send question answers
-		TCDriver_SendMultiStatements(tc_lrs,answerStatments);
+		TCDriver_SendMultiStatements(tc_lrs,answerStatements);
         
         if (parent.RecordTest){
             parent.RecordTest(score,activityId);
@@ -206,20 +221,23 @@ for (var i=0; i<includeFiles.length; i++){
                 break;
             }
             document.write ("</div>");      //close out question div
+
             //define the question in the assessment
-			var qObj = new TCObject().SetValue("id",question.Id)
-				.SetValue("definition",new TCObject().SetValue("type","question")
-					.SetValue("description",question.Text)
-					.SetValue("interaction_type",question.Type)
-					.SetValue("correct_responses",String(question.CorrectAnswer)));
-			testObj.definition.children.push(qObj);
+			/*var qObj = {
+                "id":question.Id,
+				"definition":{
+                    "type":"question",
+					"description":question.Text,
+					"interactionType":question.Type,
+					"correctResponsesPattern",[String(question.CorrectAnswer)]
+                }
+            };
+			testObj.definition.children.push(qObj);*/
 
         }
         document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
         document.write ("</form></div>");      //close out test div
         
-		//send test definition
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","attempted").SetValue("object",testObj).Send();
     }
     </script>
     <script src="scripts/contentfunctions.js" type="text/javascript"></script>

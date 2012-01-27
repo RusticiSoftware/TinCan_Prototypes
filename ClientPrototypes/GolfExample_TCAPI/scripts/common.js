@@ -16,7 +16,7 @@ GolfExample.getContext = function(parentActivityId){
             "grouping":{"id":GolfExample.CourseActivity.id}
         }
     };
-    if(parentActivityId !== null){
+    if(parentActivityId !== undefined && parentActivityId !== null){
         ctx.contextActivities["parent"] = {"id":parentActivityId};
     }
     return ctx;

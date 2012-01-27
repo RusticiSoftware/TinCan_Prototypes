@@ -119,7 +119,7 @@ function TCDriver_SendStatement (lrs, stmt, callback) {
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SendMultiStatements (lrs, stmtArray, callback) {
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-        for(var i = 0; i < stmtArray; i++){
+        for(var i = 0; i < stmtArray.length; i++){
             var stmt = stmtArray[i];
             if(stmt.actor === undefined){
                 stmt.actor = JSON.parse(lrs.actor);

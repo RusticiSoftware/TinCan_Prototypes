@@ -163,9 +163,14 @@
     }
     
     function doFinish(){
-        
-        var stmt = new TCStatement(tc_lrs).SetValue("verb","completed").SetValue("object",courseObj).Send();
 
+        var stmt = {
+            "verb":"completed",
+            "object":courseObj,
+            "context":GolfExample.getContext()
+        };
+
+        TCDriver_SendStatement(tc_lrs, stmt);
     }
     
     function doPrevious(){
@@ -183,10 +188,7 @@
     }
     
     function setBookmark(){
-
-        TCDriver_SendState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
-        
-        
+        TCDriver_SetState (tc_lrs, "scorm.com/GolfExample_TCAPI", "location", currentPage);
     }
     
     //called from the assessmenttemplate.html page to record the results of a test
@@ -197,19 +199,22 @@
 
         var scaledScore = score / 100;
         
-        var testObj = new TCObject().SetValue("id",activityId);
-		var resultObj = new TCObject().SetValue("score",new TCObject()
-				.SetValue("scaled",scaledScore)
-				.SetValue("raw",score)
-				.SetValue("min",0)
-				.SetValue("max",100));
-						
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","completed")
-			.SetValue("object",testObj)
-			.SetValue("result",resultObj)
-			.Send();
-        
-        
+        var stmt = { 
+            "verb":"completed",
+            "object": {"id" : activityId },
+            "result": {
+                "score":{
+                    "scaled":scaledScore,
+                    "raw":score,
+                    "min":0,
+                    "max":100
+                }
+            },
+            "context":GolfExample.getContext(
+                        GolfExample.CourseActivity.id)
+        };
+
+        TCDriver_SendStatement(tc_lrs, stmt);
     }
     
     
@@ -218,12 +223,7 @@
     function GetQuestionAnswerStatement(id, questionText, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
         
 		//send question info
- 		var questionObj = new TCObject().SetValue("id",id);
-/*			//question was defined with the assessment
-			.SetValue("definition",new TCObject().SetValue("type","question")
-				.SetValue("description",questionText)
-				.SetValue("interaction.type",questionType)
-				.SetValue("correct_responses",correctAnswer));*/
+ 		/*var questionObj = new TCObject().SetValue("id",id);
 		var resultObj = new TCObject().SetValue("response",learnerResponse)
 				.SetValue("success",wasCorrect);
 		var contextObj = new TCObject().SetValue("activity",new TCObject().SetValue("id",activityId));
@@ -233,7 +233,27 @@
 			.SetValue("result",resultObj)
 			.SetValue("context",contextObj);
 		
-		return stmt.GetStatement();
+		return stmt.GetStatement();*/
+
+		var qObj = {
+            "id":id,
+			"definition":{
+                "type":"question",
+				"description":questionText,
+				"interactionType":questionType,
+				"correctResponsesPattern":[String(correctAnswer)]
+            }
+        };
+
+        return {
+            "verb":"answered",
+            "object":qObj,
+            "result":{
+                "response":learnerResponse,
+                "success":wasCorrect
+            },
+            "context":GolfExample.getContext(activityId)
+        }
     }
     
     function FormatChoiceResponse(value){
