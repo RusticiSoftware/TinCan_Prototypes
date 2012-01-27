@@ -37,7 +37,6 @@ function XHR_request(url, method, data, auth, callback, ignore404, headers) {
         xhr.setRequestHeader("Authorization", auth);
 
         if(headers !== undefined && headers !== null){
-            alert(JSON.stringify(headers));
             for(var headerName in headers){
                 xhr.setRequestHeader(headerName, headers[headerName]);
             }
@@ -97,6 +96,12 @@ function XHR_request(url, method, data, auth, callback, ignore404, headers) {
 	}
 }
 
+function TCDriver_Log(str){
+    if(console !== undefined){
+        console.log(str);
+    }
+}
+
 function TCDriver_GetLRSObject(){
 	var lrsProps = ["endpoint","auth","actor","registration","activity_id"];
 	var lrs = new Object();
@@ -107,7 +112,7 @@ function TCDriver_GetLRSObject(){
 		}
 	}
     if(lrs.endpoint === undefined || lrs.endpoint == "" || lrs.auth === undefined || lrs.auth == ""){
-        alert("Configuring TCDriver LRS Object from queryString failed");
+        TCDriver_Log("Configuring TCDriver LRS Object from queryString failed");
         return null;
     }
 	return lrs;
@@ -164,7 +169,7 @@ function TCDriver_GetState (lrs, activityId, stateKey, callback) {
 }
 
 // Synchronous if callback is not provided (not recommended)
-function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, currentContent, callback) {
+function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, lastSha1Hash, callback) {
 	
 	if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
 		var url = lrs.endpoint + "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
@@ -173,10 +178,8 @@ function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, 
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
         var headers = null;
-        if(currentContent !== null){
-            var digestBytes = Crypto.SHA1(currentContent, { asBytes: true });
-            var digest = Crypto.util.bytesToHex(digestBytes);
-            headers = {"If-Matches":'"'+digest+'"'};
+        if(lastSha1Hash !== null){
+            headers = {"If-Matches":'"'+lastSha1Hash+'"'};
         }
 		XHR_request(url, "PUT", profileStr, lrs.auth, callback, false, headers);
 	}

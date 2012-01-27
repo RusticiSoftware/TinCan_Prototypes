@@ -201,10 +201,17 @@ function tc_addScoreToLeaderBoard(newScoreObj, attemptCount){
 		HighScoresArray.splice(highScorePos, 0, newScoreObj);
 		if (HighScoresArray.length>15) HighScoresArray.pop();
 
+        //Use this to respect concurrency control in profile API
+        var lastSha1Hash = null;
+        if(LastHighScoresStr !== null){
+            var digestBytes = Crypto.SHA1(LastHighScoresStr, { asBytes: true });
+            var lastSha1Hash = Crypto.util.bytesToHex(digestBytes);
+        }
+
 		TCDriver_SendActivityProfile(
             tc_lrs, GAME_ID, "highscores", 
             JSON.stringify(HighScoresArray),
-            LastHighScoresStr,
+            lastSha1Hash,
             function(xhr){
                 //If we hit a conflict just try this whole thing again...
                 if(xhr.status == 409 || xhr.status == 412){
