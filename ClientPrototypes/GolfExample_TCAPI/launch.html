@@ -1,0 +1,32 @@
+<head>
+    <script type="text/javascript" src="scripts/base64.js"></script>
+    <script type="text/javascript" src="scripts/config.js"></script>
+    <script type="text/javascript">
+        /*!
+        Excerpt from: Math.uuid.js (v1.4)
+        http://www.broofa.com
+        mailto:robert@broofa.com
+        Copyright (c) 2010 Robert Kieffer
+        Dual licensed under the MIT and GPL licenses.
+        */
+        function _ruuid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                        return v.toString(16);
+                });
+        }
+
+        var auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
+        var link = "index.html" +
+            "?endpoint=" + encodeURIComponent(Config.endpoint) +
+            "&auth=" + encodeURIComponent(auth) + 
+            "&actor=" + encodeURIComponent(JSON.stringify(Config.actor));
+
+        function onLoad(){
+            document.getElementById("launchLink").setAttribute('href',link);
+        }
+    </script>
+</head>
+<body onload="onLoad()">
+    <a id="launchLink" href="">Launch</a>
+</body>
