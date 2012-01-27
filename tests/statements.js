@@ -157,6 +157,48 @@ asyncTest('PUT / GET Actor as Object', function() {
         
 });
 
+// verify a valid duration format is stored and returned
+// note -- could result in false negative if LRS represents the same duration in another way
+asyncTest('Duration', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myStatement = {
+        id: myStatementId,
+        verb: "attempted",
+        object: env.statement.actor,
+        duration: "P1Y2MT10M15.12S"
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
+		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			env.util.validateStatement(xhr.responseText, myStatement, myStatementId);
+			start();
+		});
+	});
+        
+});
+
+// verify a valid duration format is stored and returned
+// note -- could result in false negative if LRS represents the same duration in another way
+asyncTest('Reject Bad duration', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myStatement = {
+        id: myStatementId,
+        verb: "attempted",
+        object: env.statement.actor,
+        duration: "not a duration"
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
+		start();
+	});
+        
+});
+
+
 asyncTest('Reject Actor Modification', function () {
 	"use strict";
 	var env = statementsEnv,
