@@ -60,8 +60,11 @@ $(document).ready(function(){
 });
 
 
+function TC_GetStatementsWithinContext (num, verb, activityId, callbackFunction, nextPage) {
+	TC_GetStatements(num, verb, activityId, callbackFunction, nextPage, true);
+}
 
-function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage) {
+function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isContextActivity) {
 	var url = endpoint + "statements/?sparse=false";
 	if (nextPage && moreStatementsUrl !== null){
 		url = endpoint + moreStatementsUrl.substr(1);
@@ -75,6 +78,9 @@ function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage) {
 	    if (activityId != null){
 	    	var obj = {id:activityId};
 	    	url += "&object=" + encodeURIComponent(JSON.stringify(obj));
+	    }
+	    if(isContextActivity){
+	    	url += "&context=true";
 	    }
     }
 
@@ -197,7 +203,7 @@ function RenderStatements(xhr){
 
 function RenderHighScores(xhr){
 	var scores = JSON.parse(xhr.responseText);
-	
+
 	if (scores.length > 0){
 		$("#tetrisHighScoreData").empty();
 	}
@@ -207,10 +213,9 @@ function RenderHighScores(xhr){
 	for (var i = 0; i < scores.length ; i++){
 		html += "<tr class='highScoreRow'><td class='scoreRank'>" + (i+1) + "</td>";
 		
-		var name = (scores[i].actor.name != undefined) ? scores[i].actor.name : scores[i].actor.mbox;
+		var name = (scores[i].actor.name != undefined) ? scores[i].actor.name[0] : scores[i].actor.mbox[0];
 		html += " <td class='actor'>"+ name +"</td>";
-		
-		
+
 		html += " <td class='score'>"+ scores[i].score +"</td>";
 		
 		var dt = scores[i].date.substr(0,19).replace("T"," ");//yyyy-MM-ddTHH:mm:ss
@@ -221,6 +226,7 @@ function RenderHighScores(xhr){
 		
 	}
 	html += "</table>";
+	
 	$("#tetrisHighScoreData").append(html);
 }
 
@@ -232,14 +238,14 @@ function RenderTetrisScoreChart(xhr){
 	var scores = new Array();
 	var maxScore = 0;
 	
-	var i;
-	for (i = 0; i < statements.length ; i++){
-		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name : statements[i].actor.mbox;
+	for (var i = 0; i < statements.length ; i++){
+		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name[0] : statements[i].actor.mbox[0];
+		
 		var score = (statements[i].result != undefined 
 			&& statements[i].result.score != undefined 
 			&& statements[i].result.score.raw != undefined) ? statements[i].result.score.raw : 0;
 		
-		if (playerScores[name] != undefined){
+		if (playerScores[name] !== undefined){
 			if (score > playerScores[name].score){
 				playerScores[name].score = score;
 				playerScores[name].count++;
@@ -252,10 +258,9 @@ function RenderTetrisScoreChart(xhr){
 			playerScores[name].count = 1;
 			players.push(name);
 		}
-		 
-	
-	
 	}
+	
+	
 	var height = (players.length * 40) + 50;
 	
     var data = new google.visualization.DataTable();
@@ -298,7 +303,6 @@ function RenderTetrisScoreChart(xhr){
       // Instantiate and draw our chart, passing in some options.
       var gamesChart = new google.visualization.ScatterChart(document.getElementById('tetrisGamesScores'));
       gamesChart.draw(gamesData, gamesOptions);
-	
 }
 
 function RenderGolfData(xhr){
@@ -351,19 +355,15 @@ function RenderGolfData(xhr){
 
 function RenderGolfDataScores(xhr){
 	var statements = JSON.parse(xhr.responseText).statements;
-	
-	var i;
-	for (i = 0; i < statements.length ; i++){
-		var mbox = statements[i].actor.mbox;
-		
+
+	for (var i = 0; i < statements.length ; i++){
+		var mbox = statements[i].actor.mbox[0];		
 		$('.score[mbox="' + mbox + '"]').text(statements[i].result.score.raw);
-		
 	}
-	
 }
 
 function RequestGolfQuestions(){
-	var questions = ["com.scorm.golfsamples.interactions.playing_1",
+	/*var questions = ["com.scorm.golfsamples.interactions.playing_1",
 					"com.scorm.golfsamples.interactions.playing_2",
 					"com.scorm.golfsamples.interactions.playing_3",
 					"com.scorm.golfsamples.interactions.playing_4",
@@ -381,35 +381,51 @@ function RequestGolfQuestions(){
 	
 	for (var i = 0; i < questions.length ; i++){
 		TC_GetStatements(0,'answered',questions[i],RenderGolfQuestions);
-	}
+	}*/
+	TC_GetStatementsWithinContext(0, 'answered', 'scorm.com/GolfExample_TCAPI', RenderGolfQuestions);
 	
 }
 function RenderGolfQuestions(xhr){
 	var statements = JSON.parse(xhr.responseText).statements;
+	if(statements === undefined || statements === null || statements.length == 0){
+		return;
+	}
 	
-	if (statements.length > 0){
-		var html = "<tr class='golfQuestion'>";
-	
-		var q = statements[0];
-		html += "<td class='question'>" + q.object.definition.description + "</td>";
-		html += "<td class='correctAnswer'>" + q.object.definition.correct_responses + "</td>";
-	
-		
-		var correct = 0;
-		var incorrect = 0;
-		var i;
-		for (i = 0; i < statements.length ; i++){
-			if (statements[i].result.success){
-				correct++;
-			} else {
-				incorrect++;
-			}
-		
+	var resultsByQuestion = {};
+	for(var i = 0; i < statements.length; i++){
+		var stmt = statements[i];
+		if(stmt.verb != "answered"){
+			continue;
 		}
-		html += "<td class='metric'>" + statements.length + "</td>";
-		html += "<td class='metric'>" + correct + "</td>";
-		html += "<td class='metric'>" + incorrect + "</td>";
 		
+		var questionId = stmt.object.id;
+		
+		if(resultsByQuestion[questionId] === undefined){
+			resultsByQuestion[questionId] = {
+				"question": stmt.object.definition.description,
+				"correctAnswer": stmt.object.definition.correctResponsesPattern[0],
+				"numCorrect":0,
+				"numIncorrect":0
+			};
+		}
+		if(stmt.result.success == true){
+			resultsByQuestion[questionId]["numCorrect"] += 1;
+		} else {
+			resultsByQuestion[questionId]["numIncorrect"] += 1;
+		}
+	}
+	
+	var sortedQuestionIds = Object.keys(resultsByQuestion).sort();
+	
+	for(var i = 0; i < sortedQuestionIds.length; i++){
+		var questionId = sortedQuestionIds[i];
+		var html = "<tr class='golfQuestion'>";
+			var results = resultsByQuestion[questionId];
+			html += "<td class='question'>" + results["question"] + "</td>";
+			html += "<td class='correctAnswer'>" + results["correctAnswer"] + "</td>";
+			html += "<td class='metric'>" + (results["numCorrect"] + results["numIncorrect"]) + "</td>";
+			html += "<td class='metric'>" + results["numCorrect"] + "</td>";
+			html += "<td class='metric'>" + results["numIncorrect"] + "</td>";
 		html += "</tr>";
 	
 		$("table#golfQuestions").append(html);
@@ -466,7 +482,7 @@ function RequestLocations(){
 					"scorm.com/Course/NashvilleMuseums/AdventureScienceCenter",
 					"scorm.com/Course/NashvilleMuseums/Cheekwood"];
 	*/
-	var locations = ["scorm.com/Course/DevLearnLasVegas/DevLearn",
+	/*var locations = ["scorm.com/Course/DevLearnLasVegas/DevLearn",
 		"scorm.com/Course/DevLearnLasVegas/Fountains",
 		"scorm.com/Course/DevLearnLasVegas/EiffelTower",
 		"scorm.com/Course/DevLearnLasVegas/HarleyDavidson",
@@ -475,7 +491,7 @@ function RequestLocations(){
 		"scorm.com/Course/DevLearnLasVegas/Airport"];
 	for (var i = 0; i < locations.length ; i++){
 		TC_GetStatements(0,null,locations[i],RenderLocations);
-	}
+	}*/
 	
 }
 function RenderLocations(xhr){

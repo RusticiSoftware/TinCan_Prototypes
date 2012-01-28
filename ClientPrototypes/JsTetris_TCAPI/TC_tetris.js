@@ -94,7 +94,7 @@ function tc_sendStatment_StartNewGame(){
 		var stmt = {
 			"verb":"played",
 			"object":tcGameObj,
-        }
+        };
 
         tc_sendStatementWithContext(stmt);
 	}	
