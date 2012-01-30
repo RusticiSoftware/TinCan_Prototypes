@@ -44,6 +44,7 @@
         
 		$(document).ready(function(){
 			
+            var PROTOTYPE_SHOW_CONFIG_INFO = true;
             var PROTOTYPE_DEFAULT_NAME = Config.actor.name[0];
             var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox[0];
             var PROTOTYPE_ENDPOINT = Config.endpoint;
@@ -82,7 +83,7 @@
 			$('#locatorExampleLaunch').click(function(){
 				var em = $("#tc_emailInput_loc").val();
 				var nm = $("#tc_nameInput_loc").val();
-				var actor = {'mbox' : 'mailto:' + em, 'name' : nm};
+				var actor = {'mbox' : ['mailto:' + em], 'name' : [nm]};
 				
 				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
@@ -99,7 +100,6 @@
 				$('#defActorMbox').text(PROTOTYPE_DEFAULT_MBOX);
 			}
 			
-
 		});
 
         
@@ -189,7 +189,7 @@
 
 				<div class='prototypeDiv'>
 
-				<!--<h2><a id="locatorExampleLaunch" baseref="Locator_Vegas_TCAPI/?" href="Locator_Vegas_TCAPI/?">DevLearn2011 Tour Example</a></h2>
+				<h2><a id="locatorExampleLaunch" baseref="Locator_TCAPI/?" href="Locator_TCAPI/?">Locator Example</a></h2>
 				<div class="warning">WARNING: Name and email will appear in the LRS viewer. made-up names & email if you don't want yours to appear.<br/><br/>
 
 If you don't enter a unique email address below, you won't be able to try the course properly, as 'you' will have already visited all the locations, and won't be able to save them again.</div><br/>				
@@ -204,7 +204,7 @@ If you don't enter a unique email address below, you won't be able to try the co
 				</ul>
 
 
-				</div>-->
+				</div>
 
 
 			</div>

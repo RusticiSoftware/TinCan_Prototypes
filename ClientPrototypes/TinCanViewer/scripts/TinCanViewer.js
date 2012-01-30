@@ -35,7 +35,7 @@ $(document).ready(function(){
 	});
 	
 	
-	TC_GetStatements(0,null,"scorm.com/Course/DevLearnLasVegas.2",RenderLocationData);
+	TC_GetStatements(0,null,"scorm.com/Course/NashvilleMuseumsTour",RenderLocationData);
 	RequestLocations();
 	$('#refreshLocationCourseData').click(function(){
 		$("#locationCourseData").empty();
@@ -161,8 +161,11 @@ function RenderStatements(xhr){
 				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name : obj;
 				stmtStr += " <span class='object'>"+ obj +"</span>";
 				
-				if (statements[i].context.latitude != null && statements[i].context.longitude != null){
-					stmtStr += " (latitude: "+ statements[i].context.latitude +", longitude: " + statements[i].context.longitude + ")";
+				if (statements[i].context.extensions.latitude != null && statements[i].context.extensions.longitude != null){
+					stmtStr += " (latitude: "+ 
+                                    statements[i].context.extensions.latitude +
+                                    ", longitude: " + 
+                                    statements[i].context.extensions.longitude + ")";
 				}
 			
 			
@@ -357,6 +360,9 @@ function RenderGolfDataScores(xhr){
 	var statements = JSON.parse(xhr.responseText).statements;
 
 	for (var i = 0; i < statements.length ; i++){
+        if(statements[i].verb != "completed"){
+            continue;
+        }
 		var mbox = statements[i].actor.mbox[0];		
 		$('.score[mbox="' + mbox + '"]').text(statements[i].result.score.raw);
 	}
@@ -480,32 +486,49 @@ function RequestLocations(){
 					"scorm.com/Course/NashvilleMuseums/CountryMusicHallofFame",
 					"scorm.com/Course/NashvilleMuseums/TheFrist",
 					"scorm.com/Course/NashvilleMuseums/AdventureScienceCenter",
-					"scorm.com/Course/NashvilleMuseums/Cheekwood"];
-	*/
+					"scorm.com/Course/NashvilleMuseums/Cheekwood"];*/
+	
 	/*var locations = ["scorm.com/Course/DevLearnLasVegas/DevLearn",
 		"scorm.com/Course/DevLearnLasVegas/Fountains",
 		"scorm.com/Course/DevLearnLasVegas/EiffelTower",
 		"scorm.com/Course/DevLearnLasVegas/HarleyDavidson",
 		"scorm.com/Course/DevLearnLasVegas/NYNY",
 		"scorm.com/Course/DevLearnLasVegas/LeoLion",
-		"scorm.com/Course/DevLearnLasVegas/Airport"];
-	for (var i = 0; i < locations.length ; i++){
+		"scorm.com/Course/DevLearnLasVegas/Airport"];*/
+	/*for (var i = 0; i < locations.length ; i++){
 		TC_GetStatements(0,null,locations[i],RenderLocations);
 	}*/
+	TC_GetStatementsWithinContext(0, 'experienced', 'scorm.com/Course/NashvilleMuseumsTour', RenderLocations);
 	
 }
 function RenderLocations(xhr){
 	var statements = JSON.parse(xhr.responseText).statements;
+    var resultsByLocationId = {};
+    for(var i = 0; i < statements.length; i++){
+        var stmt = statements[i];
+        if(stmt.verb != 'experienced'){
+            continue;
+        }
+        var locationId = stmt.object.id;
+        if(resultsByLocationId[locationId] === undefined){
+            resultsByLocationId[locationId] = {
+                "name":stmt.object.definition.name,
+                "description":stmt.object.definition.description,
+                "visitors":0
+            };
+        }
+        resultsByLocationId[locationId]["visitors"] += 1;
+    }
 	
-	if (statements.length > 0){
+	var sortedLocationIds = Object.keys(resultsByLocationId).sort();
+
+    for(var i = 0; i < sortedLocationIds.length; i++){
+        var locationId = sortedLocationIds[i];
+		var loc = resultsByLocationId[locationId];
 		var html = "<tr class='locationRow'>";
-	
-		var q = statements[0];
-		html += "<td class='location'>" + q.object.definition.name + "<br/>";
-		html += "<span class='description'>" + q.object.definition.description + "</span></td>";
-	
-		html += "<td class='metric'>" + statements.length + "</td>";
-		
+		    html += "<td class='location'>" + loc.name + "<br/>";
+		    html += "<span class='description'>" + loc.description + "</span></td>";
+		    html += "<td class='metric'>" + loc.visitors + "</td>";
 		html += "</tr>";
 	
 		$("table#courseLocations").append(html);
