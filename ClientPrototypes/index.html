@@ -35,7 +35,8 @@
 		</style>
 		
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-		<script src="prototypeConfig.js"></script>
+		<script src="config.js"></script>
+		<script src="base64.js"></script>
 		
 		
         
@@ -43,6 +44,11 @@
         
 		$(document).ready(function(){
 			
+            var PROTOTYPE_DEFAULT_NAME = Config.actor.name[0];
+            var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox[0];
+            var PROTOTYPE_ENDPOINT = Config.endpoint;
+            var PROTOTYPE_AUTH = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
+
 			$('#tc_nameInput_golf').val(PROTOTYPE_DEFAULT_NAME);
 			$('#tc_emailInput_golf').val(PROTOTYPE_DEFAULT_MBOX);
 			$('#tc_nameInput_loc').val(PROTOTYPE_DEFAULT_NAME);
@@ -52,8 +58,18 @@
 			$('#golfExampleLaunch').click(function(){
 				var em = $("#tc_emailInput_golf").val();
 				var nm = $("#tc_nameInput_golf").val();
-				var actor = {'mbox' : 'mailto:' + em, 'name' : nm};
+				var actor = {'mbox' : ['mailto:' + em], 'name' : [nm]};
 				
+				
+				$(this).attr('href',$(this).attr('baseref') 
+					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
+					+ "&auth=" + encodeURIComponent(PROTOTYPE_AUTH)
+					+ "&actor=" +encodeURIComponent(JSON.stringify(actor)));
+				return true;
+			});
+
+			$('#jsExampleLaunch').click(function(){
+				var actor = Config.actor;
 				
 				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
@@ -157,7 +173,7 @@
 
 				<div class='prototypeDiv'>
 
-				<h2><a href="JsTetris_TCAPI/tetris.html">Js Tetris</a></h2>
+				<h2><a id="jsExampleLaunch" href="" baseref="JsTetris_TCAPI/tetris.html?">Js Tetris</a></h2>
 
 				<ul>
 					<li>Allows the player to optionally report tetris game data back to the LRS.</li>
@@ -173,7 +189,7 @@
 
 				<div class='prototypeDiv'>
 
-				<h2><a id="locatorExampleLaunch" baseref="Locator_Vegas_TCAPI/?" href="Locator_Vegas_TCAPI/?">DevLearn2011 Tour Example</a></h2>
+				<!--<h2><a id="locatorExampleLaunch" baseref="Locator_Vegas_TCAPI/?" href="Locator_Vegas_TCAPI/?">DevLearn2011 Tour Example</a></h2>
 				<div class="warning">WARNING: Name and email will appear in the LRS viewer. made-up names & email if you don't want yours to appear.<br/><br/>
 
 If you don't enter a unique email address below, you won't be able to try the course properly, as 'you' will have already visited all the locations, and won't be able to save them again.</div><br/>				
@@ -188,7 +204,7 @@ If you don't enter a unique email address below, you won't be able to try the co
 				</ul>
 
 
-				</div>
+				</div>-->
 
 
 			</div>
