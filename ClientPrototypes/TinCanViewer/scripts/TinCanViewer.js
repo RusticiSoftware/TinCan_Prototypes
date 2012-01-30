@@ -132,7 +132,8 @@ function RenderStatements(xhr){
 		
 		var obj = statements[i].object.id;
 		if (statements[i].object.definition != undefined){
-			if (statements[i].object.definition.type != undefined && statements[i].object.definition.type == "question"){
+            var activityType = statements[i].object.definition.type;
+			if (activityType != undefined && (activityType == "question" || activityType == "interaction")){
 				obj = (statements[i].object.definition.description != undefined) ? statements[i].object.definition.description : obj;
 				
 				var answer = "";
