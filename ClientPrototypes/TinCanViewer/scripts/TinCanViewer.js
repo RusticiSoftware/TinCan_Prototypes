@@ -124,8 +124,9 @@ function RenderStatements(xhr){
 		aDate = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(statements[i].stored);
 		dt = new Date(Date.UTC(aDate[1], aDate[2]-1, aDate[3], aDate[4], aDate[5], aDate[6]));  
 		stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString()  +"</td>";
-		
-		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name : statements[i].actor.mbox;
+
+		console.log(JSON.stringify(statements[i]));
+		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name[0] : statements[i].actor.mbox[0];
 		stmtStr += "<td > <span class='actor'>"+ name +"</span>";
 		
 		
@@ -324,7 +325,7 @@ function RenderGolfData(xhr){
 	var i;
 	for (i = 0; i < statements.length ; i++){
 		var l;
-		var mbox = statements[i].actor.mbox;
+		var mbox = statements[i].actor.mbox[0];
 		if (learnerObjs[mbox] == undefined){
 			learners.push(mbox);
 			learnerObjs[mbox] = new Object()

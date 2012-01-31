@@ -70,10 +70,6 @@ Util.prototype.inList = function (test, list) {
 	return false;
 };
 
-Util.prototype.requestWithHeaders = function (method, url, headers, data, useAuth, expectedStatus, expectedStatusText, callback){
-    this.request(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, headers);
-};
-
 Util.prototype.getIEModeRequest = function(method, url, headers, data){
 	var newUrl = url;
 	
@@ -106,6 +102,10 @@ Util.prototype.getIEModeRequest = function(method, url, headers, data){
     	"headers":{},
     	"data":formData.join("&")
     };
+};
+
+Util.prototype.requestWithHeaders = function (method, url, headers, data, useAuth, expectedStatus, expectedStatusText, callback){
+    this.request(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, headers);
 };
 
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders) {

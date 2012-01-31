@@ -93,7 +93,7 @@ function tc_sendStatment_StartNewGame(){
 
 		var stmt = {
 			"verb":"played",
-			"object":tcGameObj,
+			"object":tcGameObj
         };
 
         tc_sendStatementWithContext(stmt);
@@ -178,14 +178,6 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
         tc_addScoreToLeaderBoard(newScoreObj, 0);
 	}	
 }
-
-
-var tmpScoreObj = {
-    "actor":JSON.parse(tc_lrs.actor),
-	"score":6784,
-	"date":TCDriver_ISODateString(new Date())
-};
-
 
 function tc_addScoreToLeaderBoard(newScoreObj, attemptCount){
     if(attemptCount === undefined || attemptCount === null){
