@@ -635,6 +635,31 @@ function verifyGolfDescendants(callback) {
 	});
 }
 
+// verify LRS can handle all supported actor types (agent & person)
+asyncTest('ActorTypes', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+    var myStatement = {
+        id: myStatementId,
+        verb: "attempted",
+        object: env.statement.actor,
+        context: { instructor : 
+        	{ objectType : "Agent",
+        	  mbox: ["mailto:auto_tests_agent@example.scorm.com"],
+        	  name: ["agent name"]}
+        }
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
+		env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+			env.util.validateStatement(xhr.responseText, myStatement, myStatementId);
+			start();
+		});
+	});
+        
+});
+
 asyncTest('Statements, context activities filter', function () {
 	"use strict";
 	var env = statementsEnv;
