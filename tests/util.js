@@ -72,7 +72,41 @@ Util.prototype.inList = function (test, list) {
 
 Util.prototype.requestWithHeaders = function (method, url, headers, data, useAuth, expectedStatus, expectedStatusText, callback){
     this.request(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, headers);
-}
+};
+
+Util.prototype.getIEModeRequest = function(method, url, headers, data){
+	var newUrl = url;
+	
+	//Everything that was on query string goes into form vars
+    var formData = new Array();
+    var qsIndex = newUrl.indexOf('?');
+    if(qsIndex > 0){
+        formData.push(newUrl.substr(qsIndex+1));
+        newUrl = newUrl.substr(0, qsIndex);
+    }
+
+    //Method has to go on querystring, and nothing else
+    newUrl = newUrl + '?method=' + method;
+    
+    //Headers
+    if(headers !== null){
+        for(var headerName in headers){
+            formData.push(headerName + "=" + encodeURIComponent(headers[headerName]));
+        }
+    }
+
+    //The original data is repackaged as "content" form var
+    if(data !== null){
+        formData.push('content=' + encodeURIComponent(data));
+    }
+    
+    return {
+    	"method":"POST",
+    	"url":newUrl,
+    	"headers":{},
+    	"data":formData.join("&")
+    };
+};
 
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders) {
 	"use strict";
@@ -89,7 +123,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	url = url.replace('<actor>', encodeURIComponent(JSON.stringify(actorKey)));
 
 
-    //Stop if we get data but can't sending it
+    //Stop if we get data but can't send it
 	if (method !== 'PUT' && method !== 'POST' && data !== null) {
 		throw new Error('data not valid for method: ' + method);
 	}
@@ -106,6 +140,24 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         contentType = isFormData ? "application/x-www-form-urlencoded" : "application/json";
         contentLength = data.length;
     }
+    
+    //Consolidate all the headers
+    var headers = {};
+    if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
+        headers["Content-Type"] = contentType;
+    }
+    if(contentLength > 0){
+        headers["Content-Length"] = contentLength;
+    }
+    if (useAuth) {
+    	headers["Authorization"] = 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password');
+    }
+    if(extraHeaders !== null){
+        for(var headerName in extraHeaders){
+            headers[headerName] = extraHeaders[headerName];
+        }
+    }
+    
 
     var usingIEMode = false;
 
@@ -115,41 +167,12 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         usingIEMode = true;
         this.log("Using alternate IE mode for communication");
 
-        //Everything that was on query string goes into form vars
-        var formData = new Array();
-        var qsIndex = url.indexOf('?');
-        if(qsIndex > 0){
-            formData.push(url.substr(qsIndex+1));
-            url = url.substr(0, qsIndex);
-        }
-
-        //Method has to go on querystring, and nothing else
-        url = url + '?method=' + method;
+        //Pack up the original request into the "IE Mode" request
+        var ieModeRequest = this.getIEModeRequest(method, url, headers, data);
 
         //All requests in this mode are POST
         var xdr = new XDomainRequest();
-        xdr.open("POST", this.endpoint + url);
-        
-        //Headers
-        if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
-	        formData.push("Content-Type=" + encodeURIComponent(contentType));
-        }
-        if(contentLength > 0){
-	        formData.push("Content-Length=" + encodeURIComponent(contentLength));
-        }
-	    if (useAuth) {
-	        formData.push("Authorization=" + encodeURIComponent('Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password')));
-	    }
-        if(extraHeaders !== null){
-            for(var headerName in extraHeaders){
-                formData.push(headerName + "=" + encodeURIComponent(extraHeaders[headerName]));
-            }
-        }
-
-        //The original data is repackaged as "content" form var
-        if(data !== null){
-            formData.push('content=' + encodeURIComponent(data));
-        }
+        xdr.open(ieModeRequest.method, this.endpoint + ieModeRequest.url);
 
         //Setup callbacks
 	    xdr.onload = function () {
@@ -167,7 +190,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
         //Contact
 	    try {
-	    	xdr.send(formData.join('&'));
+	    	xdr.send(ieModeRequest.data);
 	    } catch (ex) {
 	    	ok(false, ex.toString());
 	    	console.error(ex.toString());
@@ -182,19 +205,8 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	    xhr.open(method, this.endpoint + url, true);
 
         //Headers
-        if(extraHeaders === undefined || extraHeaders['Content-Type'] === undefined){
-	        xhr.setRequestHeader("Content-Type", contentType);
-        }
-        if(contentLength > 0){
-            xhr.setRequestHeader("Content-Length", contentLength);
-        }
-	    if (useAuth) {
-	    	xhr.setRequestHeader("Authorization", 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password'));
-	    }
-        if(extraHeaders !== null){
-            for(var headerName in extraHeaders){
-                xhr.setRequestHeader(headerName, extraHeaders[headerName]);
-            }
+        for(var headerName in headers){
+            xhr.setRequestHeader(headerName, headers[headerName]);
         }
 
         //Setup callback
