@@ -533,6 +533,80 @@ asyncTest('GET statements (via POST), all filters', function () {
 	});
 });
 
+asyncTest('GET, verb filter', function () {
+	"use strict";
+	var env = statementsEnv;
+    var util = env.util;
+    var url = '/statements/';
+    var statement = util.clone(env.statement);
+
+    var regId = util.ruuid();
+    var firstId = util.ruuid();
+    var secondId = util.ruuid();
+
+    statement.context = { "registration" : regId };
+	statement.verb = 'experienced';
+
+    async.waterfall([
+	    function(cb){
+            //Put the first statement
+            var myUrl = url + '?statementId=' + firstId;
+            util.request('PUT', myUrl, JSON.stringify(statement), true, 204, 'No Content', function(){cb(null)});
+        },
+        function(cb){
+            //Put the second statement, different verb...
+	        statement.verb = 'attempted';
+            var myUrl = url + '?statementId=' + secondId;
+	        util.request('PUT', myUrl, JSON.stringify(statement), true, 204, 'No Content', function(){cb(null)});
+        },
+        function(cb){
+            //Use verb filter to find the expected statement
+		    util.request('GET', url + '?verb=attempted&registration='+regId+'&limit=1', null, true, 200, 'OK', 
+                function (xhr) {
+		        	var statements = JSON.parse(xhr.responseText).statements;
+                    equal(statements.length, 1, 'returned a statement');
+		        	equal(statements[0].verb, 'attempted', 'verb');
+		        	equal(statements[0].id, secondId, 'returned statement id');
+		        	cb(null);
+		        });
+        },
+        //Start up the test runner again...
+        start
+	]);
+});
+
+asyncTest('GET, sparse == false', function () {
+	"use strict";
+    var env = statementsEnv;
+
+    var regId = env.util.ruuid();
+    var myActivityId = env.util.ruuid();
+    var myActivityFull = { "id":myActivityId, "definition":{"name":"My Tezzzt Activity"} };
+    var myActivitySparse = { "id":myActivityId };
+    var statement1 = { "verb":"imported", "object":myActivityFull, "context":{"registration":regId} };
+    var statement2 = { "verb":"attempted", "object":myActivitySparse, "context":{"registration":regId} };
+
+    //Import the activity
+    env.util.request('POST','/statements',JSON.stringify([statement1]), true, 200, 'OK', function(){
+        //Attempt the activity (using sparse activity info)
+        env.util.request('POST','/statements',JSON.stringify([statement2]), true, 200, 'OK', function(xhr){
+            //Now get the statement that had sparse info
+            var getUrl = '/statements?registration=' + regId + '&sparse=false';
+            env.util.request('GET',getUrl, null, true, 200, 'OK', function(xhr){
+                //Check to make sure the activity is filled in on both statements
+                var statements = JSON.parse(xhr.responseText).statements;
+                for(var i = 0; i < statements.length; i++){
+                    var stmtObject = statements[i].object;
+                    delete(stmtObject.objectType);
+                    deepEqual(stmtObject, myActivityFull);
+                }
+                //Start up the test runner again...
+                start();
+            });
+        });
+    });
+});
+
 function getGolfStatement(id) {
 	"use strict";
 	var ii, util = statementsEnv.util;

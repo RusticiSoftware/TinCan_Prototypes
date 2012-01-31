@@ -250,17 +250,28 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
     if(statement.object.objectType === undefined){
         delete responseObj.object.objectType;
     }
+    if(statement.object.definition === undefined){
+        delete responseObj.object.definition;
+    }
+
+    //Clean up extra info from returned context activities
     if(statement.context !== undefined && statement.context.contextActivities !== undefined){
         var ctxacts = statement.context.contextActivities;
-        var ctxparent = ctxacts["parent"];
-        var ctxgrouping = ctxacts["grouping"];
-        if(ctxparent !== undefined && ctxparent.objectType === undefined){
-            delete responseObj.context.contextActivities["parent"].objectType;
-        }
-        if(ctxgrouping !== undefined && ctxgrouping.objectType === undefined){
-            delete responseObj.context.contextActivities["grouping"].objectType;
+        var ctxIds = ["parent","grouping","other"];
+        for(var i = 0; i < ctxIds.length; i++){
+            var ctxId = ctxIds[i];
+            if(ctxacts[ctxId] !== undefined){
+                var activity = ctxacts[ctxId];
+                if(activity.objectType === undefined){
+                    delete responseObj.context.contextActivities[ctxId].objectType;
+                }
+                if(activity.definition === undefined){
+                    delete responseObj.context.contextActivities[ctxId].definition;
+                }
+            }
         }
     }
+
     if(statement.actor !== undefined && statement.actor.objectType === undefined){
         delete responseObj.actor.objectType;
     }

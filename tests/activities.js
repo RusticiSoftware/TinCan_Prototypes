@@ -46,6 +46,7 @@ asyncTest('Definition, update', function () {
         //Find the activity
 	    var url = '/activities?activityId=' + myActivityId;
 	    env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+
             //Check result
 		    var activity = env.util.tryJSONParse(xhr.responseText);
 		    equal(activity.id, myActivity.id, 'activity id');
@@ -56,6 +57,7 @@ asyncTest('Definition, update', function () {
 
                 //Find again
 	            env.util.request('GET', url, null, true, 200, 'OK', function (xhr) {
+
                     //Check result
 		            var activity = env.util.tryJSONParse(xhr.responseText);
 		            equal(activity.id, myActivityUpdate.id, 'activity id');
@@ -103,6 +105,7 @@ asyncTest('Definition, extensions', function () {
 	    });
     });
 });
+
 
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
