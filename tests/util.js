@@ -203,7 +203,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     else {
 	    var xhr = new XMLHttpRequest();
 	    xhr.open(method, this.endpoint + url, true);
-
+		
         //Headers
         for(var headerName in headers){
             xhr.setRequestHeader(headerName, headers[headerName]);
@@ -248,7 +248,6 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	equal(responseObj.id, id, "LRS expected to use specified ID");
 	ok(responseObj.stored !== undefined, "LRS expected to add stored timestamp");
 
-
 	// since LRS adds these values, comparison will fail if included
 	if (statement.id === undefined) {
 		delete responseObj.id;
@@ -259,12 +258,14 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 		delete responseObj.context.activity.definition;
 	}
     delete responseObj.inProgress;
-    if(statement.object.objectType === undefined){
-        delete responseObj.object.objectType;
-    }
-    if(statement.object.definition === undefined){
-        delete responseObj.object.definition;
-    }
+    if (statement.object) {
+		if(statement.object.objectType === undefined){
+			delete responseObj.object.objectType;
+		}
+		if(statement.object.definition === undefined){
+			delete responseObj.object.definition;
+		}
+	}    
 
     //Clean up extra info from returned context activities
     if(statement.context !== undefined && statement.context.contextActivities !== undefined){
@@ -463,6 +464,30 @@ String.prototype.addFS = function () {
 Util.prototype.clone = function (a) {
 	"use strict";
 	return JSON.parse(JSON.stringify(a));
+};
+
+Util.prototype.testListInList = function(test, list, message) {
+	"use strict";
+
+	var missing = false,
+		ii;
+	
+	if (test instanceof Array) {
+		for (ii = 0; ii < test.length; ii++) {
+			if (!this.inList(test[ii], list)) {
+				missing = true;
+				break;
+			}
+		}
+	} else {
+		missing = !this.inList(test, list);
+	}
+	
+	if (missing) {
+		deepEqual(list, test, message);
+	} else {
+		ok(true, message);
+	}
 };
 
 /*!

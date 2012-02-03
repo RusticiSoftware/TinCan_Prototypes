@@ -167,7 +167,7 @@ asyncTest('Duration', function() {
         id: myStatementId,
         verb: "attempted",
         object: env.statement.actor,
-        duration: "P1Y2MT10M15.12S"
+        result: {duration: "P1Y2MT10M15.12S"} 
     };
 
 	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
@@ -189,7 +189,7 @@ asyncTest('Reject Bad duration', function() {
         id: myStatementId,
         verb: "attempted",
         object: env.statement.actor,
-        duration: "not a duration"
+        result: { duration: "not a duration" }
     };
 
 	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
@@ -199,34 +199,77 @@ asyncTest('Reject Bad duration', function() {
 });
 
 
-asyncTest('Reject Actor Modification', function () {
+asyncTest('Actor Modification', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
 		otherId = util.ruuid(),
 		url = '/statements?statementId=',
-		modLearnerName = 'Renamed Auto Test Learner';
+		modLearnerName = 'Renamed Auto Test Learner',
+		modStatement;
 
 	util.request('PUT', url + util.ruuid(), JSON.stringify(env.statement), true, null, null, function () {
-		util.request('PUT', url + otherId, JSON.stringify(env.statement).replace(env.statement.actor.name[0], modLearnerName), true, 204, 'No Content', function () {
+		modStatement = JSON.stringify(env.statement).replace(env.statement.actor.name[0], modLearnerName);
+		util.request('PUT', url + otherId, modStatement , true, 204, 'No Content', function () {
 			util.request('GET', url + otherId, null, true, 200, 'OK', function (xhr) {
 				var response;
 				response = util.tryJSONParse(xhr.responseText);
 
-				// verify statement is returned with modified name, but then undo modification for checking the rest of the statement
+				// verify statement is returned with modified name
 				equal(response.actor.name[0], modLearnerName);
-				response.actor.name = env.statement.actor.name;
-				util.validateStatement(JSON.stringify(response), env.statement, otherId);
+				//response.actor.name = env.statement.actor.name;
+				util.validateStatement(JSON.stringify(response), JSON.parse(modStatement), otherId);
 
 				util.request('GET', '/actors?actor=<actor>', null, true, 200, 'OK', function (xhr) {
-					equal(util.tryJSONParse(xhr.responseText).name[0], env.statement.actor.name[0], 
-                          'Actor should not have been renamed based on statement.');
+					util.testListInList([env.statement.actor.name[0],modLearnerName], util.tryJSONParse(xhr.responseText).name, 'Both actor names should now be reflected on actor object.');
 					start();
 				});
 			});
 		});
 	});
 });
+
+asyncTest('Actor Transitive equalilty', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		otherId = util.ruuid(),
+		url = '/statements?',
+		modLearnerName = 'Renamed Auto Test Learner',
+		modStatements, prop, ids, resultIds = [], resultStatements, ii;
+
+	modStatements = [util.clone(env.statement),util.clone(env.statement),util.clone(env.statement),util.clone(env.statement)];
+	modStatements[0].actor = { mbox: ["mailto:auto_tests3@example.scorm.com"], name: ["Auto Test Transitive Learner"]}
+	modStatements[1].actor = { openid : ["http://example.com/some_unique_openId_autotest"], account : [ { accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest", accountName : "autotestuser"}] };
+	modStatements[2].actor = { mbox: ["mailto:auto_tests3@example.scorm.com", "mailto:auto_tests2@example.scorm.com"] };
+	modStatements[3].actor = { mbox_sha1sum: ["545d9aac1e1b3300f6fa308c1df6bccb47ffcd75"], account : [{ accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest", accountName : "autotestuser"}] };
+	util.request('POST', url, JSON.stringify(modStatements), true, 200, 'OK', function (xhr) {
+
+		ids = util.tryJSONParse(xhr.responseText);
+
+		// should be able to find all four statements based on initial actor information
+		var filters = [];
+		var queryString = [];
+		filters.actor = JSON.stringify(modStatements[0].actor, null, 4);
+		filters.limit='4';
+		
+		for (prop in filters) {
+			if (filters.hasOwnProperty(prop)) {
+				queryString.push(prop + '=' + encodeURIComponent(filters[prop]));
+			}
+		}
+
+		util.request('GET', url +  queryString.join('&'), null, true, 200, 'OK', function (xhr) {
+			resultStatements = util.tryJSONParse(xhr.responseText).statements;
+			for (ii = 0; ii < resultStatements.length; ii++) {
+				resultIds.push(resultStatements[ii].id);
+			}
+			util.testListInList(ids, resultIds, "should be able to get back all statements based on first actor.");
+			start();
+		});
+	});
+});
+
 
 asyncTest('Bad Verb', function () {
 	"use strict";
