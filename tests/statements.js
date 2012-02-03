@@ -205,23 +205,27 @@ asyncTest('Actor Modification', function () {
 		util = env.util,
 		otherId = util.ruuid(),
 		url = '/statements?statementId=',
+        origStatement = JSON.parse(JSON.stringify(env.statement)),
 		modLearnerName = 'Renamed Auto Test Learner',
 		modStatement;
 
-	util.request('PUT', url + util.ruuid(), JSON.stringify(env.statement), true, null, null, function () {
-		modStatement = JSON.stringify(env.statement).replace(env.statement.actor.name[0], modLearnerName);
+    origStatement.actor.mbox = ["modification.test@projecttincan.com"];
+
+	util.request('PUT', url + util.ruuid(), JSON.stringify(origStatement), true, null, null, function () {
+		modStatement = JSON.stringify(origStatement).replace(origStatement.actor.name[0], modLearnerName);
 		util.request('PUT', url + otherId, modStatement , true, 204, 'No Content', function () {
 			util.request('GET', url + otherId, null, true, 200, 'OK', function (xhr) {
 				var response;
 				response = util.tryJSONParse(xhr.responseText);
 
 				// verify statement is returned with modified name
-				equal(response.actor.name[0], modLearnerName);
-				//response.actor.name = env.statement.actor.name;
+				ok(util.inList(modLearnerName, response.actor.name), "modified name in list of names");
+				response.actor.name = [modLearnerName];
 				util.validateStatement(JSON.stringify(response), JSON.parse(modStatement), otherId);
 
-				util.request('GET', '/actors?actor=<actor>', null, true, 200, 'OK', function (xhr) {
-					util.testListInList([env.statement.actor.name[0],modLearnerName], util.tryJSONParse(xhr.responseText).name, 'Both actor names should now be reflected on actor object.');
+                var actorParam = encodeURIComponent(JSON.stringify(origStatement.actor));
+				util.request('GET', '/actors?actor=' + actorParam, null, true, 200, 'OK', function (xhr) {
+					util.testListInList([origStatement.actor.name[0],modLearnerName], util.tryJSONParse(xhr.responseText).name, 'Both actor names should now be reflected on actor object.');
 					start();
 				});
 			});
