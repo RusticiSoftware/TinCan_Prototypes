@@ -50,7 +50,10 @@ asyncTest('Definition, update', function () {
             //Check result
 		    var activity = env.util.tryJSONParse(xhr.responseText);
 		    equal(activity.id, myActivity.id, 'activity id');
-            equal(activity.definition.name, myActivity.definition.name);
+		    ok(activity.definition, "activity definition exists");
+		    if (activity.definition) {
+            	equal(activity.definition.name, myActivity.definition.name);
+            }
 
             //Update the definition
             env.util.request('POST','/statements',JSON.stringify([myStatementUpdate]), true, 200, 'OK', function() {
