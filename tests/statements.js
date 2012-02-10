@@ -739,7 +739,10 @@ asyncTest('Statements, context activities filter', function () {
     async.waterfall([
         function(cb){
             //Post all the golf statements (which include grouping and parent context activities)
-	        util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function(){cb(null);});
+	        //util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function(){cb(null);});
+            
+            //Just rely on golf statements already posted in POST multiple test
+            cb(null);
         },
         function(cb){
             //Put this extra, specific statement that we'll be looking for...

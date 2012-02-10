@@ -16,7 +16,8 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 5000;
+	QUnit.config.testTimeout = 30000;
+	//QUnit.config.testTimeout = 1000 * 60 * 20;
 
 	if (env.id === undefined) {
 		// set up test to be shared accross tests (only once)
