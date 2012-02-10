@@ -145,7 +145,8 @@ asyncTest('PUT / GET Actor as Object', function() {
     var myStatement = {
         id: myStatementId,
         verb: "imported",
-        object: env.statement.actor
+        object: env.statement.object,
+        actor: env.statement.actor
     };
 
 	env.util.request('PUT', url, JSON.stringify(myStatement), true, 204, 'No Content', function () {
@@ -268,7 +269,7 @@ asyncTest('Actor Transitive equalilty', function () {
 			for (ii = 0; ii < resultStatements.length; ii++) {
 				resultIds.push(resultStatements[ii].id);
 			}
-			util.testListInList(ids, resultIds, "should be able to get back all statements based on first actor.");
+			util.testListInList(ids, resultIds, "should be able to get back all statements based on first actor.: " + url +  queryString.join('&'));
 			start();
 		});
 	});
@@ -574,7 +575,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 				start();
 			});
 		} else {
-			ok(false, 'Test requires at least 10 existing statements');
+			ok(false, 'Test requires at least 10 existing statements ' + url + '?limit=10&actor='+actorParam);
 			start();
 		}
 	});
@@ -628,7 +629,7 @@ asyncTest('GET, sparse == false', function () {
 
     var regId = env.util.ruuid();
     var myActivityId = env.util.ruuid();
-    var myActivityFull = { "id":myActivityId, "definition":{"name":"My Tezzzt Activity"} };
+    var myActivityFull = { "id":myActivityId, "definition":{"name": { "en-us" : "My Tezzzt Activity"} } };
     var myActivitySparse = { "id":myActivityId };
     var statement1 = { "verb":"imported", "object":myActivityFull, "context":{"registration":regId} };
     var statement2 = { "verb":"attempted", "object":myActivitySparse, "context":{"registration":regId} };
