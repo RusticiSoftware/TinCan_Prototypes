@@ -356,7 +356,7 @@ TCDriver_ISODateString = function(d){
     }
     var padder = Math.pow(10, n-1);
     var tempVal = val.toString();
-    while(val < padder){        
+    while(val < padder && padder > 1){        
         tempVal = '0' + tempVal;
         padder = padder / 10;
     }
