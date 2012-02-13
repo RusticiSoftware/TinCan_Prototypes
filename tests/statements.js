@@ -241,13 +241,18 @@ asyncTest('Actor Transitive equalilty', function () {
 		otherId = util.ruuid(),
 		url = '/statements?',
 		modLearnerName = 'Renamed Auto Test Learner',
-		modStatements, prop, ids, resultIds = [], resultStatements, ii;
+		modStatements, prop, ids, resultIds = [], resultStatements, ii, account, mbox1, mbox2;
+		
+	account = [ { accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest/"+otherId, accountName : "autotestuser"}];
+	mbox1 = ["mailto:" + otherId + "3@example.scorm.com"];
+	mbox2 = ["mailto:" + otherId + "2@example.scorm.com"];
 
 	modStatements = [util.clone(env.statement),util.clone(env.statement),util.clone(env.statement),util.clone(env.statement)];
-	modStatements[0].actor = { mbox: ["mailto:auto_tests3@example.scorm.com"], name: ["Auto Test Transitive Learner"]}
-	modStatements[1].actor = { openid : ["http://example.com/some_unique_openId_autotest"], account : [ { accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest", accountName : "autotestuser"}] };
-	modStatements[2].actor = { mbox: ["mailto:auto_tests3@example.scorm.com", "mailto:auto_tests2@example.scorm.com"] };
-	modStatements[3].actor = { mbox_sha1sum: ["545d9aac1e1b3300f6fa308c1df6bccb47ffcd75"], account : [{ accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest", accountName : "autotestuser"}] };
+	modStatements[0].actor = { mbox: mbox1, name: ["Auto Test Transitive Learner " + otherId]}
+	modStatements[1].actor = { openid : ["http://example.com/some_unique_openId_autotest_"+otherId], account : account };
+	modStatements[2].actor = { mbox: [mbox1[0],mbox2[0]] };
+	modStatements[3].actor = { mbox_sha1sum: [""], account :account };
+	modStatements[3].actor.mbox_sha1sum[0] = Crypto.util.bytesToHex(Crypto.SHA1(mbox2[0], { asBytes: true }));
 	util.request('POST', url, JSON.stringify(modStatements), true, 200, 'OK', function (xhr) {
 
 		ids = util.tryJSONParse(xhr.responseText);
