@@ -281,7 +281,7 @@ asyncTest('Actor Transitive equalilty', function () {
 });
 
 
-asyncTest('Bad Verb', function () {
+asyncTest('Reject Bad Verb', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -301,7 +301,7 @@ asyncTest('Bad Verb', function () {
 	});
 });
 
-asyncTest('Bad ID', function () {
+asyncTest('Reject Bad ID', function () {
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -317,6 +317,73 @@ asyncTest('Bad ID', function () {
 			start();
 		});
 	});
+});
+
+asyncTest('Reject Bad interactionType', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+
+    var myObj = env.util.clone(env.statement.object);
+    myObj["definition"] = {interactionType: "bad type"};
+
+    var myStatement = {
+        id: myStatementId,
+        actor: env.statement.actor,
+        verb: "attempted",
+        object: myObj
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
+		start();
+	});
+});
+
+asyncTest('Reject Bad activityType', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+
+    var myObj = env.util.clone(env.statement.object);
+    myObj["definition"] = {type: "bad type"};
+
+    var myStatement = {
+        id: myStatementId,
+        actor: env.statement.actor,
+        verb: "attempted",
+        object: myObj
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
+		start();
+	});
+});
+
+asyncTest('Reject Bad mbox', function() {
+    var env = statementsEnv;
+    var myStatementId = env.util.ruuid();
+    var url = '/statements?statementId=' + myStatementId;
+
+    var myActor = env.util.clone(env.statement.actor);
+    myActor.mbox = ["example@scorm.com"]; //invalid, missing mailto: prefix
+
+    var myStatement = {
+        id: myStatementId,
+        actor: myActor,
+        verb: "attempted",
+        object: env.statement.object
+    };
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
+		start();
+	});
+
+    myActor.mbox = ["mailto:not_valid_email"]; 
+
+	env.util.request('PUT', url, JSON.stringify(myStatement), true, 400, 'Bad Request', function () {
+		start();
+	});
+        
 });
 
 asyncTest('pass special handling', function () {
@@ -807,6 +874,8 @@ asyncTest('Statements, context activities filter', function () {
         start,
     ]);
 });
+
+
 
 
 /*asyncTest('Statements, descendants filter', function () {
