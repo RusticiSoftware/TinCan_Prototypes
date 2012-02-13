@@ -55,9 +55,11 @@
     NSLog(@"isNoContent = %@\n", ([response isNoContent] ? @"YES" : @"NO")); //look for a 204 - NoContent as the proper response
     
     NSLog(@"isOk = %@\n", ([response isOK] ? @"YES" : @"NO")); //look for a 200 - as the proper response for a get statements
-    NSLog(@"URL : %@",[response URL]);
-    if ([response isOK])  {
-        //nothing yet
+    NSLog(@"URL : %@",[[[response request] URL] path]);
+    NSString *path = [NSString stringWithFormat:@"%@",[[[response request] URL] path]];
+    if ([response isOK] && [path hasSuffix:@"/statements"])  {
+        //this should be the get statements call
+        [self.txtJson setStringValue:[response bodyAsString]];
     }
 }
 

@@ -1,0 +1,7 @@
+
+*~
+
+*.suo
+[B|b]in/
+[O|o]bj/
+.DS_Store

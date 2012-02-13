@@ -52,7 +52,7 @@
 
 
 - (NSString*)localizedStatusCodeString {
-	return [NSHTTPURLResponse localizedStringForStatusCode:[self statusCode]];
+	return [NSHTTPURLResponse localizedStringForStatusCode:[_response statusCode]];
 }
 
 - (NSData *)body {
@@ -65,7 +65,7 @@
 
 - (NSStringEncoding)bodyEncoding {
     CFStringEncoding cfEncoding = kCFStringEncodingInvalidId;    
-    NSString *textEncodingName = [self bodyEncodingName];
+    NSString *textEncodingName = [_response bodyEncodingName];
     if (textEncodingName) {
         cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef) textEncodingName);
     }
@@ -73,12 +73,12 @@
 }
 
 - (NSString *)bodyAsString {
-	return [[[NSString alloc] initWithData:self.body encoding:[self bodyEncoding]] autorelease];
+	return [[[NSString alloc] initWithData:_response.body encoding:[_response bodyEncoding]] autorelease];
 }
 
 
 - (NSString*)failureErrorDescription {
-	if ([self isFailure]) {
+	if ([_response isFailure]) {
 		return [_failureError localizedDescription];
 	} else {
 		return nil;
@@ -114,120 +114,120 @@
 }
 
 - (BOOL)isInvalid {
-	return ([self statusCode] < 100 || [self statusCode] > 600);
+	return ([_response statusCode] < 100 || [_response statusCode] > 600);
 }
 
 - (BOOL)isInformational {
-	return ([self statusCode] >= 100 && [self statusCode] < 200);
+	return ([_response statusCode] >= 100 && [_response statusCode] < 200);
 }
 
 - (BOOL)isSuccessful {
-	return (([self statusCode] >= 200 && [self statusCode] < 300) || ([self wasLoadedFromCache]));
+	return (([_response statusCode] >= 200 && [_response statusCode] < 300) || ([_response wasLoadedFromCache]));
 }
 
 - (BOOL)isRedirection {
-	return ([self statusCode] >= 300 && [self statusCode] < 400);
+	return ([_response statusCode] >= 300 && [_response statusCode] < 400);
 }
 
 - (BOOL)isClientError {
-	return ([self statusCode] >= 400 && [self statusCode] < 500);
+	return ([_response statusCode] >= 400 && [_response statusCode] < 500);
 }
 
 - (BOOL)isServerError {
-	return ([self statusCode] >= 500 && [self statusCode] < 600);
+	return ([_response statusCode] >= 500 && [_response statusCode] < 600);
 }
 
 - (BOOL)isError {
-	return ([self isClientError] || [self isServerError]);
+	return ([_response isClientError] || [_response isServerError]);
 }
 
 - (BOOL)isOK {
-	return ([self statusCode] == 200);
+	return ([_response statusCode] == 200);
 }
 
 - (BOOL)isCreated {
-	return ([self statusCode] == 201);
+	return ([_response statusCode] == 201);
 }
 
 - (BOOL)isNoContent {
-	return ([self statusCode] == 204);
+	return ([_response statusCode] == 204);
 }
 
 - (BOOL)isNotModified {
-	return ([self statusCode] == 304);
+	return ([_response statusCode] == 304);
 }
 
 - (BOOL)isUnauthorized {
-	return ([self statusCode] == 401);
+	return ([_response statusCode] == 401);
 }
 
 - (BOOL)isForbidden {
-	return ([self statusCode] == 403);
+	return ([_response statusCode] == 403);
 }
 
 - (BOOL)isNotFound {
-	return ([self statusCode] == 404);
+	return ([_response statusCode] == 404);
 }
 
 - (BOOL)isConflict {
-    return ([self statusCode] == 409);
+    return ([_response statusCode] == 409);
 }
 
 - (BOOL)isGone {
-    return ([self statusCode] == 410);
+    return ([_response statusCode] == 410);
 }
 
 - (BOOL)isUnprocessableEntity {
-	return ([self statusCode] == 422);
+	return ([_response statusCode] == 422);
 }
 
 - (BOOL)isRedirect {
-	return ([self statusCode] == 301 || [self statusCode] == 302 || [self statusCode] == 303 || [self statusCode] == 307);
+	return ([_response statusCode] == 301 || [_response statusCode] == 302 || [_response statusCode] == 303 || [_response statusCode] == 307);
 }
 
 - (BOOL)isEmpty {
-	return ([self statusCode] == 201 || [self statusCode] == 204 || [self statusCode] == 304);
+	return ([_response statusCode] == 201 || [_response statusCode] == 204 || [_response statusCode] == 304);
 }
 
 - (BOOL)isServiceUnavailable {
-	return ([self statusCode] == 503);
+	return ([_response statusCode] == 503);
 }
 
 - (NSString*)contentType {
-	return ([[self allHeaderFields] objectForKey:@"Content-Type"]);
+	return ([[_response allHeaderFields] objectForKey:@"Content-Type"]);
 }
 
 - (NSString*)contentLength {
-	return ([[self allHeaderFields] objectForKey:@"Content-Length"]);
+	return ([[_response allHeaderFields] objectForKey:@"Content-Length"]);
 }
 
 - (NSString*)location {
-	return ([[self allHeaderFields] objectForKey:@"Location"]);
+	return ([[_response allHeaderFields] objectForKey:@"Location"]);
 }
 
 - (BOOL)isHTML {
-	NSString* contentType = [self contentType];
+	NSString* contentType = [_response contentType];
 	return (contentType && ([contentType rangeOfString:@"text/html"
 											   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0 ||
-                            [self isXHTML]));
+                            [_response isXHTML]));
 }
 
 - (BOOL)isXHTML {
-	NSString* contentType = [self contentType];
+	NSString* contentType = [_response contentType];
 	return (contentType &&
 			[contentType rangeOfString:@"application/xhtml+xml"
 							   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0);
 }
 
 - (BOOL)isXML {
-	NSString* contentType = [self contentType];
+	NSString* contentType = [_response contentType];
 	return (contentType &&
 			[contentType rangeOfString:@"application/xml"
 							   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0);
 }
 
 - (BOOL)isJSON {
-	NSString* contentType = [self contentType];
+	NSString* contentType = [_response contentType];
 	return (contentType &&
 			[contentType rangeOfString:@"application/json"
 							   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0);
