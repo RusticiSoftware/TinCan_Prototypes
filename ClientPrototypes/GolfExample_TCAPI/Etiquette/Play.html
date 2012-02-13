@@ -13,13 +13,13 @@
 		var pageObj = {
                 "id":"scorm.com/GolfExample_TCAPI/Etiquette/Play.html",
 			    "definition":{
-				    "name":"Etiquette - Playing",
-				    "description":"An overview of golf etiquette as it pertains to game play."
+				    "name":{"en-US":"Etiquette - Playing"},
+				    "description":{"en-US":"An overview of golf etiquette as it pertains to game play."}
                 }
         };
 
 		var stmt = {
-            "verb": "read",
+            "verb": "experienced",
             "object": pageObj,
             "context": GolfExample.getContext(
                             GolfExample.CourseActivity.id)

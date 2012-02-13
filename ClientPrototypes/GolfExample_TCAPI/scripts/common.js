@@ -1,14 +1,14 @@
-GolfExample = { }
+GolfExample = { };
 
 GolfExample.CourseActivity = 
 {
     "id":"scorm.com/GolfExample_TCAPI", 
     "definition":{
-    	"name":"Golf Example - Tin Can Course",
     	"type":"Course",
-    	"description":"An overview of how to play the great game of golf."
+    	"name":{"en-US":"Golf Example - Tin Can Course"},
+    	"description":{"en-US":"An overview of how to play the great game of golf."}
     }
-}
+};
 
 GolfExample.getContext = function(parentActivityId){
     var ctx = {
@@ -20,4 +20,4 @@ GolfExample.getContext = function(parentActivityId){
         ctx.contextActivities["parent"] = {"id":parentActivityId};
     }
     return ctx;
-}
+};

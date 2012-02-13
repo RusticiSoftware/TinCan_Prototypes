@@ -13,13 +13,13 @@
 		var pageObj = {
                 "id":"scorm.com/GolfExample_TCAPI/HavingFun/HowToBeStylish.html",
 			    "definition":{
-				    "name":"How to be Stylish",
-				    "description":"Some tips for how to be stylish on the golf course. Directed primarily at women."
+				    "name":{"en-US":"How to be Stylish"},
+				    "description":{"en-US":"Some tips for how to be stylish on the golf course. Directed primarily at women."}
                 }
         };
 
 		var stmt = {
-            "verb": "read",
+            "verb": "experienced",
             "object": pageObj,
             "context": GolfExample.getContext(
                             GolfExample.CourseActivity.id)

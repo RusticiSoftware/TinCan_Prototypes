@@ -85,14 +85,14 @@ function tc_sendStatment_StartNewGame(){
 		var tcGameObj = {
             'id':GAME_ID,
 			"definition":{
-				"name":"Js Tetris - Tin Can Prototype",
-				"type":"Game",
-				"description":"A game of tetris."
+				"type":"media",
+				"name":{"en-US":"Js Tetris - Tin Can Prototype"},
+				"description":{"en-US":"A game of tetris."}
             }
         };
 
 		var stmt = {
-			"verb":"played",
+			"verb":"attempted",
 			"object":tcGameObj
         };
 
@@ -106,9 +106,9 @@ function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
 		var tcGameObj = {
             "id":"scorm.com/JsTetris_TCAPI/level" + level,
 			"definition":{
-				"name":"Js Tetris Level" + level,
-				"type":"Game",
-				"description":"Starting at 1, the higher the level, the harder the game."
+				"type":"media",
+				"name":{"en-US":"Js Tetris Level" + level},
+				"description":{"en-US":"Starting at 1, the higher the level, the harder the game."}
             }
         };
 
@@ -125,7 +125,7 @@ function tc_sendStatment_FinishLevel(level,time,apm,lines,score){
         };
 			
 		var stmt = {
-			"verb":"achieved",
+			"verb":"completed",
 			"object":tcGameObj,
 			"result":resultObj
         };
@@ -140,9 +140,9 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
 		var tcGameObj = {
             "id":GAME_ID,
 			"definition":{
-				"name":"Js Tetris - Tin Can Prototype",
-				"type":"Game",
-				"description":"A game of tetris."
+				"type":"media",
+				"name":{"en-US":"Js Tetris - Tin Can Prototype"},
+				"description":{"en-US":"A game of tetris."}
             }
         };
 

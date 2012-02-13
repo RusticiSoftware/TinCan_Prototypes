@@ -53,15 +53,16 @@
             var PROTOTYPE_AUTH = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
 
 			$('#tc_nameInput_golf').val(PROTOTYPE_DEFAULT_NAME);
-			$('#tc_emailInput_golf').val(PROTOTYPE_DEFAULT_MBOX);
+			$('#tc_emailInput_golf').val(PROTOTYPE_DEFAULT_MBOX.replace('mailto:',''));
 			$('#tc_nameInput_loc').val(PROTOTYPE_DEFAULT_NAME);
-			$('#tc_emailInput_loc').val(PROTOTYPE_DEFAULT_MBOX);
+			$('#tc_emailInput_loc').val(PROTOTYPE_DEFAULT_MBOX.replace('mailto:',''));
 			
 			
 			$('#golfExampleLaunch').click(function(){
 				var em = $("#tc_emailInput_golf").val();
+				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
 				var nm = $("#tc_nameInput_golf").val();
-				var actor = {'mbox' : ['mailto:' + em], 'name' : [nm]};
+				var actor = {'mbox' : [mbox], 'name' : [nm]};
 				
 				
 				$(this).attr('href',$(this).attr('baseref') 
@@ -85,7 +86,8 @@
 			$('#locatorExampleLaunch').click(function(){
 				var em = $("#tc_emailInput_loc").val();
 				var nm = $("#tc_nameInput_loc").val();
-				var actor = {'mbox' : ['mailto:' + em], 'name' : [nm]};
+				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
+				var actor = {'mbox' : [mbox], 'name' : [nm]};
 				
 				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)

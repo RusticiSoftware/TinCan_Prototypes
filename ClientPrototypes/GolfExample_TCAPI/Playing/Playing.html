@@ -13,13 +13,13 @@
 		var pageObj = {
                 "id":"scorm.com/GolfExample_TCAPI/Playing/Playing.html",
 			    "definition":{
-				    "name":"Playing Golf",
-				    "description":"An overview of the game of golf."
+				    "name":{"en-US":"Playing Golf"},
+				    "description":{"en-US":"An overview of the game of golf."}
                 }
         };
 
 		var stmt = {
-            "verb": "read",
+            "verb": "experienced",
             "object": pageObj,
             "context": GolfExample.getContext(
                             GolfExample.CourseActivity.id)

@@ -66,7 +66,7 @@ function TC_GetStatementsWithinContext (num, verb, activityId, callbackFunction,
 
 function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isContextActivity) {
 	var url = endpoint + "statements/?sparse=false";
-	if (nextPage && moreStatementsUrl !== null){
+	if (nextPage && moreStatementsUrl !== null && moreStatementsUrl !== undefined){
 		url = endpoint + moreStatementsUrl.substr(1);
 	} else {
 	    if (num > 0){
@@ -108,6 +108,9 @@ function RenderStatements(xhr){
 	var statementsResult = JSON.parse(xhr.responseText);
     var statements = statementsResult.statements;
     moreStatementsUrl = statementsResult.more;
+    if(moreStatementsUrl === undefined || moreStatementsUrl === null){
+    	$("#showAllStatements").hide();
+    }
 	var stmtStr = "<table>";
 	var i;
 	var dt;
@@ -125,7 +128,6 @@ function RenderStatements(xhr){
 		dt = new Date(Date.UTC(aDate[1], aDate[2]-1, aDate[3], aDate[4], aDate[5], aDate[6]));  
 		stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString()  +"</td>";
 
-		console.log(JSON.stringify(statements[i]));
 		var name = (statements[i].actor.name != undefined) ? statements[i].actor.name[0] : statements[i].actor.mbox[0];
 		stmtStr += "<td > <span class='actor'>"+ name +"</span>";
 		
@@ -135,7 +137,7 @@ function RenderStatements(xhr){
 		if (statements[i].object.definition != undefined){
             var activityType = statements[i].object.definition.type;
 			if (activityType != undefined && (activityType == "question" || activityType == "interaction")){
-				obj = (statements[i].object.definition.description != undefined) ? statements[i].object.definition.description : obj;
+				obj = (statements[i].object.definition.description != undefined) ? statements[i].object.definition.description["en-US"] : obj;
 				
 				var answer = "";
 				var corrAnswer = "";
@@ -160,7 +162,7 @@ function RenderStatements(xhr){
 			} else if (statements[i].verb == "experienced" && statements[i].object.definition.type != undefined && statements[i].object.definition.type == "Location"){
 				
 				stmtStr += " <span class='verb'>visited</span>";
-				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name : obj;
+				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name["en-US"] : obj;
 				stmtStr += " <span class='object'>"+ obj +"</span>";
 				
 				if (statements[i].context.extensions.latitude != null && statements[i].context.extensions.longitude != null){
@@ -173,7 +175,7 @@ function RenderStatements(xhr){
 			
 			} else {
 				stmtStr += " <span class='verb'>"+ statements[i].verb +"</span>";
-				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name : obj;
+				obj = (statements[i].object.definition.name != undefined) ? statements[i].object.definition.name["en-US"] : obj;
 				stmtStr += " <span class='object'>"+ obj +"</span>";
 			}
 			
@@ -324,11 +326,14 @@ function RenderGolfData(xhr){
 	
 	var i;
 	for (i = 0; i < statements.length ; i++){
+		if(statements[i].actor == null){
+			continue;
+		}
 		var l;
 		var mbox = statements[i].actor.mbox[0];
 		if (learnerObjs[mbox] == undefined){
 			learners.push(mbox);
-			learnerObjs[mbox] = new Object()
+			learnerObjs[mbox] = new Object();
 			learnerObjs[mbox].complete = 'incomplete';
 			learnerObjs[mbox].score = '-';
 		}
@@ -410,7 +415,7 @@ function RenderGolfQuestions(xhr){
 		
 		if(resultsByQuestion[questionId] === undefined){
 			resultsByQuestion[questionId] = {
-				"question": stmt.object.definition.description,
+				"question": stmt.object.definition.description["en-US"],
 				"correctAnswer": stmt.object.definition.correctResponsesPattern[0],
 				"numCorrect":0,
 				"numIncorrect":0
@@ -514,8 +519,8 @@ function RenderLocations(xhr){
         var locationId = stmt.object.id;
         if(resultsByLocationId[locationId] === undefined){
             resultsByLocationId[locationId] = {
-                "name":stmt.object.definition.name,
-                "description":stmt.object.definition.description,
+                "name":stmt.object.definition.name["en-US"],
+                "description":stmt.object.definition.description["en-US"],
                 "visitors":0
             };
         }
