@@ -144,10 +144,6 @@ asyncTest('Metadata load', function () {
         //Get it
 	    env.util.request('GET', "/activities?activityId=" + encodeURIComponent(myActivityId), null, true, 200, 'OK', function (xhr) {
 	    	var activity = env.util.tryJSONParse(xhr.responseText);
-	    	if (activity.definition.description.el) {
-	    		//cheat, encoding problems on java side, leave out of tests until that's fixed
-	    		activity.definition.description.el = expected.definition.description.el;
-	    	}
 			deepEqual(activity, expected, 'activity from metadata');
 	    	start();
 	    });
