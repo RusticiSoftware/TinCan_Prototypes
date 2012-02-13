@@ -16,7 +16,8 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 30000;
+	//QUnit.config.testTimeout = 30000;
+	QUnit.config.testTimeout = 1000;
 	//QUnit.config.testTimeout = 1000 * 60 * 20;
 
 	if (env.id === undefined) {
@@ -517,7 +518,7 @@ Util.prototype.ISODateString = function(d){
     }
     var padder = Math.pow(10, n-1);
     var tempVal = val.toString();
-    while(val < padder){        
+    while(val < padder && padder > 1){        
         tempVal = '0' + tempVal;
         padder = padder / 10;
     }

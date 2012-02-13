@@ -210,7 +210,7 @@ asyncTest('Actor Modification', function () {
 		modLearnerName = 'Renamed Auto Test Learner',
 		modStatement;
 
-    origStatement.actor.mbox = ["modification.test@projecttincan.com"];
+    origStatement.actor.mbox = ["mailto:modification.test@projecttincan.com"];
 
 	util.request('PUT', url + util.ruuid(), JSON.stringify(origStatement), true, null, null, function () {
 		modStatement = JSON.stringify(origStatement).replace(origStatement.actor.name[0], modLearnerName);
