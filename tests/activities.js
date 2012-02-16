@@ -122,7 +122,7 @@ asyncTest('Metadata load', function () {
       "und": "Rustici example interaction"
     },
     "description": {
-      "en-us": "Longer description about the example interaction.",
+      "en-US": "Longer description about the example interaction.",
       "el": "Εκτενέστερη περιγραφή για την πορεία παράδειγμα."
     },
     "type": "interaction",

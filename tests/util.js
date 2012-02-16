@@ -42,7 +42,7 @@ Util.init = function (env) {
 Util.prototype.endpoint = Config.endpoint;
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
 Util.prototype.verb = "experienced";
-Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : { 'en-us' : 'Tin Can Auto Test Activity' } } };
+Util.prototype.activity = {id : "http://scorm.com/tincan/autotest/testactivity", definition : { name : { 'en-US' : 'Tin Can Auto Test Activity' } } };
 Util.prototype.actorUniqueProps = ['mbox', 'account', 'openid', 'mbox_sha1sum', 'account'];
 
 Util.prototype.areActorsEqual = function (source, target) {

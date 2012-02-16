@@ -4,8 +4,8 @@ golfStatements = [
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/GolfAssessment.html",
       "definition":{
-         "name": { "en-us" : "Golf Example Assessment" },
-         "description": { "en-us" : "An Assessment for the Golf Example course." },
+         "name": { "en-US" : "Golf Example Assessment" },
+         "description": { "en-US" : "An Assessment for the Golf Example course." },
          "type":"Assessment"
       }
    }
@@ -24,7 +24,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.playing_1",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "The rules of golf are maintained by:" },
+         "description": { "en-US" : "The rules of golf are maintained by:" },
          "interactionType":"choice",
          "correctResponsesPattern":["USGA and Royal and Ancient"]
       }
@@ -36,7 +36,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.playing_2",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "A score of two under par on a given hole is known as a(n):" },
+         "description": { "en-US" : "A score of two under par on a given hole is known as a(n):" },
          "interactionType":"choice",
          "correctResponsesPattern":["eagle"]
       }
@@ -48,7 +48,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.playing_3",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "A typical golf course has ____ holes" },
+         "description": { "en-US" : "A typical golf course has ____ holes" },
          "interactionType":"numeric",
          "correctResponsesPattern":["18"]
       }
@@ -60,7 +60,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.playing_4",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "In stableford scoring, the highest score wins."},
+         "description": { "en-US" : "In stableford scoring, the highest score wins."},
          "interactionType":"true-false",
          "correctResponsesPattern":["true"]
       }
@@ -72,7 +72,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.playing_5",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Par for a 175 yard hole is typically:" },
+         "description": { "en-US" : "Par for a 175 yard hole is typically:" },
          "interactionType":"numeric",
          "correctResponsesPattern":["3"]
       }
@@ -84,7 +84,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.etiquette_1",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "When another player is attempting a shot, it is best to stand:" },
+         "description": { "en-US" : "When another player is attempting a shot, it is best to stand:" },
          "interactionType":"choice",
          "correctResponsesPattern":["Out of the player's line of sight"]
       }
@@ -96,7 +96,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.etiquette_2",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Generally sand trap rakes should be left outside of the hazard" },
+         "description": { "en-US" : "Generally sand trap rakes should be left outside of the hazard" },
          "interactionType":"true-false",
          "correctResponsesPattern":["true"]
       }
@@ -108,7 +108,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.etiquette_3",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "The player with the best score on previous hole tees off:" },
+         "description": { "en-US" : "The player with the best score on previous hole tees off:" },
          "interactionType":"choice",
          "correctResponsesPattern":["First"]
       }
@@ -120,7 +120,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.handicap_1",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Which formula is used to calculate the 'course handicap'?"},
+         "description": { "en-US" : "Which formula is used to calculate the 'course handicap'?"},
          "interactionType":"choice",
          "correctResponsesPattern":["Course Handicap = Handicap index * Slope Rating / 113"]
       }
@@ -132,7 +132,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.handicap_2",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Golfer A has a course handicap of 6. Golfer B has a course handicap of 10. Golfer A shoots an 81. Golfer B shoots an 84. Golfer B wins the match be how many strokes?"},
+         "description": { "en-US" : "Golfer A has a course handicap of 6. Golfer B has a course handicap of 10. Golfer A shoots an 81. Golfer B shoots an 84. Golfer B wins the match be how many strokes?"},
          "interactionType":"numeric",
          "correctResponsesPattern":["1"]
       }
@@ -144,7 +144,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.handicap_3",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "A 'scratch golfer' has a handicap of ___"},
+         "description": { "en-US" : "A 'scratch golfer' has a handicap of ___"},
          "interactionType":"numeric",
          "correctResponsesPattern":["0"]
       }
@@ -156,7 +156,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.handicap_4",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Golfer A has a course handicap of 3. Golfer B has a course handicap of 28. On the 6th handicap hole, how many strokes will Golfer A have to give Golfer B in match play?"},
+         "description": { "en-US" : "Golfer A has a course handicap of 3. Golfer B has a course handicap of 28. On the 6th handicap hole, how many strokes will Golfer A have to give Golfer B in match play?"},
          "interactionType":"numeric",
          "correctResponsesPattern":["2"]
       }
@@ -168,7 +168,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.fun_1",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "To make friends on the golf course, you should play really slowly." },
+         "description": { "en-US" : "To make friends on the golf course, you should play really slowly." },
          "interactionType":"true-false",
          "correctResponsesPattern":["false"]
       }
@@ -180,7 +180,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.fun_2",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "Knickers indicate a refined sense of style." },
+         "description": { "en-US" : "Knickers indicate a refined sense of style." },
          "interactionType":"true-false",
          "correctResponsesPattern":["false"]
       }
@@ -192,7 +192,7 @@ golfStatements = [
       "id":"com.scorm.golfsamples.interactions.fun_3",
       "definition":{
          "type":"question",
-         "description": { "en-us" : "You should take your score very seriously if you want to have a lot of fun on the course." },
+         "description": { "en-US" : "You should take your score very seriously if you want to have a lot of fun on the course." },
          "interactionType":"true-false",
          "correctResponsesPattern":["false"]
       }
@@ -204,9 +204,9 @@ golfStatements = [
    "object":{
       "id":"scorm.com/GolfExample_TCAPI",
       "definition":{
-         "name": { "en-us" : "Golf Example - Tin Can Course" },
+         "name": { "en-US" : "Golf Example - Tin Can Course" },
          "type":"Course",
-         "description": { "en-us" : "An overview of how to play the great game of golf." }
+         "description": { "en-US" : "An overview of how to play the great game of golf." }
       }
    }
 },

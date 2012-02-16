@@ -701,7 +701,7 @@ asyncTest('GET, sparse == false', function () {
 
     var regId = env.util.ruuid();
     var myActivityId = env.util.ruuid();
-    var myActivityFull = { "id":myActivityId, "definition":{"name": { "en-us" : "My Tezzzt Activity"} } };
+    var myActivityFull = { "id":myActivityId, "definition":{"name": { "en-US" : "My Tezzzt Activity"} } };
     var myActivitySparse = { "id":myActivityId };
     var statement1 = { "verb":"imported", "object":myActivityFull, "context":{"registration":regId} };
     var statement2 = { "verb":"attempted", "object":myActivitySparse, "context":{"registration":regId} };
