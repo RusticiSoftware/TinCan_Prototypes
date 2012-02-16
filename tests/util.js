@@ -286,6 +286,16 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
         }
     }
 
+    if (responseObj.actor == undefined) {
+    	ok(false, "Statements returned from LRS must always have an actor.");
+    }
+    if (responseObj.actor.objectType == undefined) {
+    	ok(false, "Statements returned from LRS must always have an actor objectType.");
+    }
+	// LRS will add actor if not supplied
+	if (statement.actor == undefined) {
+		delete responseObj.actor;
+	}
     if(statement.actor !== undefined && statement.actor.objectType === undefined){
         delete responseObj.actor.objectType;
     }

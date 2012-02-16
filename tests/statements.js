@@ -280,6 +280,67 @@ asyncTest('Actor Transitive equalilty', function () {
 	});
 });
 
+asyncTest('Actor Transitive equalilty, multi-post', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		otherId = util.ruuid(),
+		url = '/statements?',
+		modLearnerName = 'Renamed Auto Test Learner',
+		modStatements, prop, ids, resultIds = [], resultStatements, ii, account, mbox1, mbox2;
+		
+	account = [ { accountServiceHomePage : "http://projecttincan.com/TCAPI_autotest/"+otherId, accountName : "autotestuser"}];
+	mbox1 = ["mailto:" + otherId + "3@example.scorm.com"];
+	mbox2 = ["mailto:" + otherId + "2@example.scorm.com"];
+
+	ids = [util.ruuid(), util.ruuid(), util.ruuid(), util.ruuid()];
+
+	modStatements = [util.clone(env.statement),util.clone(env.statement),util.clone(env.statement),util.clone(env.statement)];
+	modStatements[0].actor = { mbox: mbox1, name: ["Auto Test Transitive Learner " + otherId]}
+	modStatements[1].actor = { openid : ["http://example.com/some_unique_openId_autotest_"+otherId], account : account };
+	modStatements[2].actor = { mbox: [mbox1[0],mbox2[0]] };
+	modStatements[3].actor = { mbox_sha1sum: [""], account :account };
+	modStatements[3].actor.mbox_sha1sum[0] = Crypto.util.bytesToHex(Crypto.SHA1(mbox2[0], { asBytes: true }));
+	
+	for ( ii = 0; ii < ids.length; ii++) {
+		modStatements[ii].id = ids[ii];
+	}
+	util.request('POST', url, JSON.stringify([modStatements[0]]), true, 200, 'OK', function () {
+		util.request('POST', url, JSON.stringify([modStatements[1]]), true, 200, 'OK', function () {
+			util.request('POST', url, JSON.stringify([modStatements[2]]), true, 200, 'OK', function () {
+				util.request('POST', url, JSON.stringify([modStatements[3]]), true, 200, 'OK', function () {
+
+					// should be able to find all four statements based on initial actor information
+					var filters = [];
+					var queryString = [];
+					filters.actor = JSON.stringify(modStatements[0].actor, null, 4);
+					filters.limit='4';
+					
+					for (prop in filters) {
+						if (filters.hasOwnProperty(prop)) {
+							queryString.push(prop + '=' + encodeURIComponent(filters[prop]));
+						}
+					}
+			
+					util.request('GET', url +  queryString.join('&'), null, true, 200, 'OK', function (xhr) {
+						resultStatements = util.tryJSONParse(xhr.responseText).statements;
+						for (ii = 0; ii < resultStatements.length; ii++) {
+							resultIds.push(resultStatements[ii].id);
+						}
+						util.testListInList(ids, resultIds, "should be able to get back all statements based on first actor.: " + url +  queryString.join('&'));
+						
+						util.request('GET', '/actors?actor=' + encodeURIComponent(filters.actor), null, true, 200, 'OK', function (xhr) {
+							util.testListInList([mbox1[0], mbox2[0]], util.tryJSONParse(xhr.responseText).mbox, 'Mboxes for all actors should now be reflected on actor object.');
+							start();
+						});
+					});
+				});
+			});
+		});
+	});
+});
+
+
 
 asyncTest('Reject Bad Verb', function () {
 	"use strict";
