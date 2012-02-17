@@ -150,8 +150,8 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         headers["Content-Length"] = contentLength;
     }
     if (useAuth) {
-    	headers["Authorization"] = 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password');
-    }
+		headers["Authorization"] = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPass);   
+	}
     if(extraHeaders !== null){
         for(var headerName in extraHeaders){
             headers[headerName] = extraHeaders[headerName];
