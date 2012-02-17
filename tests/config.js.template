@@ -6,3 +6,4 @@ function Config() {
 Config.endpoint = "[TCAPI endpoint]";
 Config.authUser = "testuser2.autotest@scorm.example.com";
 Config.authPass = "password";
+Config.timeout = 5000;

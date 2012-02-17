@@ -317,13 +317,7 @@ asyncTest('Actor Transitive equalilty, multi-post', function () {
 					filters.actor = JSON.stringify(modStatements[0].actor, null, 4);
 					filters.limit='4';
 					
-					for (prop in filters) {
-						if (filters.hasOwnProperty(prop)) {
-							queryString.push(prop + '=' + encodeURIComponent(filters[prop]));
-						}
-					}
-			
-					util.request('GET', url +  queryString.join('&'), null, true, 200, 'OK', function (xhr) {
+					util.request('GET', url +  util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
 						resultStatements = util.tryJSONParse(xhr.responseText).statements;
 						for (ii = 0; ii < resultStatements.length; ii++) {
 							resultIds.push(resultStatements[ii].id);
@@ -515,7 +509,7 @@ asyncTest('POST multiple', function () {
 		golfStatements = util.golfStatements;
 
 	util.request('POST', url, JSON.stringify(golfStatements), true, 200, 'OK', function (xhr) {
-		var ids = JSON.parse(xhr.responseText),
+		var ids = env.util.tryJSONParse(xhr.responseText),
 			object,
 			ii,
 			testId = ids[ids.length - 5]; // first few statements aren't good examples, grab a later one
@@ -643,6 +637,50 @@ asyncTest('GET statements (via POST), simple', function () {
 });
 
 
+asyncTest('GET statements, context', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/statements/',
+		statement = util.clone(env.statement),
+		ctxActId = statement.object.id+'__context',
+		filters, result;
+
+	statement.id = util.ruuid();
+	statement.context = { contextActivities : { parent : { id: ctxActId }}};
+		
+	util.request('PUT', url + '?statementId=' + statement.id, JSON.stringify(statement), true, 204, 'No Content', function () {
+
+		filters = { object : JSON.stringify(statement.object), limit : 1 };
+		util.request('GET', url + '?' + util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
+			result = util.tryJSONParse(xhr.responseText);
+			equals(result.statements[0].id, statement.id, 'found saved statement with activity filter');
+			
+			filters.object = JSON.stringify({ id : ctxActId});
+			util.request('GET', url + '?' + util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
+				result = util.tryJSONParse(xhr.responseText);
+				equals(result.statements.length, 0, 'should not find any saved statement with context activity filter and context not set');
+				
+				filters.context = true;
+				util.request('GET', url + '?' + util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
+					result = util.tryJSONParse(xhr.responseText);
+					equals(result.statements[0].id, statement.id, 'found saved statement with context parameter + context activity');
+
+					filters.object = JSON.stringify(statement.object);
+					util.request('GET', url + '?' + util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
+						result = util.tryJSONParse(xhr.responseText);
+						if (ok(result.statements.length==1, "expected a statement to be returend, should have been the statement saved (with context parameter + object activity)")) 
+							equals(result.statements[0].id, statement.id, 'found saved statement with context parameter + object activity');
+
+						start();
+					
+					});
+				});
+			});
+		});
+	});
+});
+
 asyncTest('GET statements (via POST), all filters', function () {
 	"use strict";
 	var env = statementsEnv,
@@ -655,9 +693,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 	util.request('POST', url, 'limit=10&actor='+actorParam, true, 200, 'OK', function (xhr) {
 		var statements = util.tryJSONParse(xhr.responseText).statements,
 			statement,
-			filters = {},
-			prop,
-			queryString = [];
+			filters = {};
 
 		if (statements !== undefined && statements.length >= 10) {
 			// pick a statement with statements stored before & after
@@ -675,13 +711,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 			}
 			filters.actor = JSON.stringify(env.statement.actor, null, 4);
 
-			for (prop in filters) {
-				if (filters.hasOwnProperty(prop)) {
-					queryString.push(prop + '=' + encodeURIComponent(filters[prop]));
-				}
-			}
-
-			util.request('POST', url, queryString.join('&'), true, 200, 'OK', function (xhr) {
+			util.request('POST', url, util.buildQueryString(filters), true, 200, 'OK', function (xhr) {
 				var results = util.tryJSONParse(xhr.responseText).statements,
 					ii,
 					found = false;

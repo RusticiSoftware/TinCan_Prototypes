@@ -16,8 +16,7 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 30000;
-	//QUnit.config.testTimeout = 1000 * 60 * 20;
+	QUnit.config.testTimeout = Config.timeout;
 
 	if (env.id === undefined) {
 		// set up test to be shared accross tests (only once)
@@ -151,7 +150,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         headers["Content-Length"] = contentLength;
     }
     if (useAuth) {
-    	headers["Authorization"] = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPass);
+    	headers["Authorization"] = 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password');
     }
     if(extraHeaders !== null){
         for(var headerName in extraHeaders){
@@ -577,4 +576,17 @@ Util.prototype.log = function(str){
     if(console !== undefined){
         console.log(str);
     }
+};
+
+Util.prototype.buildQueryString = function (filters) {
+	"use strict";
+	var prop, queryString = [];
+	
+	for (prop in filters) {
+		if (filters.hasOwnProperty(prop)) {
+			queryString.push(prop + '=' + encodeURIComponent(filters[prop]));
+		}
+	}
+	
+	return queryString.join('&');
 };
