@@ -1,5 +1,9 @@
 golfStatements = [
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/GolfAssessment.html",
@@ -12,6 +16,10 @@ golfStatements = [
 },
 
 { 
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
     "verb":"imported",
     "object":{
         "id":"com.scorm.golfsamples.context_other"
@@ -19,6 +27,10 @@ golfStatements = [
 },
 
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.playing_1",
@@ -31,6 +43,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.playing_2",
@@ -43,6 +59,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.playing_3",
@@ -55,6 +75,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.playing_4",
@@ -67,6 +91,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.playing_5",
@@ -79,6 +107,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.etiquette_1",
@@ -91,6 +123,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.etiquette_2",
@@ -103,6 +139,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.etiquette_3",
@@ -115,6 +155,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.handicap_1",
@@ -127,6 +171,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.handicap_2",
@@ -139,6 +187,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.handicap_3",
@@ -151,6 +203,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.handicap_4",
@@ -163,6 +219,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.fun_1",
@@ -175,6 +235,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.fun_2",
@@ -187,6 +251,10 @@ golfStatements = [
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"com.scorm.golfsamples.interactions.fun_3",
@@ -200,6 +268,10 @@ golfStatements = [
 },
 
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI",
@@ -212,90 +284,150 @@ golfStatements = [
 },
 
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Playing/Par.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Playing/Scoring.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Playing/OtherScoring.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Playing/RulesOfGolf.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Etiquette/Course.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Etiquette/Distracting.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Etiquette/Play.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Handicapping/Overview.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Handicapping/CalculatingHandicap.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Handicapping/CalculatingScore.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/Handicapping/Example.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/HavingFun/HowToHaveFun.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/HavingFun/MakeFriends.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/HavingFun/HowToBeStylish.html"
    }
 },
 {
+   "actor": {
+       "mbox": ["mailto:tincan@scorm.com"],
+       "name": ["TinCan User"]
+   },
    "verb":"imported",
    "object":{
       "id":"scorm.com/GolfExample_TCAPI/GolfAssessment.html"

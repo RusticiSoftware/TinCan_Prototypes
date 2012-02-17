@@ -16,7 +16,7 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 30000;
+	QUnit.config.testTimeout = 1000;
 	//QUnit.config.testTimeout = 1000 * 60 * 20;
 
 	if (env.id === undefined) {
@@ -345,6 +345,7 @@ Util.prototype.getServerTime = function (id, callback) {
 	// if ID not specified, 
 	if (id === null || id === undefined) {
 		id = this.ruuid();
+        statement.actor = this.actor;
 		statement.verb = 'imported';
 		statement.object = { id: "about:blank" };
 		this.request('PUT', '/statements?statementId=' + encodeURIComponent(id), JSON.stringify(statement), true, null, null, function (xhr) {

@@ -166,8 +166,9 @@ asyncTest('Duration', function() {
     var url = '/statements?statementId=' + myStatementId;
     var myStatement = {
         id: myStatementId,
+        actor: env.statement.actor,
         verb: "attempted",
-        object: env.statement.actor,
+        object: env.statement.object,
         result: {duration: "P1Y2MT10M15.12S"} 
     };
 
@@ -760,12 +761,24 @@ asyncTest('GET, sparse == false', function () {
 	"use strict";
     var env = statementsEnv;
 
+    var actor = env.statement.actor;
+
     var regId = env.util.ruuid();
     var myActivityId = env.util.ruuid();
     var myActivityFull = { "id":myActivityId, "definition":{"name": { "en-US" : "My Tezzzt Activity"} } };
     var myActivitySparse = { "id":myActivityId };
-    var statement1 = { "verb":"imported", "object":myActivityFull, "context":{"registration":regId} };
-    var statement2 = { "verb":"attempted", "object":myActivitySparse, "context":{"registration":regId} };
+    var statement1 = { 
+        "actor":actor, 
+        "verb":"imported", 
+        "object":myActivityFull, 
+        "context":{"registration":regId} 
+    };
+    var statement2 = { 
+        "actor":actor, 
+        "verb":"attempted", 
+        "object":myActivitySparse, 
+        "context":{"registration":regId} 
+    };
 
     //Import the activity
     env.util.request('POST','/statements',JSON.stringify([statement1]), true, 200, 'OK', function(){
@@ -822,9 +835,10 @@ asyncTest('ActorTypes', function() {
     var myStatementId = env.util.ruuid();
     var url = '/statements?statementId=' + myStatementId;
     var myStatement = {
+        actor: env.statement.actor,
         id: myStatementId,
         verb: "attempted",
-        object: env.statement.actor,
+        object: env.statement.object,
         context: { instructor : 
         	{ objectType : "Agent",
         	  mbox: ["mailto:auto_tests_agent@example.scorm.com"],

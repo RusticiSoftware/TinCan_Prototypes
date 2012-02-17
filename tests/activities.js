@@ -37,8 +37,16 @@ asyncTest('Definition, update', function () {
     var myActivityId = env.util.ruuid();
     var myActivity = { "id":myActivityId, "definition":{"name": {"und" : "My Tezzzt Activity" } } };
     var myActivityUpdate = { "id":myActivityId, "definition":{"name": {"und" : "My Test Activity"}  } };
-    var myStatement = { "verb":"imported", "object":myActivity };
-    var myStatementUpdate = { "verb":"imported", "object":myActivityUpdate };
+    var myStatement = { 
+        "actor":env.statement.actor,
+        "verb":"imported", 
+        "object":myActivity 
+    };
+    var myStatementUpdate = { 
+        "actor":env.statement.actor,
+        "verb":"imported", 
+        "object":myActivityUpdate 
+    };
 
     //Import the activity
     env.util.request('POST','/statements',JSON.stringify([myStatement]), true, 200, 'OK', function(){
@@ -92,7 +100,7 @@ asyncTest('Definition, extensions', function () {
         }
     };
 
-    var myStatements = [{ verb: "imported", object: myActivity }];
+    var myStatements = [{ actor:env.statement.actor, verb: "imported", object: myActivity }];
 
     //Import activity through statement
     env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
@@ -137,7 +145,7 @@ asyncTest('Metadata load', function () {
   }
 };
 
-    var myStatements = [{ verb: "imported", object: myActivity }];
+    var myStatements = [{ actor:env.statement.actor, verb: "imported", object: myActivity }];
 
     //Import activity through statement
     env.util.request('POST','/statements',JSON.stringify(myStatements), true, 200, 'OK', function(){
