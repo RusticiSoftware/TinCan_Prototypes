@@ -16,7 +16,7 @@ function Util() {
 
 Util.init = function (env) {
 	"use strict";
-	QUnit.config.testTimeout = 1000;
+	QUnit.config.testTimeout = 30000;
 	//QUnit.config.testTimeout = 1000 * 60 * 20;
 
 	if (env.id === undefined) {
@@ -151,7 +151,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         headers["Content-Length"] = contentLength;
     }
     if (useAuth) {
-    	headers["Authorization"] = 'Basic ' + Base64.encode('testuser2.autotest@scorm.example.com:password');
+    	headers["Authorization"] = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPass);
     }
     if(extraHeaders !== null){
         for(var headerName in extraHeaders){

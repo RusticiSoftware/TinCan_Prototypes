@@ -3,8 +3,6 @@
 function Config() {
 	"use strict";
 }
-Config.endpoint = "http://localhost:8080/ScormEngineInterface/TCAPI";
-
-//"http://localhost/ScormEngine/ScormEngineInterface/TCAPI";
-//"http://192.168.157.129/ScormEngine/ScormEngineInterface/TCAPI";
-
+Config.endpoint = "[TCAPI endpoint]";
+Config.authUser = "testuser2.autotest@scorm.example.com";
+Config.authPass = "password";
