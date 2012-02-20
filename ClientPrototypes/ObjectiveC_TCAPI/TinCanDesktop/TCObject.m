@@ -35,6 +35,18 @@
     return self;
 }
 
+-(id)initWithDictionary:(NSDictionary*)dictionaryForInit
+{
+    self = [super init];
+    if (self) {
+        _definition = [dictionaryForInit valueForKey:@"definition"];
+        _objectId = [dictionaryForInit valueForKey:@"id"];
+        _objectType = [dictionaryForInit valueForKey:@"objectType"];
+    }
+    
+    return self;
+}
+
 -(NSDictionary*)serializedDictionary {
     NSMutableDictionary *object = [[NSMutableDictionary alloc] init];
     [object setObject:_objectId forKey:@"id"];

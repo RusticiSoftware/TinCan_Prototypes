@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TCStatement.h"
+#import <RestKit/RestKit.h>
+#import <RestKit/RKRequestSerialization.h>
 
 @interface TCStatementQueue : NSObject
 {
@@ -14,5 +17,10 @@
 }
 
 @property (readwrite,assign) NSMutableArray *_statementQueue;
+
+- (void) addStatementToQueue:(TCStatement*)statementToAdd;
+- (NSUInteger) statementCount;
+- (NSString*)jsonString;
+- (void) removeAllStatements;
 
 @end

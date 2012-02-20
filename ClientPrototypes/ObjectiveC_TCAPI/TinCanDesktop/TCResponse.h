@@ -5,6 +5,8 @@
 //  Created by Brian Rogers on 2/11/12.
 //  Copyright 2012 Rustici Software. All rights reserved.
 //
+// this class really is just a copy of the RKResponse object, 
+// but is here so that another lib could be used instead of RestKit
 
 #import <Foundation/Foundation.h>
 #import "RestKit/RKRequest.h"

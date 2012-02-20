@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "TCStatement.h"
+#import "TCStatementQueue.h"
 #import "TCResponse.h"
 #import <RestKit/RestKit.h>
 #import <RestKit/RKRequestSerialization.h>
 #import "RestKit/RKObjectMapping.h"
 #import "RestKit/RKObjectLoader.h"
 #import "RestKit/RKObjectManager.h"
+#import "RestKit/RKClient.h"
 
 @protocol TCRequestDelegate <NSObject>
 @required
@@ -33,6 +35,8 @@
 
 - (id)initWithEndPoint:(NSString*)endpoint withUsername:(NSString*)username withPassword:(NSString*)password;
 - (void)putStatement:(TCStatement*)statement withDelegate:(id)delegate;
+- (void)postStatementQueue:(TCStatementQueue*)statementQueue withDelegate:(id)delegate;
+
 - (void)getStatementsWithDelegate:(id)delegate;
 
 - (void)objectLoader:(RKObjectLoader*)objectLoader didLoadObjects:(NSArray*)objects;

@@ -36,6 +36,17 @@
     return self;
 }
 
+- (id)initWithDictionary:(NSDictionary*)dictionaryForInit
+{
+    self = [super init];
+    if (self) {
+        names = [dictionaryForInit valueForKey:@"name"];
+        mboxes = [dictionaryForInit valueForKey:@"mbox"];
+    }
+    
+    return self;
+}
+
 -(void)addName:(NSString*)name {
     [names addObject:name];
 }

@@ -7,11 +7,13 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
-#import "TCStatement.h"
+#import "TCConnector.h"
 
 @interface TCStatementTests : SenTestCase
 {
     TCStatement *statement;
+    TCStatement *statement2;
+    TCStatementQueue *queue;
 }
 
 - (void)testJsonString;

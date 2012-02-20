@@ -18,7 +18,7 @@
 -(void)addMbox:(NSString *)mbox;
 
 -(id)initWithName:(NSString*)name withMbox:(NSString*)mbox;
-
+- (id)initWithDictionary:(NSDictionary*)dictionaryForInit;
 -(NSDictionary*)serializedDictionary;
 
 @end

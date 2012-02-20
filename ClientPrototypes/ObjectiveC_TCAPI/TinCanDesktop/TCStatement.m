@@ -20,6 +20,8 @@
         statementid = [self generateUuidString];
         actor = [[TCActor alloc] init];
         object = [[TCObject alloc] init];
+        result = [[TCResult alloc] init];
+        context = [[TCContext alloc] init];
     }
     
     return self;
@@ -36,7 +38,20 @@
     return self;
 }
 
-- (NSString*)VerbToString:(TCVerb)verbToConvert {
+- (id)initWithDictionary:(NSDictionary*)dictionaryForInit
+{
+    self = [super init];
+    if(self) {
+        statementid = [dictionaryForInit valueForKey:@"id"];
+        verb = [self stringToVerb:[dictionaryForInit valueForKey:@"verb"]];
+        actor = [[TCActor alloc] initWithDictionary:[dictionaryForInit valueForKey:@"actor"]];
+        object = [[TCObject alloc] initWithDictionary:[dictionaryForInit valueForKey:@"object"]];
+        context = [[TCContext alloc] initWithDictionary:[dictionaryForInit valueForKey:@"context"]];
+    }
+    return self;
+}
+
+- (NSString*)verbToString:(TCVerb)verbToConvert {
     NSString *output = nil;
     switch(verbToConvert) {
         case TCVerb_Created:
@@ -75,16 +90,53 @@
     return output;
 }
 
+- (TCVerb)stringToVerb:(NSString*)stringToConvert {
+    if ([stringToConvert isEqualToString:@"created"]) {
+        return TCVerb_Created;
+    }
+    else if([stringToConvert isEqualToString:@"completed"]) {
+        return TCVerb_Completed;
+    }
+    else if([stringToConvert isEqualToString:@"failed"]) {
+        return TCVerb_Failed;
+    }
+    else if([stringToConvert isEqualToString:@"passed"]) {
+        return TCVerb_Passed;
+    }
+    else if([stringToConvert isEqualToString:@"answered"]) {
+        return TCVerb_Answered;
+    }
+    else if([stringToConvert isEqualToString:@"attempted"]) {
+        return TCVerb_Attemped;
+    }
+    else if([stringToConvert isEqualToString:@"attended"]) {
+        return TCVerb_Attended;
+    }
+    else if([stringToConvert isEqualToString:@"imported"]) {
+        return TCVerb_Imported;
+    }
+    else if([stringToConvert isEqualToString:@"interacted"]) {
+        return TCVerb_Interacted;
+    }
+    else if([stringToConvert isEqualToString:@"experienced"]) {
+        return TCVerb_Experienced;
+    }
+    else{
+        return TCVerb_Experienced;
+    }
+}
+
 - (NSDictionary*)serializedDictionary {
  
     NSMutableDictionary* statement = [[NSMutableDictionary alloc] init];
     
     [statement setObject:statementid forKey:@"id"];
-    [statement setObject:[self VerbToString:verb] forKey:@"verb"];
+    [statement setObject:[self verbToString:verb] forKey:@"verb"];
     
     [statement setObject:[actor serializedDictionary] forKey:@"actor"];
     [statement setObject:[object serializedDictionary] forKey:@"object"];
-    
+    [statement setObject:[result serializedDictionary] forKey:@"result"];
+    [statement setObject:[context serializedDictionary] forKey:@"context"];
     [statement autorelease];
     return statement;
 }
@@ -100,6 +152,7 @@
         return [error description];
     }
 }
+
 
 // return a new autoreleased UUID string
 - (NSString *)generateUuidString

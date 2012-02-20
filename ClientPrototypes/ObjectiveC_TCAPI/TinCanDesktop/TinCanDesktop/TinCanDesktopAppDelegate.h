@@ -9,9 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import <RestKit/RestKit.h>
 #import <RestKit/RKRequestSerialization.h>
-#import "TCStatement.h"
-#import "TCRequest.h"
-#import "TCResponse.h"
+#import "TCConnector.h"
+#import "SBJson.h"
 
 @interface TinCanDesktopAppDelegate : NSObject <NSApplicationDelegate, TCRequestDelegate> {
     NSWindow *window;
@@ -22,10 +21,18 @@
     NSTextField *txtObjectToCreate;
     NSButton *btnGetStatements;
     NSButton *btnAddCreateStatement;
-    RKClient *client;
+    
+    NSTextField *txtQueue;
+    NSTextField *txtQueueLabel;
+    NSButton *btnAddStatementToQueue;
+    NSButton *btnPostQueueToServer;
     
     TCStatement *statement;
+    TCStatement *statement2;
+    TCStatementQueue *statementQueue;
     TCRequest *tcRequest;
+    
+    
 }
 
 @property (assign) IBOutlet NSWindow *window;
@@ -44,9 +51,17 @@
 
 @property (assign) IBOutlet NSButton *btnAddCreateStatement;
 
+@property (assign) IBOutlet NSTextField *txtQueue;
+@property (assign) IBOutlet NSTextField *txtQueueLabel;
+@property (assign) IBOutlet NSButton *btnAddStatementToQueue;
+@property (assign) IBOutlet NSButton *btnPostQueueToServer;
+
 - (IBAction)AddCreateStatement:(id)sender;
 
 - (IBAction)GetStatements:(id)sender;
+
+- (IBAction)AddStatementToQueue:(id)sender;
+- (IBAction)PostQueueToServer:(id)sender;
 
 - (void) requestCompleted: (TCResponse*)response;
 

@@ -52,12 +52,14 @@ typedef enum {  TCVerb_Created,
 @property (readwrite, copy) NSDate *timestamp;
 
 - (id)initWithVerb:(TCVerb)verb;
+- (id)initWithDictionary:(NSDictionary*)dictionaryForInit;
 
 -(void)setActor:(TCActor*)actor;
 -(void)setObject:(TCObject*)object;
 
 -(NSDictionary*)serializedDictionary;
 -(NSString*)jsonString;
-
+- (NSString*)verbToString:(TCVerb)verbToConvert;
+- (TCVerb)stringToVerb:(NSString*)stringToConvert;
 - (NSString *)generateUuidString;
 @end

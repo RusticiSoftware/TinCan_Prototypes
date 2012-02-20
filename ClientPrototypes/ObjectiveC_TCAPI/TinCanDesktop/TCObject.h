@@ -19,6 +19,7 @@
 }
 
 -(id)initWithId:(NSString*)objectId;
+- (id)initWithDictionary:(NSDictionary*)dictionaryForInit;
 
 -(void)setDefinitionName:(TCLanguageMap*)name;
 -(void)setDefinitionDescription:(TCLanguageMap*)description;

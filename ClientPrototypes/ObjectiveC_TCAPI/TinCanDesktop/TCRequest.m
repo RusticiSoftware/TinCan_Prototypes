@@ -44,6 +44,17 @@
     [_client put:[NSString stringWithFormat:@"/statements/?statementId=%@",statement.statementid] params:[RKRequestSerialization serializationWithData:[json dataUsingEncoding:NSUTF8StringEncoding] MIMEType:RKMIMETypeJSON] delegate:self];
 }
 
+
+- (void)postStatementQueue:(TCStatementQueue*)statementQueue withDelegate:(id)delegate
+{
+    _delegate = delegate;
+    
+    NSString *json = [statementQueue jsonString];
+    
+    [_client post:[NSString stringWithFormat:@"/statements/"] params:[RKRequestSerialization serializationWithData:[json dataUsingEncoding:NSUTF8StringEncoding] MIMEType:RKMIMETypeJSON] delegate:self];
+    
+}
+
 - (void)getStatementsWithDelegate:(id)delegate {
     _delegate = delegate;
     [_client get:@"/statements/" delegate:self];
