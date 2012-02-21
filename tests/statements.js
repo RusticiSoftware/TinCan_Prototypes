@@ -9,7 +9,6 @@ module('Statements', {
 	}
 });
 
-
 asyncTest('empty statement PUT', function () {
 	// empty statement should fail w/o crashing the LRS (error response shoudl be received)
 	"use strict";
@@ -347,7 +346,7 @@ asyncTest('Reject Bad Verb', function () {
 	statement.verb = 'not a valid verb';
 	util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function (xhr, usingIEMode) {
 		// should return an error message, can't validatate content, but make sure it's there
-        util.log(xhr.responseText);
+        util.log("bad verb response: " + xhr.responseText);
         if(!usingIEMode){
 		    ok(xhr.responseText !== null && xhr.responseText.length > 0, "Message returned");
         }
@@ -551,7 +550,7 @@ asyncTest('GET statements, simple', function () {
 
 	util.request('GET', url + '?limit=1', null, true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText).statements;
-		util.log(JSON.stringify(result, null, 4));
+		util.log("GET statements, simple result: " + JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'GET limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
@@ -566,6 +565,7 @@ asyncTest('GET statements, continue token', function () {
 
     var recordsAtOnce = null;
     var recordsOverPages = new Array();
+    var untilStr = "";
 
     async.waterfall([
         function(cb){
@@ -573,12 +573,13 @@ asyncTest('GET statements, continue token', function () {
 	        util.request('GET', url + '?limit=6', null, true, 200, 'OK', 
                 function (xhr) {
                     recordsAtOnce = util.tryJSONParse(xhr.responseText).statements;
+                    untilStr = '&until=' + encodeURIComponent(recordsAtOnce[0].stored.toString());
                     cb(null);
             });
         },
         function(cb){
             //Get first page, just two records...
-        	util.request('GET', url + '?limit=2', null, true, 200, 'OK', function (xhr) {
+        	util.request('GET', url + '?limit=2' + untilStr, null, true, 200, 'OK', function (xhr) {
         		var result = util.tryJSONParse(xhr.responseText);
                 var statements = result.statements;
         		equal(statements.length, 2, 'GET limit 2');
@@ -610,7 +611,7 @@ asyncTest('GET statements, continue token', function () {
             //Compare all at once results to paged results...
             equal(recordsAtOnce.length, recordsOverPages.length, 'Paged result same as all at once');
             for(var i = 0; i < recordsOverPages.length; i++){
-                equal(recordsOverPages[i].id, recordsAtOnce[i].id, 'Statement ' + i + ' has same id in both results');
+                equal(recordsOverPages[i].id, recordsAtOnce[i].id, 'Statement ' + i + ' must have same id in both results');
             }
             cb(null);
         },
@@ -629,7 +630,6 @@ asyncTest('GET statements (via POST), simple', function () {
 
 	util.request('POST', url, 'limit=1', true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText).statements;
-		util.log(JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'POST limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
@@ -700,7 +700,6 @@ asyncTest('GET statements (via POST), all filters', function () {
 			statement = statements[5];
 
 			// add filters which match the selected statement
-            util.log(statement.stored);
             var sinceDate = util.DateFromISOString(statement.stored);
 			filters.since = util.ISODateString(new Date(sinceDate.getTime() - 1));
 			filters.until = statement.stored;
@@ -735,7 +734,7 @@ asyncTest('GET statements (via POST), all filters', function () {
 					// actor comparison
 					ok(util.areActorsEqual(results[ii].actor, statement.actor), 'actor');
 				}
-				ok(found, 'find statement filters based on');
+				ok(found, 'no statement found for filters: ' + JSON.stringify(filters, null, 4));
 				start();
 			});
 		} else {
