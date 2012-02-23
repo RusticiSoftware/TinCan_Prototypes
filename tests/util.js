@@ -113,6 +113,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
     //Fill in some stock params if we need to
     var actorKey = null;
+
 	if (method === 'GET') {
 		actorKey = JSON.parse(JSON.stringify(this.actor)); // "clone"
 		delete actorKey.name; // remove name since it doesn't have the reverse functional property (not useful as part of the ID)
@@ -222,9 +223,9 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	    		}
 	    		// LRS internal errors (5xx) should be retried, may have a temporary failure.
 	    		if (retries > 0 && xhr.status >= 500 && expectedStatus !== xhr.status) {
-	    			var requestFunc = this.request;
-	    			log('retrying: ' + url + ' : ' + xhr.status);
-					setTimeout(function() {requestFunc(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders, --retries)}, 100);
+	    			var util = new Util();
+	    			util.log('retrying: ' + url + ' : ' + xhr.status);
+					setTimeout(function() {util.request(method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders, --retries)}, 100);
 					return;
 	    		}
 	    		if (expectedStatus !== undefined && expectedStatusText !== undefined && expectedStatus !== null && expectedStatusText !== null) {
