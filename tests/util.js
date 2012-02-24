@@ -134,11 +134,18 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     var contentType = "application/json";
     var contentLength = 0;
     if(data !== null){
-        var isFormData = false;
+        var isJson = true;
 	    try { JSON.parse(data); } 
-        catch (ex) { isFormData = true; }
+        catch (ex) { isJson = false; }
 
-        contentType = isFormData ? "application/x-www-form-urlencoded" : "application/json";
+		if (isJson) {
+			contentType = "application/json";
+		} else if (data.indexOf(" ") > -1) {
+			// spaces are invalid in "application/x-www-form-urlencoded", content type unknown
+			contentType = "application/octet-stream";
+		} else {
+			contentType = "application/x-www-form-urlencoded";
+		}
         contentLength = data.length;
     }
     
