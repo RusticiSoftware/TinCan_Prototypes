@@ -46,7 +46,7 @@ function XHR_request(url, method, data, auth, callback, ignore404, extraHeaders)
     //If it's not cross domain or we're not using IE, use the usual XmlHttpRequest
     if (!xDomainRequest || typeof(XDomainRequest) === 'undefined') {
         xhr = new XMLHttpRequest();
-        xhr.open(method, url, (callback == true));
+        xhr.open(method, url, callback != null);
         for(var headerName in headers){
             xhr.setRequestHeader(headerName, headers[headerName]);
         }
@@ -77,7 +77,8 @@ function XHR_request(url, method, data, auth, callback, ignore404, extraHeaders)
                 }
             } else {
                 alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + ")");
-                throw new Error("debugger");
+                //throw new Error("debugger");
+                return xhr;
             }
         } else {
             return result;

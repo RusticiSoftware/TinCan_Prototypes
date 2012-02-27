@@ -1,0 +1,72 @@
+
+
+.container { padding-bottom: 40px; }
+
+.statement {margin:3px 0;}
+
+.statement table {width:100%;}
+.statementRow td {vertical-align:top;padding:2px;}
+.statementRow td.date{width:140px;}
+
+
+.statementRow .date {font-size:.7em;color:#666666;}
+.statement .actor {color:#222222;}
+.statement .verb {font-weight:bold;}
+.statement .object {color:#222222;}
+.statement .score {font-weight:bold;}
+
+.statement {cursor:pointer;}
+.tc_rawdata{display:none; font-size:.8em; width:800px; word-wrap:break-word;}
+
+#showAllStatements, #refreshHighScores {margin-top:20px;}
+
+#tetrisHighScores {float:left;width:45%;margin-top:20px;}
+#tetrisGamesScores {float:right;}
+
+.heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
+
+.lrsUtils a {color:#888888;}
+
+.highScoreRow .scoreRank{width:25px;}
+.highScoreRow .actor{padding:0 5px;}
+.highScoreRow .score{padding:0 5px;font-weight:bold;}
+.highScoreRow .date{font-size:.7em;color:#666666;width:120px;text-align:right;}
+
+#golfCourseData table {width:300px;}
+#golfCourseData tr.labels td {font-size:.8em;text-decoration:underline;}
+#golfCourseData td {padding:3px 0;}
+#golfCourseData td.name {}
+#golfCourseData td.completion {text-align:right;}
+#golfCourseData td.completion.complete {color:green;}
+#golfCourseData td.completion.incomplete {color:red;}
+#golfCourseData td.score {text-align:right;}
+
+table#golfQuestions {}
+table#golfQuestions tr.labels td {font-size:.8em;text-decoration:underline;}
+table#golfQuestions td {padding:3px;text-align:right;}
+table#golfQuestions td.question {text-align:left;}
+table#golfQuestions td.correctAnswer {}
+table#golfQuestions td.metric {}
+
+#locationCourseData table {width:300px;}
+#locationCourseData tr.labels td {font-size:.8em;text-decoration:underline;}
+#locationCourseData td {padding:3px 0;}
+#locationCourseData td.name {}
+#locationCourseData td.completion {text-align:right;}
+#locationCourseData td.completion.complete {color:green;}
+#locationCourseData td.completion.incomplete {color:red;}
+
+table#courseLocations {}
+table#courseLocations tr.labels td {font-size:.8em;text-decoration:underline;}
+table#courseLocations td {padding:3px;text-align:right;}
+table#courseLocations td.location {text-align:left;width:80%;}
+table#courseLocations td.location .description {font-size:.8em;color:#888888;}
+table#courseLocations td.metric {}
+
+#searchBox { padding-bottom: 20px; }
+.searchBoxTable td { padding-right:14px; }
+
+#TCAPIQueryText { width: 80%; height:10px; }
+
+#statementsLoading { padding-left:20px; padding-top:10px; display:none; }
+#showAllStatements { display:none; }
