@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <tincan xmlns="http://projecttincan.com/tincan.xsd">
 	<activities>
-		<activity id="http://beta.projecttincan.com/auto_testing/test_course_1" type ="interaction">
+		<activity id="scorm.com/GolfExample_TCAPI" type="course">
 			<name>Tin Can Golf Example</name>
 			<description lang="en-US">An overview of the sport of golf.</description>
 			<launch lang="en-us">index.html</launch>
