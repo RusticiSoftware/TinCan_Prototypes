@@ -266,6 +266,12 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 		if(actor.name !== undefined){
 			return actor.name[0];
 		}
+		if(actor.lastName != undefined && actor.firstName != undefined){
+			return actor.firstName[0] + " " + actor.lastName[0];
+		}
+		if(actor.familyName != undefined && actor.givenName != undefined){
+			return actor.givenName[0] + " " + actor.familyName[0];
+		}
 		if(actor.mbox !== undefined){
 			return actor.mbox[0];
 		}
