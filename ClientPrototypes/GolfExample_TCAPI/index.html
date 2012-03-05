@@ -189,6 +189,8 @@
     
 		// send score
         var scaledScore = score / 100;
+        var success = (scaledScore >= 0.8);
+
         
         var stmt = { 
             "verb":"completed",
@@ -199,7 +201,8 @@
                     "raw":score,
                     "min":0,
                     "max":100
-                }
+                },
+                "success":success
             },
             "context":GolfExample.getContext(
                         GolfExample.CourseActivity.id)
