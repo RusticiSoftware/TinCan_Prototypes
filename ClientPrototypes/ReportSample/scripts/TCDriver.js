@@ -10,7 +10,7 @@ function delay() {
 }
 
 // Synchronous if callback is not provided (not recommended)
-function XHR_request(url, method, data, auth, callback, ignore404, extraHeaders) {
+function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHeaders) {
     "use strict";
     var xhr,
         finished = false,
@@ -23,8 +23,18 @@ function XHR_request(url, method, data, auth, callback, ignore404, extraHeaders)
         location = window.location,
         urlPort,
         result,
+        extended,
+        prop,
         until;
 
+	// add extended LMS-specified values to the URL
+	if (lrs.extended) {
+		extended = new Array();
+		for (prop in lrs.extended) {
+			extended.push(prop + "=" + encodeURIComponent(lrs.extended[prop]));
+		}
+		url += (url.indexOf("?") > -1 ? "&" : "?") + extended.join("&");
+	}
      
     //Consolidate headers
     var headers = {};
@@ -152,28 +162,59 @@ function TCDriver_GetIEModeRequest(method, url, headers, data){
 
 
 function TCDriver_GetLRSObject(){
-    var lrsProps = ["endpoint","auth","actor","registration","activity_id"];
+    var lrsProps = ["endpoint","auth","actor","registration","activity_id", "grouping", "activity_platform"];
     var lrs = new Object();
+    var qsVars, prop;
+    
+    qsVars = parseQueryString();
     
     for (var i = 0; i<lrsProps.length; i++){
-        if (getQueryStringParam(lrsProps[i]) != ""){
-            lrs[lrsProps[i]] = getQueryStringParam(lrsProps[i]);
+    	prop = lrsProps[i];
+        if (qsVars[prop]){
+            lrs[prop] = qsVars[prop];
+            delete qsVars[prop];
         }
     }
     if(lrs.endpoint === undefined || lrs.endpoint == "" || lrs.auth === undefined || lrs.auth == ""){
         TCDriver_Log("Configuring TCDriver LRS Object from queryString failed");
         return null;
     }
+    
+    lrs.extended = qsVars;
+    
     return lrs;
 }
+
+function _TCDriver_PrepareStatement(lrs, stmt) {
+	if(stmt.actor === undefined){
+		stmt.actor = JSON.parse(lrs.actor);
+	}
+	if (lrs.grouping | lrs.registration | lrs.activity_platform) {
+		if (!stmt.context) {
+			stmt.context = {};
+		}
+	}
+	
+	if (lrs.grouping) {
+		if (!stmt.context.contextActivities) {
+			stmt.context.contextActivities = {};
+		}
+		stmt.context.contextActivities.grouping = { id : lrs.grouping };
+	}
+	if (lrs.registration) {
+		stmt.context.registration = lrs.registration;
+	}
+	if (lrs.activity_platform) {
+		stmt.context.platform = lrs.activity_platform;
+	}
+}
+
 
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SendStatement (lrs, stmt, callback) {
     if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
-        if(stmt.actor === undefined){
-            stmt.actor = JSON.parse(lrs.actor);
-        }
-        XHR_request(lrs.endpoint+"statements/?statementId="+_ruuid(), "PUT", JSON.stringify(stmt), lrs.auth, callback);
+		_TCDriver_PrepareStatement(lrs, stmt);
+        XHR_request(lrs, lrs.endpoint+"statements/?statementId="+_ruuid(), "PUT", JSON.stringify(stmt), lrs.auth, callback);
     }
 }
 
@@ -182,13 +223,12 @@ function TCDriver_SendMultiStatements (lrs, stmtArray, callback) {
     if (lrs.endpoint != undefined && lrs.endpoint != "" && lrs.auth != undefined && lrs.auth != ""){
         for(var i = 0; i < stmtArray.length; i++){
             var stmt = stmtArray[i];
-            if(stmt.actor === undefined){
-                stmt.actor = JSON.parse(lrs.actor);
-            }
+			_TCDriver_PrepareStatement(lrs, stmt);
         }
-        XHR_request(lrs.endpoint+"statements/", "POST", JSON.stringify(stmtArray), lrs.auth, callback);
+        XHR_request(lrs,lrs.endpoint+"statements/", "POST", JSON.stringify(stmtArray), lrs.auth, callback);
     }
 }
+
 
 // Synchronous if callback is not provided (not recommended)
 function TCDriver_SetState (lrs, activityId, stateKey, stateVal, callback) {
@@ -198,8 +238,11 @@ function TCDriver_SetState (lrs, activityId, stateKey, stateVal, callback) {
         url = url.replace('<activity ID>',encodeURIComponent(activityId));
         url = url.replace('<actor>',encodeURIComponent(lrs.actor));
         url = url.replace('<statekey>',encodeURIComponent(stateKey));
+        if (lrs.registration) {
+        	url += "&registration=" + encodeURIComponent(lrs.registration);
+        }
         
-        XHR_request(url, "PUT", JSON.stringify(stateVal), lrs.auth, callback);
+        XHR_request(lrs,url, "PUT", JSON.stringify(stateVal), lrs.auth, callback);
     }
 }
 
@@ -211,8 +254,11 @@ function TCDriver_GetState (lrs, activityId, stateKey, callback) {
         url = url.replace('<activity ID>',encodeURIComponent(activityId));
         url = url.replace('<actor>',encodeURIComponent(lrs.actor));
         url = url.replace('<statekey>',encodeURIComponent(stateKey));
+        if (lrs.registration) {
+        	url += "&registration=" + encodeURIComponent(lrs.registration);
+        }
         
-        var result = XHR_request(url, "GET", null, lrs.auth, callback, true);
+        var result = XHR_request(lrs,url, "GET", null, lrs.auth, callback, true);
         return (result === undefined || result.status == 404) ? null : result.responseText;
     }
 }
@@ -230,7 +276,7 @@ function TCDriver_SendActivityProfile (lrs, activityId, profileKey, profileStr, 
         if(lastSha1Hash !== null){
             headers = {"If-Matches":'"'+lastSha1Hash+'"'};
         }
-        XHR_request(url, "PUT", profileStr, lrs.auth, callback, false, headers);
+        XHR_request(lrs,url, "PUT", profileStr, lrs.auth, callback, false, headers);
     }
 }
 
@@ -243,7 +289,7 @@ function TCDriver_GetActivityProfile (lrs, activityId, profileKey, callback) {
         url = url.replace('<activity ID>',encodeURIComponent(activityId));
         url = url.replace('<profilekey>',encodeURIComponent(profileKey));
         
-        var result = XHR_request(url, "GET", null, lrs.auth, callback, true);
+        var result = XHR_request(lrs,url, "GET", null, lrs.auth, callback, true);
         return (result === undefined || result.status == 404) ? null : result.responseText;
     }
 }
@@ -264,9 +310,11 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId, callback) {
             var obj = {id:activityId};
             url += "&object=" + encodeURIComponent(JSON.stringify(obj));
         }
+        if (lrs.registration) {
+        	url += "&registration=" + encodeURIComponent(lrs.registration);
+        }
     
-    
-        return XHR_request(url, "GET", null, lrs.auth, callback).responseText;
+        return XHR_request(lrs,url, "GET", null, lrs.auth, callback).responseText;
     }
 }
 
@@ -319,20 +367,23 @@ TCObject.prototype.SetValue = function(name,value){
 
 
 /* Other Util functions  */
-function getQueryStringParam( name )
-{
-    
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null ){
-    return "";
-  }else{
-    return decodeURIComponent(results[1]);
-  }
+function parseQueryString() {
+	var loc, qs, pairs, pair, ii, parsed = {};
+	
+	loc = window.location.href.split('?');
+	if (loc.length === 2) {
+		qs = loc[1];
+		pairs = qs.split('&');
+		for ( ii = 0; ii < pairs.length; ii++) {
+			pair = pairs[ii].split('=');
+			if (pair.length === 2 && pair[0]) {
+				parsed[pair[0]] = decodeURIComponent(pair[1]);
+			}
+		}
+	}
+	
+	return parsed;
 }
-
 /*!
 Excerpt from: Math.uuid.js (v1.4)
 http://www.broofa.com

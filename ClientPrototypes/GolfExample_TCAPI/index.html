@@ -193,10 +193,9 @@
     
     //called from the assessmenttemplate.html page to record the results of a test
     //passes in score as a percentage
-    function RecordTest(score,activityId){
+    function GetRecordTestStatement(score,activityId){
     
 		// send score
-
         var scaledScore = score / 100;
         
         var stmt = { 
@@ -214,7 +213,7 @@
                         GolfExample.CourseActivity.id)
         };
 
-        TCDriver_SendStatement(tc_lrs, stmt);
+        return stmt;
     }
     
     

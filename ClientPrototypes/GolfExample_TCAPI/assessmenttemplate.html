@@ -164,13 +164,15 @@
         resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
         document.getElementById("test").innerHTML = resultsSummary;
 		
+        if (parent.GetRecordTestStatement){
+            answerStatements.push(parent.GetRecordTestStatement(score,activityId));
+            answerStatements.push(parent.GetRecordTestStatement(score,"scorm.com/GolfExample_TCAPI"));
+        }
+
 		//send question answers
 		TCDriver_SendMultiStatements(tc_lrs,answerStatements);
-        
-        if (parent.RecordTest){
-            parent.RecordTest(score,activityId);
-			parent.doFinish();
-        }
+
+		parent.doFinish();
     }
     </script>
     <script type="text/javascript">

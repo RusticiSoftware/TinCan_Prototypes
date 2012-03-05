@@ -311,7 +311,7 @@ function TCDriver_GetStatements (lrs,sendActor,verb,activityId, callback) {
             url += "&object=" + encodeURIComponent(JSON.stringify(obj));
         }
         if (lrs.registration) {
-        	url += "&registration=" + encodeURIComponent(registration);
+        	url += "&registration=" + encodeURIComponent(lrs.registration);
         }
     
         return XHR_request(lrs,url, "GET", null, lrs.auth, callback).responseText;

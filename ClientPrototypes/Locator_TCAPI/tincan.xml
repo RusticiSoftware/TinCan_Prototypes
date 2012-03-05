@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tincan xmlns="http://projecttincan.com/tincan.xsd">
+	<activities>
+		<activity id="scorm.com/Course/NashvilleMuseumsTour" type="course">
+			<name>Tin Can Museum Tour Example</name>
+			<description lang="en-US">A tour of Museums in Nashville</description>
+			<launch lang="en-us">http://localhost/Proto/Locator_TCAPI/index.html</launch>
+		</activity>
+	</activities>
+</tincan>
