@@ -45,6 +45,8 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
             headers[headerName] = extraHeaders[headerName];
         }
     }
+
+    var async = (callback != true);
     
     //See if this really is a cross domain
     xDomainRequest = (location.protocol.toLowerCase() !== urlparts[1] || location.hostname.toLowerCase() !== urlparts[2]);
@@ -56,7 +58,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
     //If it's not cross domain or we're not using IE, use the usual XmlHttpRequest
     if (!xDomainRequest || typeof(XDomainRequest) === 'undefined') {
         xhr = new XMLHttpRequest();
-        xhr.open(method, url, callback != null);
+        xhr.open(method, url, async);
         for(var headerName in headers){
             xhr.setRequestHeader(headerName, headers[headerName]);
         }
@@ -79,7 +81,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
             finished = true;
             var notFoundOk = (ignore404 || xhr.status != 404);
             if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 500 && notFoundOk)) {
-                if (callback) {
+                if (callback != true) {
                     callback(xhr);
                 } else {
                     result = xhr;
@@ -106,7 +108,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
 
     xhr.send(ieXDomain ? ieModeRequest.data : data);
     
-    if (!callback) {
+    if (!async) {
         // synchronous
         if (ieXDomain) {
             // synchronous call in IE, with no asynchronous mode available.
