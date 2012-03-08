@@ -84,7 +84,7 @@ function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isCon
 	    }
     }
 
-	XHR_request(url, "GET", null, auth, callbackFunction);
+	XHR_request(tc_lrs, url, "GET", null, auth, callbackFunction);
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
@@ -93,13 +93,13 @@ function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		XHR_request(url, "GET", null, auth, callbackFunction, true);
+		XHR_request(tc_lrs, url, "GET", null, auth, callbackFunction, true);
 }
 
 function TC_DeleteLRS(){
 
 	var url = endpoint;
-	XHR_request(url, "DELETE", null, auth, function () {
+	XHR_request(tc_lrs, url, "DELETE", null, auth, function () {
 		window.location = window.location;
 	});
 }

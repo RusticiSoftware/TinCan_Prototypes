@@ -28,7 +28,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
         until;
 
 	// add extended LMS-specified values to the URL
-	if (lrs.extended) {
+	if (lrs !== null && lrs.extended !== undefined) {
 		extended = new Array();
 		for (prop in lrs.extended) {
 			extended.push(prop + "=" + encodeURIComponent(lrs.extended[prop]));
