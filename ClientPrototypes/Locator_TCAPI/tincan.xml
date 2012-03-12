@@ -4,7 +4,7 @@
 		<activity id="scorm.com/Course/NashvilleMuseumsTour" type="course">
 			<name>Tin Can Museum Tour Example</name>
 			<description lang="en-US">A tour of Museums in Nashville</description>
-			<launch lang="en-us">http://localhost/Proto/Locator_TCAPI/index.html</launch>
+			<launch lang="en-us">index.html</launch>
 		</activity>
 	</activities>
 </tincan>
