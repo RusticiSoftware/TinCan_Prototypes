@@ -33,7 +33,9 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
 		for (prop in lrs.extended) {
 			extended.push(prop + "=" + encodeURIComponent(lrs.extended[prop]));
 		}
-		url += (url.indexOf("?") > -1 ? "&" : "?") + extended.join("&");
+		if (extended.length > 0) {
+			url += (url.indexOf("?") > -1 ? "&" : "?") + extended.join("&");
+		}
 	}
      
     //Consolidate headers
@@ -77,8 +79,8 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
             // onload or both might fire depending upon browser, just covering all bases with event hooks and
             // using 'finished' flag to avoid triggering events multiple times
             finished = true;
-            var notFoundOk = (ignore404 || xhr.status != 404);
-            if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 500 && notFoundOk)) {
+            var notFoundOk = (ignore404 && xhr.status === 404);
+            if (xhr.status === undefined || (xhr.status >= 200 && xhr.status < 400) || notFoundOk) {
                 if (callback) {
                     callback(xhr);
                 } else {
@@ -86,7 +88,9 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
                     return xhr;
                 }
             } else {
-                alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + ")");
+                try {
+                	alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + " | " + xhr.responseText+ ")");
+                } catch (ex) {alert (ex.toString());}
                 //throw new Error("debugger");
                 return xhr;
             }
