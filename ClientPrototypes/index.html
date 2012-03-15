@@ -74,6 +74,9 @@
 
 			$('#jsExampleLaunch').click(function(){
 				var actor = Config.actor;
+                var em = actor.mbox[0];
+				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
+                actor.mbox = [mbox];
 				
 				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
