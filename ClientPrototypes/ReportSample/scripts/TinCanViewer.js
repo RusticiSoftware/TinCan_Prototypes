@@ -136,7 +136,7 @@ function RenderStatements(xhr){
 		var obj = statements[i].object.id;
 		if (statements[i].object.definition != undefined){
             var activityType = statements[i].object.definition.type;
-			if (activityType != undefined && (activityType == "question" || activityType == "interaction")){
+			if (activityType != undefined && (activityType == "question" || activityType.indexOf("interaction") >= 0)){
 				obj = (statements[i].object.definition.description != undefined) ? statements[i].object.definition.description["en-US"] : obj;
 				
 				var answer = "";

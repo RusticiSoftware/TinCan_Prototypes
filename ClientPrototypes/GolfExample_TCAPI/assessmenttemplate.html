@@ -140,13 +140,16 @@
             if (wasCorrect) {correctCount++;}
             
             if (parent.GetQuestionAnswerStatement){
-                answerStatements.unshift(parent.GetQuestionAnswerStatement(test.Questions[i].Id, 
-                                        test.Questions[i].Text, 
-                                        test.Questions[i].Type, 
-                                        learnerResponse, 
-                                        correctAnswer, 
-                                        wasCorrect, 
-                                        activityId));
+                answerStatements.unshift(
+                    parent.GetQuestionAnswerStatement(
+                        test.Questions[i].Id, 
+                        test.Questions[i].Text, 
+                        test.Questions[i].Answers, 
+                        test.Questions[i].Type, 
+                        learnerResponse, 
+                        correctAnswer, 
+                        wasCorrect, 
+                        activityId));
             }
             
             resultsSummary += "<div class='questionResult'><h3>Question " + i + "</h3>";
@@ -248,7 +251,6 @@
 <h1>Knowledge Check</h1>
 <script type="text/javascript">
 RenderTest(test);
-AddTagLine();
 </script>
 </body>
 </html>

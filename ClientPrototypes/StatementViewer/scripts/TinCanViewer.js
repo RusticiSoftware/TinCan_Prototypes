@@ -357,7 +357,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 					
 					if (stmt.object.definition !== undefined){
 			            var activityType = stmt.object.definition.type;
-						if (activityType != undefined && (activityType == "question" || activityType == "interaction")){
+						if (activityType != undefined && (activityType == "question" || activityType.indexOf("interaction") >= 0)){
 							if (stmt.result != undefined){
 								if (stmt.result.success != undefined){
 									verb = ((stmt.result.success)?"correctly ":"incorrectly ") + verb;
