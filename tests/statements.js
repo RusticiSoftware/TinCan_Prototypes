@@ -375,12 +375,16 @@ asyncTest('Reject Bad ID', function () {
 });
 
 asyncTest('Reject Bad interactionType', function() {
+    "use strict";
     var env = statementsEnv;
     var myStatementId = env.util.ruuid();
     var url = '/statements?statementId=' + myStatementId;
 
     var myObj = env.util.clone(env.statement.object);
-    myObj["definition"] = {interactionType: "bad type"};
+    myObj["definition"] = {
+        type: "cmi.interaction",
+        interactionType: "bad type"
+    };
 
     var myStatement = {
         id: myStatementId,
@@ -393,6 +397,59 @@ asyncTest('Reject Bad interactionType', function() {
 		start();
 	});
 });
+
+
+asyncTest('Interaction Components', function() {
+    "use strict";
+    var env = statementsEnv;
+
+    var activity = { id: "scorm.com/interaction_definition_test_" + env.util.ruuid() };
+
+    var components = [
+        {id: "1", description:{"en-US": "Interaction Component #1"}},
+        {id: "2", description:{"en-US": "Interaction Component #2"}},
+        {id: "3", description:{"en-US": "Interaction Component #3"}},
+        {id: "4", description:{"en-US": "Interaction Component #4"}}
+    ];
+
+    function checkComponentSet(interactionType, componentName, shouldWork, callback){
+        activity["definition"] = {
+            type: "cmi.interaction",
+            interactionType: interactionType
+        };
+        activity.definition[componentName] = components;
+
+        var stmt = {id: env.util.ruuid(), actor: env.statement.actor, verb: "answered", object: activity};
+
+        var url = '/statements?statementId=' + stmt.id;
+        var expectedCode = shouldWork ? 204 : 400;
+        var expectedMsg = shouldWork ? 'No Content' : 'Bad Request';
+	    env.util.request('PUT', url, JSON.stringify(stmt), true, expectedCode, expectedMsg, function(){ callback(null); });
+    }
+
+    async.waterfall([
+        //Make sure setting these components on the wrong type fail
+        function(cb){ checkComponentSet("true-false", "source", false, cb); },
+        function(cb){ checkComponentSet("choice", "source", false, cb); },
+        function(cb){ checkComponentSet("fill-in", "choices", false, cb); },
+        function(cb){ checkComponentSet("likert", "choices", false, cb); },
+        function(cb){ checkComponentSet("matching", "scale", false, cb); },
+        function(cb){ checkComponentSet("performance", "scale", false, cb); },
+        function(cb){ checkComponentSet("sequencing", "target", false, cb); },
+
+        //Make sure setting these components on the right type succeed
+        function(cb){ checkComponentSet("choice", "choices", true, cb); },
+        function(cb){ checkComponentSet("likert", "scale", true, cb); },
+        function(cb){ checkComponentSet("matching", "source", true, cb); },
+        function(cb){ checkComponentSet("matching", "target", true, cb); },
+        function(cb){ checkComponentSet("performance", "steps", true, cb); },
+        function(cb){ checkComponentSet("sequencing", "choices", true, cb); },
+
+        //Start the test runner again
+        start
+    ]);
+});
+
 
 asyncTest('Reject Bad activityType', function() {
     var env = statementsEnv;
