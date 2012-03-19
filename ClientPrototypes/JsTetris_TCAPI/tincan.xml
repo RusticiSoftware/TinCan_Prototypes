@@ -4,7 +4,7 @@
 		<activity id="scorm.com/JsTetris_TCAPI" type="course">
 			<name>Tin Can Tetris Example</name>
 			<description lang="en-US">A game of Tetris</description>
-			<launch lang="en-us">http://localhost/Proto/JsTetris_TCAPI/tetris.html</launch>
+			<launch lang="en-us">tetris.html</launch>
 		</activity>
 	</activities>
 </tincan>
