@@ -1037,6 +1037,59 @@ asyncTest('Statements, context activities filter', function () {
 });
 
 
+asyncTest('voiding statements', function () {
+	"use strict";
+	var env = statementsEnv;
+    var util = env.util;
+
+    var statement = util.clone(env.statement);
+    statement.id = util.ruuid();
+
+    var voidingStatementId = util.ruuid();
+
+    function issueVoidingStatement(statementId, statementIdToVoid, expectedCode, expectedText, callback){
+        var stmt = {
+            "id":statementId,
+            "actor":env.statement.actor,
+            "verb":"voided",
+            "object":{ "objectType":"Statement", "id":statementIdToVoid }
+        };
+        var url = '/statements?statementId=' + stmt.id;
+        util.request('PUT', url, JSON.stringify(stmt), true, expectedCode, expectedText, function(){callback(null);});
+    }
+
+
+    async.waterfall([
+        function(cb){
+            //Just put the first statement
+            var url = '/statements?statementId=' + statement.id;
+	        util.request('PUT', url, JSON.stringify(statement), true, 204, 'No Content', function(){ cb(null); });
+        },
+        function(cb){ 
+            //Void that statement, should succeed
+            issueVoidingStatement(voidingStatementId, statement.id, 204, 'No Content', cb); 
+        },
+        function(cb){
+            //Make sure statement was really voided
+            var url = '/statements?statementId=' + statement.id;
+            util.request('GET', url, null, true, 200, 'OK', function(xhr){ 
+                var response = JSON.parse(xhr.responseText);
+                equal(response.voided, true);
+                cb(null);
+            });
+        },
+        function(cb){ 
+            //Voiding a statement that doesn't exist should result in 404
+            issueVoidingStatement(util.ruuid(), util.ruuid(), 404, 'Not Found', cb);
+        },
+        function(cb){ 
+            //Voiding a voiding statement should fail
+            issueVoidingStatement(util.ruuid(), voidingStatementId, 400, 'Bad Request', cb); 
+        },
+        //Start up the next test
+        start
+    ]);
+});
 
 
 /*asyncTest('Statements, descendants filter', function () {
