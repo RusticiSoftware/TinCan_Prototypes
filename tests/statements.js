@@ -1073,8 +1073,21 @@ asyncTest('voiding statements', function () {
             //Make sure statement was really voided
             var url = '/statements?statementId=' + statement.id;
             util.request('GET', url, null, true, 200, 'OK', function(xhr){ 
-                var response = JSON.parse(xhr.responseText);
+                var response = util.tryJSONParse(xhr.responseText);
                 equal(response.voided, true);
+                cb(null);
+            });
+        },
+        function(cb){
+            //Make sure voiding statement is reported correctly
+            var url = '/statements?statementId=' + voidingStatementId;
+            util.request('GET', url, null, true, 200, 'OK', function(xhr){ 
+                var response = util.tryJSONParse(xhr.responseText);
+                ok(response.object !== undefined);
+                if(response.object !== undefined){
+                    equal(response.object.objectType, "Statement");
+                    equal(response.object.id, statement.id);
+                }
                 cb(null);
             });
         },
