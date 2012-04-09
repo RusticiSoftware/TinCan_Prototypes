@@ -8,3 +8,6 @@ Config.authUser = "testuser2.autotest@scorm.example.com";
 Config.authPass = "password";
 Config.timeout = 5000;
 Config.retries = 3;
+
+//OAuth consumer
+Config.testConsumer = { consumerKey: "com.scorm/testProvider", consumerSecret : "secret key"};
