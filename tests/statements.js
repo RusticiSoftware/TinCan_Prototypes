@@ -726,7 +726,7 @@ asyncTest('GET statements, context', function () {
 					filters.object = JSON.stringify(statement.object);
 					util.request('GET', url + '?' + util.buildQueryString(filters), null, true, 200, 'OK', function (xhr) {
 						result = util.tryJSONParse(xhr.responseText);
-						if (ok(result.statements.length==1, "expected a statement to be returend, should have been the statement saved (with context parameter + object activity)")) 
+						if (ok(result.statements.length==1, "expected a statement to be returned, should have been the statement saved (with context parameter + object activity)")) 
 							equal(result.statements[0].id, statement.id, 'found saved statement with context parameter + object activity');
 
 						start();
