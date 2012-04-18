@@ -19,7 +19,7 @@ This is the url you will launch in your browser to run the client prototypes.
 
 ### Client
  * Copy the file ClientPrototypes/config.js.template to ClientPrototypes/config.js 
-and set Config.endpoint to the LRS endpoint, including a trailing slash (ex: http://beta.projecttincan.com/TCAPI/public/)
+and set Config.endpoint to the LRS endpoint, including a trailing slash (ex: https://cloud.scorm.com/ScormEngineInterface/TCAPI/public/)
  * Verify the LRS endpoint in your browser by navigating to the URL: &lt;endpoint&gt;/statements?limit=1
 	* You should be prompted to log in, the credentials are: test/password
 	* You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
