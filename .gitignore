@@ -2,6 +2,7 @@ tests/config.js
 ClientPrototypes/config.js
 *~
 *.suo
+*.swp
 [B|b]in/
 [O|o]bj/
 .DS_Store

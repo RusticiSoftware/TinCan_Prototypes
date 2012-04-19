@@ -123,27 +123,47 @@ asyncTest('Metadata load', function () {
     var myActivityId = "http://beta.projecttincan.com/sample/tincan.xml"
     var myActivity = { id:myActivityId} ;
     var expected = {
-  "objectType": "Activity",
-  "id": "http://beta.projecttincan.com/sample/tincan.xml",
-  "definition": {
-    "name": {
-      "und": "Rustici example interaction"
-    },
-    "description": {
-      "en-US": "Longer description about the example interaction.",
-      "el": "Εκτενέστερη περιγραφή για την πορεία παράδειγμα."
-    },
-    "type": "interaction",
-    "interactionType": "choice",
-    "correctResponsesPattern": [
-      "choice1",
-      "choice3"
-    ],
-    "extensions": {
-      "tin": "can"
-    }
-  }
-};
+      "objectType": "Activity",
+      "id": "http://beta.projecttincan.com/sample/tincan.xml",
+      "definition": {
+        "name": {
+          "und": "Rustici example interaction"
+        },
+        "description": {
+          "en-US": "Longer description about the example interaction.",
+          "el": "Εκτενέστερη περιγραφή για την πορεία παράδειγμα."
+        },
+        "type": "cmi.interaction",
+        "interactionType": "choice",
+        "correctResponsesPattern": [
+          "choice1",
+          "choice3"
+        ],
+        "choices": [
+          {
+            "id": "choice1",
+            "description": {
+              "en-US": "Choice 1"
+            }
+          },
+          {
+            "id": "choice2",
+            "description": {
+              "en-US": "Choice 2"
+            }
+          },
+          {
+            "id": "choice3",
+            "description": {
+              "en-US": "Choice 3"
+            }
+          }
+        ],
+        "extensions": {
+          "tin": "can"
+        }
+      }
+    };
 
     var myStatements = [{ actor:env.statement.actor, verb: "imported", object: myActivity }];
 
@@ -157,7 +177,6 @@ asyncTest('Metadata load', function () {
 	    });
     });
 });
-
 
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
