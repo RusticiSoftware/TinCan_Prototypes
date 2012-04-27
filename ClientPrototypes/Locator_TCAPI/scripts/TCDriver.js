@@ -244,7 +244,7 @@ function TCDriver_SetState (lrs, activityId, stateKey, stateVal, callback) {
         	url += "&registration=" + encodeURIComponent(lrs.registration);
         }
         
-        XHR_request(lrs,url, "PUT", JSON.stringify(stateVal), lrs.auth, callback);
+        XHR_request(lrs,url, "PUT", stateVal, lrs.auth, callback);
     }
 }
 
