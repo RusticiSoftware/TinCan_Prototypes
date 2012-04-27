@@ -79,6 +79,12 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
     OAuth.SignatureMethod.sign(message, accessor);
     parameterMap = OAuth.getParameterMap(message.parameters);
     this.log("oAuth parameters -- " + JSON.stringify(parameterMap, null, 4));
+    this.log("auth : " + JSON.stringify(auth, null, 4));
+    
+    // if URL has an empty query string, trim it out
+    if (url.indexOf("?") === url.length - 1) {
+    	url = url.substring(0, url.length - 1);
+    }
     for (p in parameterMap) {
         if (p.substring(0, 6) == "oauth_")
         {

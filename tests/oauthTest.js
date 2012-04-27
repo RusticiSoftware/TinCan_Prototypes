@@ -9,7 +9,7 @@ function authorize() {
 		if (xhr.status === 200) {
 			util.parseQueryString(xhr.responseText, auth);
 		} else {
-			alert ("Error: " + xhr.status + " ; " + xhr.responseText);
+			alert ("(Initiate) Error: " + xhr.status + " ; " + xhr.responseText);
 			return;
 		}
 		
