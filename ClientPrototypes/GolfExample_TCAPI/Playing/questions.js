@@ -9,7 +9,7 @@ test.AddQuestion( new Question ("com.scorm.golfsamples.interactions.playing_1",
 test.AddQuestion( new Question ("com.scorm.golfsamples.interactions.playing_2",
                                 "A score of two under par on a given hole is known as a(n):",
                                QUESTION_TYPE_CHOICE,
-                                new Array("opportity for improvement", "birdie", "double bogie", "eagle"),
+                                new Array("opportunity for improvement", "birdie", "double bogie", "eagle"),
                                 "eagle",
                                 "obj_playing")
                 );

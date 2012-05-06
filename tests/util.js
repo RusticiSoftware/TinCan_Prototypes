@@ -4,13 +4,16 @@ function Util() {
 	"use strict";
 	var ii;
 
-	this.golfStatements = JSON.parse(JSON.stringify(golfStatements)); // "clone"
-	for (ii = 0; ii < this.golfStatements.length; ii++) {
-		if (this.golfStatements[ii].actor) {
-			this.golfStatements[ii].actor.mbox = this.actor.mbox;
-			this.golfStatements[ii].actor.name = this.actor.name;
+	// depending on consumer, golfStatements many not be available, or needed
+	if (typeof golfStatements !== "undefined") {
+		this.golfStatements = JSON.parse(JSON.stringify(golfStatements)); // "clone"
+		for (ii = 0; ii < this.golfStatements.length; ii++) {
+			if (this.golfStatements[ii].actor) {
+				this.golfStatements[ii].actor.mbox = this.actor.mbox;
+				this.golfStatements[ii].actor.name = this.actor.name;
+			}
+			this.golfStatements[ii].id = this.ruuid();
 		}
-		this.golfStatements[ii].id = this.ruuid();
 	}
 }
 
@@ -37,6 +40,61 @@ Util.init = function (env) {
 		env.statement.object.definition.name = env.util.activity.definition.name;
 	}
 };
+
+// sign the specified request, based on the specified oAuth information
+Util.prototype.oAuthSign = function(url, method, data, auth) {
+	var pairs, pair, parts, parameterMap, accessor, message, p;
+	
+	if (auth.type !== "oAuth") {
+		// not using oAuth, nothing to do
+		return url;
+	}
+    message = { action: url
+                  , method: method
+                  , parameters: []
+                  };	
+	if (data !== null && data !== "") {
+		this.log("request data: " + data);
+		pairs = data.split('&');
+		for (pair in pairs) {
+			parts = pair.split('=');
+			if (parts.length === 2) {
+				parts[1] = decodeURIComponent(parts[1]);
+				message.parameters.push(parts);
+			} else {
+				// not valid form data, don't include in signature 
+				this.log("non-form data: " + pair);
+			}
+		}
+	}
+	accessor = { consumerSecret : auth.consumerSecret};
+	message.parameters.push(["oauth_consumer_key", auth.consumerKey]);
+	if (auth.oauth_token != undefined) {
+		message.parameters.push(["oauth_token", auth.oauth_token]);
+		accessor.tokenSecret = auth.oauth_token_secret;
+	}
+	
+    OAuth.setTimestampAndNonce(message);
+    this.log(OAuth.SignatureMethod.getBaseString(message));
+    OAuth.SignatureMethod.sign(message, accessor);
+    parameterMap = OAuth.getParameterMap(message.parameters);
+    this.log("oAuth parameters -- " + JSON.stringify(parameterMap, null, 4));
+    this.log("auth : " + JSON.stringify(auth, null, 4));
+    
+    // if URL has an empty query string, trim it out
+    if (url.indexOf("?") === url.length - 1) {
+    	url = url.substring(0, url.length - 1);
+    }
+    for (p in parameterMap) {
+        if (p.substring(0, 6) == "oauth_")
+        {
+            url += (url.indexOf("?") > -1 ? "&" : "?") + p + "=" + encodeURIComponent(parameterMap[p]);
+        }
+    }
+    this.log("url: " + url);
+	return url;
+};
+
 
 Util.prototype.endpoint = Config.endpoint;
 Util.prototype.actor = { mbox: ["mailto:auto_tests@example.scorm.com"], name: ["Auto Test Learner"]};
@@ -70,7 +128,7 @@ Util.prototype.inList = function (test, list) {
 	return false;
 };
 
-Util.prototype.getIEModeRequest = function(method, url, headers, data){
+Util.prototype.getIEModeRequest = function(method, url, headers, data, auth){
 	var newUrl = url;
 	
 	//Everything that was on query string goes into form vars
@@ -98,7 +156,7 @@ Util.prototype.getIEModeRequest = function(method, url, headers, data){
     
     return {
     	"method":"POST",
-    	"url":newUrl,
+    	"url": this.oAuthSign(newUrl, "POST", formData.join("&"), auth) ,
     	"headers":{},
     	"data":formData.join("&")
     };
@@ -158,15 +216,18 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         headers["Content-Length"] = contentLength;
     }
     if (useAuth) {
-		headers["Authorization"] = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPass);   
+    	if (window.location.href.indexOf('auth=') > -1) {
+    		useAuth = JSON.parse(this.parseQueryString(window.location.href.substring(window.location.href.indexOf('?') + 1)).auth);
+    	}
+    	if (useAuth.type !== "oAuth") {
+			headers["Authorization"] = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPass);   
+		}
 	}
     if(extraHeaders !== null){
         for(var headerName in extraHeaders){
             headers[headerName] = extraHeaders[headerName];
         }
     }
-    
-
     var usingIEMode = false;
 
     //Make the request already!
@@ -176,7 +237,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
         this.log("Using alternate IE mode for communication");
 
         //Pack up the original request into the "IE Mode" request
-        var ieModeRequest = this.getIEModeRequest(method, url, headers, data);
+        var ieModeRequest = this.getIEModeRequest(method, url, headers, data, useAuth);
 
         //All requests in this mode are POST
         var xdr = new XDomainRequest();
@@ -210,7 +271,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     //Else we're using the normal CORS XHR built into modern browsers
     else {
 	    var xhr = new XMLHttpRequest();
-	    xhr.open(method, this.endpoint + url, true);
+	    xhr.open(method, this.oAuthSign(this.endpoint + url, method, data, useAuth), true);
 		
         //Headers
         for(var headerName in headers){
@@ -612,4 +673,29 @@ Util.prototype.buildQueryString = function (filters) {
 	}
 	
 	return queryString.join('&');
+};
+
+Util.prototype.parseQueryString = function(qs, parsed) {
+	var loc, pairs, pair, ii;
+	
+	if (!parsed) {
+		parsed = {};
+	}
+	
+	loc = window.location.href.split('?');
+	if (loc.length === 2) {
+		qs = loc[1];
+	}
+	
+	if (qs) {
+		pairs = qs.split('&');
+		for ( ii = 0; ii < pairs.length; ii++) {
+			pair = pairs[ii].split('=');
+			if (pair.length === 2 && pair[0]) {
+				parsed[pair[0]] = decodeURIComponent(pair[1]);
+			}
+		}
+	}
+	
+	return parsed;
 };

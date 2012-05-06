@@ -30,7 +30,7 @@
 
         var stmt = {
             "verb":"attempted",
-            "inprogress":true,
+            "inProgress":true,
             "object":courseObj,
             "context":GolfExample.getContext()
         };
@@ -214,30 +214,30 @@
     
     
     //called from the assessmenttemplate.html page to record the results of a question
-    function GetQuestionAnswerStatement(id, questionText, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
-        
-		//send question info
- 		/*var questionObj = new TCObject().SetValue("id",id);
-		var resultObj = new TCObject().SetValue("response",learnerResponse)
-				.SetValue("success",wasCorrect);
-		var contextObj = new TCObject().SetValue("activity",new TCObject().SetValue("id",activityId));
-						
-		var stmt = new TCStatement(tc_lrs).SetValue("verb","answered")
-			.SetValue("object",questionObj)
-			.SetValue("result",resultObj)
-			.SetValue("context",contextObj);
-		
-		return stmt.GetStatement();*/
+    function GetQuestionAnswerStatement(id, questionText, questionChoices, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
 
+        console.log("GetQuestionAnswerStatement");
+
+		//send question info
 		var qObj = {
             "id":id,
 			"definition":{
-                "type":"question",
+                "type":"cmi.interaction",
 				"description":{"en-US":questionText},
 				"interactionType":questionType,
 				"correctResponsesPattern":[String(correctAnswer)]
             }
         };
+
+        if(questionChoices !== null && questionChoices.length > 0){
+            var choices = [];
+            for(var i = 0; i < questionChoices.length; i++){
+                var choice = questionChoices[i];
+                choices.push({"id":choice, "description":{"en-US":choice}});
+            }
+            console.log(qObj);
+            qObj["definition"]["choices"] = choices;
+        }
 
         return {
             "verb":"answered",
