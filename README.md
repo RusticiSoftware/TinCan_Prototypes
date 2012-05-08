@@ -5,7 +5,7 @@
 
 ##Overview
 
-###This package contains server and client prototypes for the Tin Can API.
+###This package contains client prototypes for the Tin Can API.
 * Client prototypes (see ClientPrototypes/index.html for details)
 	* GolfExample\_TCAPI : a converted SCORM course
 	* JsTetris\_TCAPI : Tetris
@@ -23,4 +23,4 @@ and set Config.endpoint to the LRS endpoint, including a trailing slash (ex: htt
  * Verify the LRS endpoint in your browser by navigating to the URL: &lt;endpoint&gt;/statements?limit=1
 	* You should be prompted to log in, the credentials are: test/password
 	* You should then see: [] , or JSON of a statement if statements have already been stored for this LRS.
- * Launch: ClientPrototypes/index.html (from your web server in your browser, not from the file system) 
+ * Launch: ClientPrototypes/index.html
