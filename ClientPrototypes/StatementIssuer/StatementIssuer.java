@@ -91,6 +91,7 @@ public class StatementIssuer {
 		for(SimpleStatementInfo stmt : stmts){
 			json.append(first ? "" : ",");
 			json.append(stmt.toJson());
+            first = false;
 		}
 		json.append("]");
 		return makeRequest(tincanUrl + "/statements", authUser, authPassword, json.toString());
