@@ -54,10 +54,11 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
                   , parameters: []
                   };	
 	if (data !== null && data !== "") {
-		this.log("request data: " + data);
 		pairs = data.split('&');
+		this.log("request data: " + data + " (pairs: " + pairs.length + ")");
 		for (pair in pairs) {
-			parts = pair.split('=');
+			this.log("request data pair: " + pairs[pair]);
+			parts = pairs[pair].split('=');
 			if (parts.length === 2) {
 				parts[1] = decodeURIComponent(parts[1]);
 				message.parameters.push(parts);
@@ -69,14 +70,17 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
 	}
 	accessor = { consumerSecret : auth.consumerSecret};
 	message.parameters.push(["oauth_consumer_key", auth.consumerKey]);
+	if (auth.oauth_verifier) {
+		message.parameters.push(["oauth_verifier", auth.oauth_verifier]);
+	}
 	if (auth.oauth_token != undefined) {
 		message.parameters.push(["oauth_token", auth.oauth_token]);
 		accessor.tokenSecret = auth.oauth_token_secret;
 	}
 	
     OAuth.setTimestampAndNonce(message);
-    this.log(OAuth.SignatureMethod.getBaseString(message));
     OAuth.SignatureMethod.sign(message, accessor);
+    this.log("base: " + OAuth.SignatureMethod.getBaseString(message));
     parameterMap = OAuth.getParameterMap(message.parameters);
     this.log("oAuth parameters -- " + JSON.stringify(parameterMap, null, 4));
     this.log("auth : " + JSON.stringify(auth, null, 4));
@@ -169,8 +173,18 @@ Util.prototype.requestWithHeaders = function (method, url, headers, data, useAut
 Util.prototype.request = function (method, url, data, useAuth, expectedStatus, expectedStatusText, callback, extraHeaders, retries) {
 	"use strict";
 
+	if (this.endpoint.substring(this.endpoint.length-1) === "/") {
+		if (url.indexOf("/") === 0) {
+			url = url.substring(1); // remove redundant '/'
+		}
+	}  else if (url.indexOf("/") !== 0) {
+		// add missing '/'
+		url = "/" + url;
+	}
+
     //Fill in some stock params if we need to
     var actorKey = null;
+    var formData = false;
 
 	if (method === 'GET') {
 		actorKey = JSON.parse(JSON.stringify(this.actor)); // "clone"
@@ -203,6 +217,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 			contentType = "application/octet-stream";
 		} else {
 			contentType = "application/x-www-form-urlencoded";
+			formData = true;
 		}
         contentLength = data.length;
     }
@@ -271,7 +286,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     //Else we're using the normal CORS XHR built into modern browsers
     else {
 	    var xhr = new XMLHttpRequest();
-	    xhr.open(method, this.oAuthSign(this.endpoint + url, method, data, useAuth), true);
+	    xhr.open(method, this.oAuthSign(this.endpoint + url, method, formData ? data : "", useAuth), true);
 		
         //Headers
         for(var headerName in headers){
@@ -318,13 +333,13 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	"use strict";
 	var responseObj;
 
-	if (responseText.id !== undefined) {
+	if (responseText.id != undefined) {
 		responseObj = responseText;
 	} else {
 		responseObj = this.tryJSONParse(responseText);
 	}
 
-	if (responseObj.id === undefined) {
+	if (responseObj.id == undefined) {
 		ok(false, 'statement ID missing');
 	}
 
@@ -333,7 +348,7 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	ok(responseObj.stored !== undefined, "LRS expected to add stored timestamp");
 
 	// since LRS adds these values, comparison will fail if included
-	if (statement.id === undefined) {
+	if (statement.id == undefined) {
 		delete responseObj.id;
 	}
 	delete responseObj.authority;
@@ -343,16 +358,16 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	}
     delete responseObj.inProgress;
     if (statement.object && responseObj.object) {
-		if(statement.object.objectType === undefined){
+		if(statement.object.objectType == undefined){
 			delete responseObj.object.objectType;
 		}
-		if(statement.object.definition === undefined){
+		if(statement.object.definition == undefined){
 			delete responseObj.object.definition;
 		}
 	}    
 
     //Clean up extra info from returned context activities
-    if(statement.context !== undefined && statement.context.contextActivities !== undefined){
+    if(statement.context != undefined && statement.context.contextActivities != undefined){
         var ctxacts = statement.context.contextActivities;
         var ctxIds = ["parent","grouping","other"];
         for(var i = 0; i < ctxIds.length; i++){
@@ -371,15 +386,14 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 
     if (responseObj.actor == undefined) {
     	ok(false, "Statements returned from LRS must always have an actor.");
-    }
-    if (responseObj.actor.objectType == undefined) {
+    }else if (responseObj.actor.objectType == undefined) {
     	ok(false, "Statements returned from LRS must always have an actor objectType.");
     }
 	// LRS will add actor if not supplied
 	if (statement.actor == undefined) {
 		delete responseObj.actor;
 	}
-    if(statement.actor !== undefined && statement.actor.objectType === undefined){
+    if(statement.actor != undefined && statement.actor.objectType == undefined){
         delete responseObj.actor.objectType;
     }
 
@@ -682,10 +696,6 @@ Util.prototype.parseQueryString = function(qs, parsed) {
 		parsed = {};
 	}
 	
-	loc = window.location.href.split('?');
-	if (loc.length === 2) {
-		qs = loc[1];
-	}
 	
 	if (qs) {
 		pairs = qs.split('&');
