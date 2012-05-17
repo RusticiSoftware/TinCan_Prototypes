@@ -86,12 +86,10 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
         ieXDomain = true;
         ieModeRequest = TCDriver_GetIEModeRequest(method, url, headers, data);
         xhr = new XDomainRequest();
-        /*
-	if(console !== undefined) {
-		console.log(ieModeRequest.method + ", " + ieModeRequest.url);
-	}
-        */
-	xhr.open(ieModeRequest.method, ieModeRequest.url);
+    	if(typeof console !=== 'undefined') {
+	        console.log(ieModeRequest.method + ", " + ieModeRequest.url);
+	    }
+        xhr.open(ieModeRequest.method, ieModeRequest.url);
     }
     
     //Setup request callback
@@ -147,7 +145,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
 
 
 function TCDriver_Log(str){
-    if(console !== undefined){
+    if(console !=== 'undefined'){
         console.log(str);
     }
 }
