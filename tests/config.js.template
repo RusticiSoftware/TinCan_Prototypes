@@ -11,3 +11,7 @@ Config.retries = 3;
 
 //OAuth consumer
 Config.testConsumer = { consumerKey: "com.scorm/testProvider", consumerSecret : "secret key"};
+Config.testUnregisteredConsumer = { consumerKey: "com.scorm/unregistered", consumerSecret : "", consumer_name : "Test Unregistered Application"};
+
+// Use "IE" version of API even if not required for the browser running the tests
+Config.forceIEMode = false;

@@ -70,6 +70,9 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
 	}
 	accessor = { consumerSecret : auth.consumerSecret};
 	message.parameters.push(["oauth_consumer_key", auth.consumerKey]);
+	if (auth.consumer_name != undefined) {
+		message.parameters.push(["consumer_name", auth.consumer_name]);
+	}
 	if (auth.oauth_verifier) {
 		message.parameters.push(["oauth_verifier", auth.oauth_verifier]);
 	}
@@ -90,7 +93,7 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
     	url = url.substring(0, url.length - 1);
     }
     for (p in parameterMap) {
-        if (p.substring(0, 6) == "oauth_")
+        if (p.substring(0, 6) == "oauth_" || p == "consumer_name")
         {
             url += (url.indexOf("?") > -1 ? "&" : "?") + p + "=" + encodeURIComponent(parameterMap[p]);
         }
@@ -285,13 +288,26 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
     } 
     //Else we're using the normal CORS XHR built into modern browsers
     else {
+    	var forceIE = Config.forceIEMode;
+    	var ieModeRequest;
+    	
+    	if (forceIE) {
+    		ieModeRequest = this.getIEModeRequest(method, url, headers, data, useAuth);
+    	}
 	    var xhr = new XMLHttpRequest();
-	    xhr.open(method, this.oAuthSign(this.endpoint + url, method, formData ? data : "", useAuth), true);
+
+		if (forceIE) {
+			xhr.open("post", this.oAuthSign(this.endpoint + ieModeRequest.url, "post", ieModeRequest.data, useAuth), true);
+		} else {
+		    xhr.open(method, this.oAuthSign(this.endpoint + url, method, formData ? data : "", useAuth), true);
+		}
 		
         //Headers
-        for(var headerName in headers){
-            xhr.setRequestHeader(headerName, headers[headerName]);
-        }
+        if (!forceIE) {
+			for(var headerName in headers){
+				xhr.setRequestHeader(headerName, headers[headerName]);
+			}
+		}
 
         //Setup callback
 	    xhr.onreadystatechange = function () {
@@ -302,7 +318,6 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	    			} else {
 	    				retries = 3;
 	    			}
-	    			
 	    		}
 	    		// LRS internal errors (5xx) should be retried, may have a temporary failure.
 	    		if (retries > 0 && xhr.status >= 500 && expectedStatus !== xhr.status) {
@@ -320,7 +335,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
         //Contact
 	    try {
-	    	xhr.send(data);
+	    	xhr.send(forceIE ? ieModeRequest.data : data);
 	    } catch (ex) {
 	    	ok(false, ex.toString());
 	    	console.error(ex.toString());

@@ -1,8 +1,10 @@
-function authorize() {
+function authorize(preAuth) {
 	var message, accessor, parameterMap, util, xhr;
 	util = new Util();
 	
-	window.auth = {type: "oAuth", consumerKey : Config.testConsumer.consumerKey, consumerSecret : Config.testConsumer.consumerSecret};
+	if (!preAuth) {
+		window.auth = {type: "oAuth", consumerKey : Config.testConsumer.consumerKey, consumerSecret : Config.testConsumer.consumerSecret};
+	}
 
 	util.request("POST", "OAuth/initiate?oauth_callback=oob", null, window.auth, null, null, function(xhr) {
 		var authPage;
@@ -41,5 +43,23 @@ function run() {
 		util.log(JSON.stringify(window.auth, null, 4));
 		window.open("tests.html?auth=" + encodeURIComponent(JSON.stringify(window.auth))); 
 	});
+}
+
+function consumer() {
+	var util, xhr;
+	util = new Util();
 	
+	window.auth = {type: "oAuth", consumerKey : Config.testConsumer.consumerKey, consumerSecret : Config.testConsumer.consumerSecret};
+
+	//util.request("GET","statements?limit=1", null, window.auth, null, null, function(xhr){
+		//alert(xhr.status + " : " + xhr.responseText);
+	//});
+	window.open("tests.html?auth=" + encodeURIComponent(JSON.stringify(window.auth))); 
+}
+
+function user() {
+	window.auth = {type: "oAuth", consumerKey : Config.testUnregisteredConsumer.consumerKey, consumerSecret : Config.testUnregisteredConsumer.consumerSecret,
+	 consumer_name : Config.testUnregisteredConsumer.consumer_name};
+
+	 authorize(true);
 }
