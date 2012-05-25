@@ -1105,6 +1105,80 @@ asyncTest('voiding statements', function () {
 });
 
 
+asyncTest('statement validation', function () {
+	"use strict";
+	var env = statementsEnv;
+    var util = env.util;
+
+    var statement = util.clone(env.statement);
+    statement.id = util.ruuid();
+
+    var statementJson = JSON.stringify(statement);
+
+    var url = '/statements?statementId=' + statement.id;
+
+    function assertBadStatement(statement, cb){
+	    util.request('PUT', url, JSON.stringify(statement), true, 400, 'Bad Request', function(){ cb(null); });
+    }
+
+    async.waterfall([
+        function(cb){
+            //Blank actor
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.actor = null;
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Blank verb
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.verb = null;
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Blank object
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.object = null;
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Actor with no IFPs
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.actor = { "objectType":"Agent", "name":["Unknown Actor"] };
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Actor with crappy account
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.actor.account = [{"accountServiceHomePage":"", "accountName":"dummy"}];
+            assertBadStatement(stmtCopy, function(){
+                stmtCopy.actor.account = [{"accountServiceHomePage":"http://example.org", "accountName":""}];
+                assertBadStatement(stmtCopy, cb);
+            });
+        },
+        function(cb){
+            //Activity with no ID
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.object = {"objectType":"Activity"};
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Activities in context with no ID
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.context = {"contextActivities":{"parent":{"objectType":"Activity"}}};
+            assertBadStatement(stmtCopy, cb);
+        },
+        function(cb){
+            //Instructor in context with no IFPs
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.context = {"instructor":{"objectType":"Agent", "name":["Unknown Actor"]}};
+            assertBadStatement(stmtCopy, cb);
+        },
+        //Start up the next test
+        start
+    ]);
+});
+
+
 /*asyncTest('Statements, descendants filter', function () {
 	"use strict";
 	var env = statementsEnv,
