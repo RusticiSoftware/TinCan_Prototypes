@@ -98,3 +98,17 @@ asyncTest('Concurrency Rules', function(){
     var url = "/activities/state?activityId=<activity ID>&actor=<actor>&stateId=" + env.util.ruuid();
     env.util.concurrencyRulesTest(env, url, false);
 });
+
+asyncTest('missing State id', function() {
+	"use strict";
+
+    var env = stateEnv;
+	var reg = '',
+		url = '/activities/state?activityId=<activity ID>&actor=<actor>',
+		urlKey = url + '&stateBadid=' + env.id,
+		stateText = 'state test text : ' + env.id;
+
+	env.util.request('PUT', urlKey, stateText, true, 400, 'Bad Request', function (xhr) {
+		start();
+	});	
+});
