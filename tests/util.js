@@ -43,7 +43,7 @@ Util.init = function (env) {
 
 // sign the specified request, based on the specified oAuth information
 Util.prototype.oAuthSign = function(url, method, data, auth) {
-	var pairs, pair, parts, parameterMap, accessor, message, p;
+	var pairs, pair, parts, parameterMap, accessor, message, p, encodedParameter;
 	
 	if (auth.type !== "oAuth") {
 		// not using oAuth, nothing to do
@@ -57,14 +57,14 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
 		pairs = data.split('&');
 		this.log("request data: " + data + " (pairs: " + pairs.length + ")");
 		for (pair in pairs) {
-			this.log("request data pair: " + pairs[pair]);
 			parts = pairs[pair].split('=');
-			if (parts.length === 2) {
+			if (parts.length === 2) { // && parts[0].substring(0, 6) == "oauth_") {
+				this.log("request data pair: " + pairs[pair]);
 				parts[1] = decodeURIComponent(parts[1]);
 				message.parameters.push(parts);
 			} else {
-				// not valid form data, don't include in signature 
-				this.log("non-form data: " + pair);
+				// not valid oauth form data, don't include in signature 
+				this.log("non-form data: " + pairs[pair]);
 			}
 		}
 	}
@@ -95,7 +95,11 @@ Util.prototype.oAuthSign = function(url, method, data, auth) {
     for (p in parameterMap) {
         if (p.substring(0, 6) == "oauth_" || p == "consumer_name")
         {
-            url += (url.indexOf("?") > -1 ? "&" : "?") + p + "=" + encodeURIComponent(parameterMap[p]);
+        	encodedParameter = p + "=" + encodeURIComponent(parameterMap[p]);
+        	// only add parameters that are not already on the query string or in the form post
+        	if (url.indexOf(encodedParameter) == -1 && (data == null || data.indexOf(encodedParameter) == -1)) {
+            	url += (url.indexOf("?") > -1 ? "&" : "?") + encodedParameter;
+            }
         }
     }
     this.log("url: " + url);
@@ -163,7 +167,7 @@ Util.prototype.getIEModeRequest = function(method, url, headers, data, auth){
     
     return {
     	"method":"POST",
-    	"url": this.oAuthSign(newUrl, "POST", formData.join("&"), auth) ,
+    	"url": newUrl,
     	"headers":{},
     	"data":formData.join("&")
     };
@@ -259,7 +263,7 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 
         //All requests in this mode are POST
         var xdr = new XDomainRequest();
-        xdr.open(ieModeRequest.method, this.endpoint + ieModeRequest.url);
+        xdr.open(ieModeRequest.method, this.oAuthSign(this.endpoint + ieModeRequest.url, "post", ieModeRequest.data, useAuth));
 
         //Setup callbacks
 	    xdr.onload = function () {
@@ -307,6 +311,8 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 			for(var headerName in headers){
 				xhr.setRequestHeader(headerName, headers[headerName]);
 			}
+		} else {
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		}
 
         //Setup callback
