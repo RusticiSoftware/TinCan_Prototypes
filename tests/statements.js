@@ -94,7 +94,7 @@ asyncTest('PUT / GET w/ Extensions', function() {
             }
         },
         result: {
-            score: { scaled: 87.0 },
+            score: { scaled: 0.87 },
             success: true,
             completion: true,
             extensions: {
