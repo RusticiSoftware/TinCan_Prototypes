@@ -297,6 +297,18 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 		}
 		return truncateString(JSON.stringify(actor), 20);
 	}
+
+    function getLangDictionaryValue(langDict){
+        if(langDict["und"] != undefined){
+            return langDict["und"];
+        }
+        if(langDict["en-US"] != undefined){
+            return langDict["en-US"];
+        }
+        for(var key in langDict){
+            return langDict[key];
+        }
+    }
 	
 	function getTargetDesc(obj){
 		if(obj.objectType !== undefined && obj.objectType !== "Activity"){
@@ -305,17 +317,11 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 		
 		if(obj.definition !== undefined){
 			if(obj.definition.name !== undefined){
-				if(obj.definition.name["und"] !== undefined){
-					return obj.definition.name["und"];
-				}
-				return obj.definition.name["en-US"];
+                return getLangDictionaryValue(obj.definition.name);
 			}
 			
 			if(obj.definition.description !== undefined){
-				if(obj.definition.description["und"] !== undefined){
-					return truncateString(obj.definition.description["und"], 48);
-				}
-				return truncateString(obj.definition.description["en-US"], 48);
+                return truncateString(getLangDictionaryValue(obj.definition.description), 48);
 			}
 		}
 		return obj.id;
@@ -356,6 +362,85 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 		$("#noStatementsMessage").show();
 	}
 
+    function getResponseText(stmt){
+        if(stmt == undefined || stmt.result == undefined || stmt.result.response == undefined){
+            return null;
+        }
+        var response = stmt.result.response;
+
+        if(stmt.object == undefined 
+            || stmt.object.definition == undefined 
+            || stmt.object.definition.type != "cmi.interaction"
+            || stmt.object.definition.interactionType == undefined){
+                return response;
+        }
+
+        var objDef = stmt.object.definition;
+
+        if(objDef.interactionType == "choice"){
+            if (objDef.choices != undefined && objDef.choices.length > 0){
+                var choices = objDef.choices;
+                var responses = response.split("[,]");
+                var responseStr = [];
+                var first = true;
+                for(var i = 0; i < responses.length; i++){
+                    for(var j = 0; j < choices.length; j++){
+                        if(responses[i] == choices[j].id){
+                            if(!first){
+                                responseStr.push(", ");
+                            }
+                            responseStr.push(getLangDictionaryValue(choices[j].description));
+                            first = false;
+                        }
+                    }
+                }
+                if(responseStr.length > 0){
+                    return responseStr.join('');
+                }
+            }
+            return response;
+        }
+
+        if(objDef.interactionType == "matching"){
+            if (objDef.source != undefined && objDef.source.length > 0
+                 && objDef.target != undefined && objDef.target.length > 0){
+
+                var source = objDef.source;
+                var target = objDef.target;
+                var responses = response.split("[,]");
+                var responseStr = [];
+                var first = true;
+
+                for(var i = 0; i < responses.length; i++){
+                    var responseParts = responses[i].split("[.]");
+                    for(var j = 0; j < source.length; j++){
+                        if(responseParts[0] == source[j].id){
+                            if(!first){
+                                responseStr.push(", ");
+                            }
+                            responseStr.push(getLangDictionaryValue(source[j].description));
+                            first = false;
+                        }
+                    }
+                    for(var j = 0; j < target.length; j++){
+                        if(responseParts[1] = target[j].id){
+                            responseStr.push(" -> ");
+                            responseStr.push(getLangDictionaryValue(target[j].description));
+                        }
+                    }
+                }
+
+                if(responseStr.length > 0){
+                    return responseStr.join('');
+                }
+            }
+            return response;
+        }
+
+        return response;
+    }
+
+
 	for (i = 0; i < statements.length ; i++){
 		var stmt = statements[i];
 		try {
@@ -380,7 +465,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 									verb = ((stmt.result.success)?"correctly ":"incorrectly ") + verb;
 								}
 								if (stmt.result.response != undefined){
-									answer = " with response '" + truncateString(stmt.result.response, 12) + "'.";
+									answer = " with response '" + truncateString(getResponseText(stmt), 12) + "' ";
 								}
 							}
 							
@@ -392,8 +477,13 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 					stmtStr.push((answer != "")? answer : ".");
 					
 					if (stmt.result != undefined){
-						if (stmt.result.score != undefined && stmt.result.score.raw != undefined){
-							stmtStr.push(" with score <span class='score'>"+ stmt.result.score.raw +"</span>");
+						if (stmt.result.score != undefined){
+                            if (stmt.result.score.scaled != undefined){
+                                stmtStr.push(" with score <span class='score'>"+ (stmt.result.score.scaled * 100.0) + "%</span>");
+                            }
+                            else if(stmt.result.score.raw != undefined){
+							    stmtStr.push(" with score <span class='score'>"+ stmt.result.score.raw +"</span>");
+                            }
 						}
 					}
 					
