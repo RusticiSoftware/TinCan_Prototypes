@@ -390,19 +390,38 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 
         var objDef = stmt.object.definition;
 
-        if(objDef.interactionType == "choice"){
-            if (objDef.choices != undefined && objDef.choices.length > 0){
-                var choices = objDef.choices;
+        var componentName = null;
+        if(objDef.interactionType == "choice" || objDef.interactionType == "sequencing"){
+            componentName = "choices";
+        }
+        else if (objDef.interactionType == "likert"){
+            componentName = "scale";
+        }
+        else if (objDef.interactionType == "performance"){
+            componentName = "steps";
+        }
+
+        if(componentName != null){
+            var components = objDef[componentName];
+            if (components != undefined && components.length > 0){
                 var responses = response.split("[,]");
                 var responseStr = [];
                 var first = true;
                 for(var i = 0; i < responses.length; i++){
-                    for(var j = 0; j < choices.length; j++){
-                        if(responses[i] == choices[j].id){
+                    for(var j = 0; j < components.length; j++){
+                        var responseId = responses[i];
+                        if(objDef.interactionType == "performance"){
+                            responseId = responses[i].split("[.]")[0];
+                        }
+                        if(responseId == components[j].id){
                             if(!first){
                                 responseStr.push(", ");
                             }
-                            responseStr.push(getLangDictionaryValue(choices[j].description));
+                            responseStr.push(getLangDictionaryValue(components[j].description));
+                            if(objDef.interactionType == "performance"){
+                                responseStr.push(" -> ");
+                                responseStr.push(responses[i].split("[.]")[1]);
+                            }
                             first = false;
                         }
                     }
@@ -436,7 +455,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
                         }
                     }
                     for(var j = 0; j < target.length; j++){
-                        if(responseParts[1] = target[j].id){
+                        if(responseParts[1] == target[j].id){
                             responseStr.push(" -> ");
                             responseStr.push(getLangDictionaryValue(target[j].description));
                         }
