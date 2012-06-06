@@ -276,6 +276,54 @@ TINCAN.Viewer.prototype.renderStatementsHandler = function(xhr){
 };
 
 TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
+	function getDateString(dt){
+		var now = new Date();
+		var usemonths = false;
+		var usedays = false;
+		var usehours = false;
+		var useminutes = false;
+		var useseconds = false;
+		
+		if (now.getFullYear() != dt.getFullYear()){
+			if (now.getFullYear() - dt.getFullYear() <= 1){
+				usemonths = true;
+			} else {
+				return (now.getFullYear() - dt.getFullYear()) + " years ago" 
+			}
+		}
+		if (usemonths || (now.getUTCMonth() != dt.getUTCMonth())){
+			if (now.getUTCMonth() - dt.getUTCMonth() <= 2){
+				usedays = true;
+			} else {
+				return (now.getUTCMonth() - dt.getUTCMonth()) + " months ago" 
+			}
+		}
+		if (usedays || (now.getUTCDate() != dt.getUTCDate())){
+			if (now.getUTCDate() - dt.getUTCDate() <= 2){
+				usehours = true;
+			} else {
+				return (now.getUTCDate() - dt.getUTCDate()) + " days ago" 
+			}
+		}
+		if (usehours || (now.getUTCHours() != dt.getUTCHours())){
+			if (now.getUTCHours() - dt.getUTCHours() <= 2){
+				useminutes = true;
+			} else {
+				return (now.getUTCHours() - dt.getUTCHours()) + " hours ago" 
+			}
+		}
+		if (useminutes || (now.getUTCMinutes() != dt.getUTCMinutes())){
+			if (now.getUTCMinutes() - dt.getUTCMinutes() <= 2){
+				useseconds = true;
+			} else {
+				return (now.getUTCMinutes() - dt.getUTCMinutes()) + " minutes ago" 
+			}
+		}
+		if (useseconds){
+			return (now.getUTCSeconds() - dt.getUTCSeconds()) + " seconds ago" 
+		}
+	}
+
 	function getActorName(actor){
 		if(actor === undefined){
 			return "";
@@ -325,41 +373,6 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 			}
 		}
 		return obj.id;
-	}
-	
-	function truncateString(str, length){
-		if(str == null || str.length < 4 || str.length <= length){
-			return str;
-		}
-		return str.substr(0, length-3)+'...';
-	};
-	
-	
-    var statements = statementsResult.statements;
-    
-    this.moreStatementsUrl = statementsResult.more;
-    if(this.moreStatementsUrl === undefined || this.moreStatementsUrl === null){
-    	$("#showAllStatements").hide();
-    } else {
-    	$("#showAllStatements").show();
-    }
-	
-    var stmtStr = new Array();
-	stmtStr.push("<table>");
-	
-	var i;
-	var dt;
-	var aDate;
-
-	if (statements.length > 0) {
-		if (!this.firstStored) {
-			this.firstStored = statements[0].stored;
-		}
-	}
-	
-	if(statements.length == 0){
-		$("#statementsLoading").hide();
-		$("#noStatementsMessage").show();
 	}
 
     function getResponseText(stmt){
@@ -439,6 +452,42 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 
         return response;
     }
+	
+	function truncateString(str, length){
+		if(str == null || str.length < 4 || str.length <= length){
+			return str;
+		}
+		return str.substr(0, length-3)+'...';
+	};
+	
+	
+    var statements = statementsResult.statements;
+    
+    this.moreStatementsUrl = statementsResult.more;
+    if(this.moreStatementsUrl === undefined || this.moreStatementsUrl === null){
+    	$("#showAllStatements").hide();
+    } else {
+    	$("#showAllStatements").show();
+    }
+	
+    var stmtStr = new Array();
+	stmtStr.push("<table>");
+	
+	var i;
+	var dt;
+	var aDate;
+
+	if (statements.length > 0) {
+		if (!this.firstStored) {
+			this.firstStored = statements[0].stored;
+		}
+	}
+	
+	if(statements.length == 0){
+		$("#statementsLoading").hide();
+		$("#noStatementsMessage").show();
+	}
+
 
 
 	for (i = 0; i < statements.length ; i++){
@@ -465,7 +514,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 									verb = ((stmt.result.success)?"correctly ":"incorrectly ") + verb;
 								}
 								if (stmt.result.response != undefined){
-									answer = " with response '" + truncateString(getResponseText(stmt), 12) + "' ";
+									answer = " with response '" + truncateString(getResponseText(stmt), 30) + "' ";
 								}
 							}
 							
