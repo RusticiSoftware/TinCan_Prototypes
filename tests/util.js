@@ -367,6 +367,7 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	ok(responseObj.authority !== undefined, "LRS expected to add authority");
 	equal(responseObj.id, id, "LRS expected to use specified ID");
 	ok(responseObj.stored !== undefined, "LRS expected to add stored timestamp");
+    ok(responseObj.timestamp !== undefined, "LRS expected to add timestamp field");
 
 	// since LRS adds these values, comparison will fail if included
 	if (statement.id == undefined) {
