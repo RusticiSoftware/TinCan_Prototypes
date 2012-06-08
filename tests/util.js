@@ -374,10 +374,12 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	}
 	delete responseObj.authority;
 	delete responseObj.stored;
-	if (responseObj.context !== undefined && responseObj.context.activity !== undefined) {
-		delete responseObj.context.activity.definition;
-	}
-    delete responseObj.inProgress;
+    if(statement.inProgress == undefined){
+        delete responseObj.inProgress;
+    }
+    if(statement.timestamp == undefined){
+        delete responseObj.timestamp;
+    }
     if (statement.object && responseObj.object) {
 		if(statement.object.objectType == undefined){
 			delete responseObj.object.objectType;
