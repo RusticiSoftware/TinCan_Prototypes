@@ -607,14 +607,44 @@ asyncTest('GET statements, simple', function () {
 
 	util.request('GET', url + '?limit=1', null, true, 200, 'OK', function (xhr) {
 		var result = util.tryJSONParse(xhr.responseText).statements;
-		util.log("GET statements, simple result: " + JSON.stringify(result, null, 4));
 		equal(result.length, 1, 'GET limit 1');
 		ok(result[0].verb !== undefined, 'statement has verb (is a statement)');
 		start();
 	});
 });
 
-asyncTest('GET statements, continue token', function () {
+asyncTest('GET statements, ascending', function () {
+	"use strict";
+	var env = statementsEnv,
+		util = env.util,
+		url = '/statements/';
+
+
+	util.request('GET', url + '?limit=5', null, true, 200, 'OK', function (xhr) {
+		var result = util.tryJSONParse(xhr.responseText).statements;
+        var isAscending = true;
+        var storedDate = '0';
+        for(var i = 0; i < result.length; i++){
+            if(!result[i].stored > storedDate){
+                isOk = false;
+                break;
+            } 
+            storedDate = result[i].stored;
+        }
+		ok(isAscending, 'statements recieved in ascending order');
+		start();
+	});
+});
+
+asyncTest('GET statements, continue token (descending)', function () {
+    continueTokenTest(false);
+});
+
+asyncTest('GET statements, continue token (ascending)', function () {
+    continueTokenTest(true);
+});
+
+function continueTokenTest(ascending){
 	"use strict";
 	var env = statementsEnv,
 		util = env.util,
@@ -622,21 +652,30 @@ asyncTest('GET statements, continue token', function () {
 
     var recordsAtOnce = null;
     var recordsOverPages = new Array();
-    var untilStr = "";
+    var dateFilterStr = "";
+
+    ascending = (ascending == null || ascending == false) ? false : true;
+    var ascendingStr = "&ascending=" + ascending;
 
     async.waterfall([
         function(cb){
             //Normal get, to grab a few record to help verify
-	        util.request('GET', url + '?limit=6', null, true, 200, 'OK', 
+	        util.request('GET', url + '?limit=6' + ascendingStr, null, true, 200, 'OK', 
                 function (xhr) {
                     recordsAtOnce = util.tryJSONParse(xhr.responseText).statements;
-                    untilStr = '&until=' + encodeURIComponent(recordsAtOnce[0].stored.toString());
+                    if(ascending == false){
+                        dateFilterStr = '&until=' + encodeURIComponent(recordsAtOnce[0].stored.toString());
+                    } else {
+                        var filterDate = util.DateFromISOString(recordsAtOnce[0].stored);
+                        filterDate.setTime(filterDate.getTime() - 1);
+                        dateFilterStr = "&since=" + encodeURIComponent(util.ISODateString(filterDate));
+                    }
                     cb(null);
             });
         },
         function(cb){
             //Get first page, just two records...
-        	util.request('GET', url + '?limit=2' + untilStr, null, true, 200, 'OK', function (xhr) {
+        	util.request('GET', url + '?limit=2' + ascendingStr + dateFilterStr, null, true, 200, 'OK', function (xhr) {
         		var result = util.tryJSONParse(xhr.responseText);
                 var statements = result.statements;
         		equal(statements.length, 2, 'GET limit 2');
@@ -676,7 +715,7 @@ asyncTest('GET statements, continue token', function () {
         start
     ]);
 
-});
+}
 
 asyncTest('GET statements (via POST), simple', function () {
 	"use strict";
