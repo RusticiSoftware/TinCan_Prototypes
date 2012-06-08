@@ -19,7 +19,7 @@
 var TINCAN = (TINCAN || {});
 
 TINCAN.Viewer = function(){ 
-	this.firstStored = null;
+	this.lastStoredDate = null;
 	this.moreStatementsUrl = null;
 	this.auth = null;
 	this.endpoint = null;
@@ -338,7 +338,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 			return actor.givenName[0] + " " + actor.familyName[0];
 		}
 		if(actor.mbox !== undefined){
-			return actor.mbox[0];
+			return actor.mbox[0].replace('mailto:','');
 		}
 		if(actor.account !== undefined){
 			return actor.account[0].accountName;
@@ -503,16 +503,16 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
     	$("#showAllStatements").show();
     }
 	
-    var stmtStr = new Array();
-	stmtStr.push("<table>");
+    var allStmtStr = new Array();
+	allStmtStr.push("<table>");
 	
 	var i;
 	var dt;
 	var aDate;
 
 	if (statements.length > 0) {
-		if (!this.firstStored) {
-			this.firstStored = statements[0].stored;
+		if (!this.lastStoredDate) {
+			this.lastStoredDate = statements[0].stored;
 		}
 	}
 	
@@ -526,6 +526,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 	for (i = 0; i < statements.length ; i++){
 		var stmt = statements[i];
 		try {
+            var stmtStr = [];
 			stmtStr.push("<tr class='statementRow'>");  
 			//dt = TCDriver_DateFromISOString(statements[i].stored);
 			//stmtStr.push("<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString()  +"</td>");
@@ -560,7 +561,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 					if (stmt.result != undefined){
 						if (stmt.result.score != undefined){
                             if (stmt.result.score.scaled != undefined){
-                                stmtStr.push(" with score <span class='score'>"+ (stmt.result.score.scaled * 100.0) + "%</span>");
+                                stmtStr.push(" with score <span class='score'>"+ Math.round((stmt.result.score.scaled * 100.0)) + "%</span>");
                             }
                             else if(stmt.result.score.raw != undefined){
 							    stmtStr.push(" with score <span class='score'>"+ stmt.result.score.raw +"</span>");
@@ -577,6 +578,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 				}
 			
 			stmtStr.push("</td></tr>");
+            allStmtStr.push(stmtStr.join(''));
 		}
 		catch (error){
 			TCDriver_Log("Error occurred while trying to display statement with id " + stmt.id + ": " + error.message);
@@ -586,7 +588,7 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 	
 	$("#statementsLoading").hide();
 	
-	$("#theStatements").append(stmtStr.join(''));
+	$("#theStatements").append(allStmtStr.join(''));
 	var unwiredDivs = $('div[tcid].unwired');
 	unwiredDivs.click(function(){
 		$('[tcid_data="' + $(this).attr('tcid') + '"]').toggle();
