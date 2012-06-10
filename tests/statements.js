@@ -626,7 +626,7 @@ asyncTest('GET statements, ascending', function () {
         var storedDate = '0';
         for(var i = 0; i < result.length; i++){
             if(!result[i].stored > storedDate){
-                isOk = false;
+                isAscending = false;
                 break;
             } 
             storedDate = result[i].stored;
