@@ -216,7 +216,9 @@
     //called from the assessmenttemplate.html page to record the results of a question
     function GetQuestionAnswerStatement(id, questionText, questionChoices, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
 
-        console.log("GetQuestionAnswerStatement");
+		if (typeof console !== 'undefined') {
+	        console.log("GetQuestionAnswerStatement");
+	    }
 
 		//send question info
 		var qObj = {
@@ -235,7 +237,9 @@
                 var choice = questionChoices[i];
                 choices.push({"id":choice, "description":{"en-US":choice}});
             }
-            console.log(qObj);
+            if (typeof console !== 'undefined') {
+	            console.log(qObj);
+	        }
             qObj["definition"]["choices"] = choices;
         }
 
