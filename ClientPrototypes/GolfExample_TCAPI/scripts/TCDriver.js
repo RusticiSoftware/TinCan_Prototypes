@@ -145,7 +145,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
 
 
 function TCDriver_Log(str){
-    if(console !== 'undefined'){
+    if(typeof console !== 'undefined'){
         console.log(str);
     }
 }
