@@ -358,7 +358,8 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
         }
     }
 	
-	function getTargetDesc(obj){
+	function getTargetDesc(stmt){
+        var obj = stmt.object;
 		if(obj.objectType !== undefined && obj.objectType !== "Activity"){
 			return getActorName(obj);
 		}
@@ -459,6 +460,19 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 		}
 		return str.substr(0, length-3)+'...';
 	};
+
+    function getVerbText(stmt){
+        var verb = stmt.verb;
+        if(verb == 'interacted'){
+            verb = 'interacted with';
+        }
+        if(typeof stmt.context != "undefined" &&
+            typeof stmt.context.extensions != "undefined" && 
+            typeof stmt.context.extensions.verb != "undefined"){
+            verb = stmt.context.extensions.verb;
+        }
+        return verb;
+    };
 	
 	
     var statements = statementsResult.statements;
@@ -502,8 +516,8 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 				stmtStr.push("<div class=\"statement unwired\" tcid='" + stmt.id + "'>")
 					stmtStr.push("<span class='actor'>"+ getActorName(stmt.actor) +"</span>");
 			
-					var verb = stmt.verb;
-					var objDesc = getTargetDesc(stmt.object);
+					var verb = getVerbText(stmt);
+					var objDesc = getTargetDesc(stmt);
 					var answer = null;
 					
 					if (stmt.object.definition !== undefined){
@@ -517,12 +531,11 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
 									answer = " with response '" + truncateString(getResponseText(stmt), 30) + "' ";
 								}
 							}
-							
 						}
 					}		
 					
 					stmtStr.push(" <span class='verb'>"+ verb +"</span>");
-					stmtStr.push(" <span class='object'>'"+ getTargetDesc(stmt.object) +"'</span>");
+					stmtStr.push(" <span class='object'>'"+ objDesc +"'</span>");
 					stmtStr.push((answer != "")? answer : ".");
 					
 					if (stmt.result != undefined){
