@@ -367,6 +367,7 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	ok(responseObj.authority !== undefined, "LRS expected to add authority");
 	equal(responseObj.id, id, "LRS expected to use specified ID");
 	ok(responseObj.stored !== undefined, "LRS expected to add stored timestamp");
+    ok(responseObj.timestamp !== undefined, "LRS expected to add timestamp field");
 
 	// since LRS adds these values, comparison will fail if included
 	if (statement.id == undefined) {
@@ -374,10 +375,12 @@ Util.prototype.validateStatement = function (responseText, statement, id) {
 	}
 	delete responseObj.authority;
 	delete responseObj.stored;
-	if (responseObj.context !== undefined && responseObj.context.activity !== undefined) {
-		delete responseObj.context.activity.definition;
-	}
-    delete responseObj.inProgress;
+    if(statement.inProgress == undefined){
+        delete responseObj.inProgress;
+    }
+    if(statement.timestamp == undefined){
+        delete responseObj.timestamp;
+    }
     if (statement.object && responseObj.object) {
 		if(statement.object.objectType == undefined){
 			delete responseObj.object.objectType;
