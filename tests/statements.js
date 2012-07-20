@@ -1161,12 +1161,13 @@ asyncTest('statement validation', function () {
     }
 
     async.waterfall([
-        function(cb){
+        //Actually, null actors are allowed in 0.9 (but not 0.95)
+        /*function(cb){
             //Blank actor
             var stmtCopy = JSON.parse(statementJson);
             stmtCopy.actor = null;
             assertBadStatement(stmtCopy, cb);
-        },
+        },*/
         function(cb){
             //Blank verb
             var stmtCopy = JSON.parse(statementJson);
