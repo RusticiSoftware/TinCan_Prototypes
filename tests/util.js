@@ -301,9 +301,9 @@ Util.prototype.request = function (method, url, data, useAuth, expectedStatus, e
 	    var xhr = new XMLHttpRequest();
 
 		if (forceIE) {
-			xhr.open("post", this.oAuthSign(this.endpoint + ieModeRequest.url, "post", ieModeRequest.data, useAuth), true);
+			xhr.open("post", this.oAuthSign(this.endpoint + ieModeRequest.url, "post", ieModeRequest.data, useAuth), false);
 		} else {
-		    xhr.open(method, this.oAuthSign(this.endpoint + url, method, formData ? data : "", useAuth), true);
+		    xhr.open(method, this.oAuthSign(this.endpoint + url, method, formData ? data : "", useAuth), false);
 		}
 		
         //Headers
