@@ -1213,6 +1213,12 @@ asyncTest('statement validation', function () {
             stmtCopy.context = {"instructor":{"objectType":"Agent", "name":["Unknown Actor"]}};
             assertBadStatement(stmtCopy, cb);
         },
+        function(cb){
+            //Bad date time
+            var stmtCopy = JSON.parse(statementJson);
+            stmtCopy.timestamp='trash';
+            assertBadStatement(stmtCopy, cb);
+        },
         //Start up the next test
         start
     ]);
