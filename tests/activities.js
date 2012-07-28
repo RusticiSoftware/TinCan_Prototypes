@@ -116,7 +116,8 @@ asyncTest('Definition, extensions', function () {
     });
 });
 
-asyncTest('Metadata load', function () {
+// Fickle test that relies on a URL, which is now gone
+/*asyncTest('Metadata load', function () {
 	"use strict";
 	var env = activityEnv;
 
@@ -176,7 +177,7 @@ asyncTest('Metadata load', function () {
 	    	start();
 	    });
     });
-});
+}); */
 
 
 //GET http://example.com/TCAPI/activities/<activity ID>/profile[?since=<timestamp>]
