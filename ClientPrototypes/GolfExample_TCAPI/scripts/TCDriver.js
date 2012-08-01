@@ -109,7 +109,10 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
                 }
             } else {
                 try {
-                	alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + " | " + xhr.responseText+ ")");
+                    //Alert all errors except cancelled XHR requests
+                    if(xhr.status > 0){
+                	    alert("There was a problem communicating with the Learning Record Store. (" + xhr.status + " | " + xhr.responseText+ ")");
+                    }
                 } catch (ex) {alert (ex.toString());}
                 //throw new Error("debugger");
                 return xhr;
