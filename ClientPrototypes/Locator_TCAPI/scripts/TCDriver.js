@@ -37,7 +37,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
         ieModeRequest,
         title,
         ticks = ['/','-','\\','|'],
-        urlparts = url.toLowerCase().match(/^(.+):\/\/([^:\/]*):?(\d+)?(\/.*)?$/),
+        urlparts = url.toLowerCase().match(/^(.+:)\/\/([^:\/]+):?(\d+)?(\/.+)?$/),
         location = window.location,
         urlPort,
         result,
@@ -69,7 +69,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
     //See if this really is a cross domain
     xDomainRequest = (location.protocol.toLowerCase() !== urlparts[1] || location.hostname.toLowerCase() !== urlparts[2]);
     if (!xDomainRequest) {
-        urlPort = (urlparts[3] === null ? ( urlparts[1] === 'http' ? '80' : '443') : urlparts[3]);
+        urlPort = (urlparts[3] === null ? ( urlparts[1] === 'http:' ? '80' : '443') : urlparts[3]);
         xDomainRequest = (urlPort === location.port);
     }
     
@@ -86,7 +86,9 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
         ieXDomain = true;
         ieModeRequest = TCDriver_GetIEModeRequest(method, url, headers, data);
         xhr = new XDomainRequest();
-        console.log(ieModeRequest.method + ", " + ieModeRequest.url);
+    	if(typeof console !== 'undefined') {
+	        console.log(ieModeRequest.method + ", " + ieModeRequest.url);
+	    }
         xhr.open(ieModeRequest.method, ieModeRequest.url);
     }
     
@@ -143,7 +145,7 @@ function XHR_request(lrs, url, method, data, auth, callback, ignore404, extraHea
 
 
 function TCDriver_Log(str){
-    if(console !== undefined){
+    if(typeof console !== 'undefined'){
         console.log(str);
     }
 }
