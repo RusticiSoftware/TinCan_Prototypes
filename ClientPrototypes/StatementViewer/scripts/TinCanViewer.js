@@ -490,6 +490,9 @@ TINCAN.Viewer.prototype.renderStatements = function(statementsResult){
             typeof stmt.context.extensions.verb != "undefined"){
             verb = stmt.context.extensions.verb;
         }
+        if(stmt.inProgress == true){
+            verb = verb + " (in progress)";
+        }
         return verb;
     };
 	
