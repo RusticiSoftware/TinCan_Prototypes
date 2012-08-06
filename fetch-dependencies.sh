@@ -2,7 +2,7 @@
 
 git submodule init
 git submodule update
-cd StatementViewer
+cd StatementViewer/resources
 git submodule init
 git submodule update
 cd ..
