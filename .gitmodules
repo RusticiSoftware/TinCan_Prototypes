@@ -1,6 +1,6 @@
 [submodule "tests"]
-    path = tests
-    url = git@github.com:RusticiSoftware/TinCanTests
+	path = tests
+	url = git@github.com:RusticiSoftware/TinCanTests
 [submodule "ClientPrototypes/StatementViewer"]
     path = ClientPrototypes/StatementViewer
     url = git@github.com:RusticiSoftware/TinCanStatementViewer
