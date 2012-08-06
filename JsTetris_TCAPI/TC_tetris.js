@@ -7,6 +7,8 @@ var gameId = "";
 
 var GAME_ID = "scorm.com/JsTetris_TCAPI";
 
+var tc_driver = TCDriver_ConfigObject();
+
 $(document).ready(function(){
 
 	$('#activateTinCan').change(function(){
@@ -15,8 +17,8 @@ $(document).ready(function(){
 			$('#tc_actorprompt').hide();
 		} else {
 			TCActive = true;
-            if(tc_lrs !== undefined && tc_lrs.actor !== undefined){
-                var actor = JSON.parse(tc_lrs.actor);
+            if(tc_driver !== undefined && tc_driver.actor !== undefined){
+                var actor = tc_driver.actor;
                 actorName = actor.name[0];
                 actorEmail = actor.mbox[0];
 			    $('#tc_name').text(actorName);
@@ -38,7 +40,7 @@ $(document).ready(function(){
 			actorName = $('#tc_nameInput').val();
 			actorEmail = $('#tc_emailInput').val();
 			
-			tc_lrs.actor = JSON.stringify({"name":[actorName], "mbox":["mailto:" + actorEmail]});
+			tc_driver.actor = JSON.stringify({"name":[actorName], "mbox":["mailto:" + actorEmail]});
 			
 			$('#tc_name').text(actorName);
 			$('#tc_email').text(actorEmail);
@@ -76,12 +78,12 @@ function tc_getContext(registrationId){
 
 function tc_sendStatementWithContext(stmt){
     stmt["context"] = tc_getContext(gameId);
-    TCDriver_SendStatement(tc_lrs, stmt);
+    TCDriver_SendStatement(tc_driver, stmt);
 }
 
 function tc_sendStatment_StartNewGame(){
 	if (TCActive){
-		gameId = _ruuid();
+		gameId = __ruuid();
 	
 		var tcGameObj = {
             'id':GAME_ID,
@@ -171,7 +173,7 @@ function tc_sendStatment_EndGame(level,time,apm,lines,score){
 			
 		//update high score
 		var newScoreObj = {
-            "actor":JSON.parse(tc_lrs.actor),
+            "actor":tc_driver.actor,
 			"score":score,
 			"date":TCDriver_ISODateString(new Date())
         };
@@ -202,7 +204,7 @@ function tc_addScoreToLeaderBoard(newScoreObj, attemptCount){
         }
 
 		TCDriver_SendActivityProfile(
-            tc_lrs, GAME_ID, "highscores", 
+            tc_driver, GAME_ID, "highscores", 
             JSON.stringify(HighScoresArray),
             lastSha1Hash,
             function(xhr){
@@ -218,7 +220,7 @@ var HighScoresArray;
 var LastHighScoresStr = null;
 
 function tc_InitHighScoresObject(){
-	var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_lrs, GAME_ID, "highscores");
+	var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_driver, GAME_ID, "highscores");
 	if (lrsHighScoresStr === undefined || lrsHighScoresStr === null || lrsHighScoresStr == ""){
 		HighScoresArray = new Array();
 	} else {

@@ -10,6 +10,8 @@
 	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
 	<script type="text/javascript">
 
+        var tc_driver = TCDriver_ConfigObject();
+
 		var pageObj = {
                 "id":"scorm.com/GolfExample_TCAPI/Handicapping/CalculatingHandicap.html",
 			    "definition":{
@@ -25,7 +27,7 @@
                             GolfExample.CourseActivity.id)
         };
 
-        TCDriver_SendStatement(tc_lrs, stmt);
+        TCDriver_SendStatement(tc_driver, stmt);
 
 	</script>
 </head>

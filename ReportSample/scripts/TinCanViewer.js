@@ -16,10 +16,12 @@
 
 */
 
-var endpoint = Config.endpoint;
-var auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
 var firstStored = null;
 var moreStatementsUrl = null;
+
+var tc_driver = {};
+tc_driver.endpoint = Config.endpoint;
+tc_driver.auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
 
 google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -82,9 +84,9 @@ function TC_GetStatementsWithinContext (num, verb, activityId, callbackFunction,
 }
 
 function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isContextActivity) {
-	var url = endpoint + "statements/?sparse=false";
+	var url = "statements/?sparse=false";
 	if (nextPage && moreStatementsUrl !== null && moreStatementsUrl !== undefined){
-		url = endpoint + moreStatementsUrl.substr(1);
+		url = moreStatementsUrl.substr(1);
 	} else {
 	    if (num > 0){
 	    	url += "&limit=" + num;
@@ -101,22 +103,20 @@ function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isCon
 	    }
     }
 
-	XHR_request(tc_lrs, url, "GET", null, auth, callbackFunction);
+	_TCDriver_XHR_request(tc_driver, url, "GET", null, callbackFunction);
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
-		var url = endpoint + "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
+		var url = "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
 		
 		url = url.replace('<activity ID>',encodeURIComponent(activityId));
 		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
 		
-		XHR_request(tc_lrs, url, "GET", null, auth, callbackFunction, true);
+		_TCDriver_XHR_request(tc_driver, url, "GET", null, callbackFunction, true);
 }
 
 function TC_DeleteLRS(){
-
-	var url = endpoint;
-	XHR_request(tc_lrs, url, "DELETE", null, auth, function () {
+	_TCDriver_XHR_request(tc_driver, "", "DELETE", null, function () {
 		window.location = window.location;
 	});
 }

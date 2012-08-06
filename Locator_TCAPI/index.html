@@ -55,6 +55,7 @@
         <div class='clear'></div>
     </div>
     <script>
+        var tc_driver = TCDriver_ConfigObject();
     
         $(document).ready(function(){
             $('title').text(COURSE_NAME);
@@ -131,7 +132,7 @@
                     "context":contextObj
                 };
 
-                TCDriver_SendStatement(tc_lrs, stmt);
+                TCDriver_SendStatement(tc_driver, stmt);
                 
                 pmrk.visited = true;
                 pmrk.gmarker.setIcon(Scavenger.currentVisitedIcon);
@@ -174,7 +175,7 @@
                     "context":contextObj
                 };
 
-                TCDriver_SendStatement(tc_lrs, stmt);
+                TCDriver_SendStatement(tc_driver, stmt);
                 
                 $(".exerciseComplete").show();
             }
@@ -191,7 +192,7 @@
             for (itm in Placemarks) {
                 idx++;
                 var visited = "";
-                var stmts = eval( '(' + TCDriver_GetStatements(tc_lrs, true,"experienced",Placemarks[itm].tc_id) + ')');
+                var stmts = eval( '(' + TCDriver_GetStatements(tc_driver, true,"experienced",Placemarks[itm].tc_id) + ')');
                 if (stmts.length > 0){
                     Placemarks[itm].visited = true;
                     Placemarks[itm].icon = Scavenger.visitedIcon;
@@ -234,7 +235,7 @@
                 "context":contextObj
             };
 
-            TCDriver_SendStatement(tc_lrs, stmt);
+            TCDriver_SendStatement(tc_driver, stmt);
         }
 
     </script>
