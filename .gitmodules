@@ -1,18 +1,15 @@
-[submodule "tests"]
-	path = tests
-	url = git@github.com:RusticiSoftware/TinCanTests
-[submodule "ClientPrototypes/StatementViewer"]
-	path = ClientPrototypes/StatementViewer
+[submodule "StatementViewer"]
+	path = StatementViewer
 	url = git@github.com:RusticiSoftware/TinCanStatementViewer
-[submodule "ClientPrototypes/GolfExample_TCAPI/scripts/TinCanDriver"]
-	path = ClientPrototypes/GolfExample_TCAPI/scripts/TinCanDriver
+[submodule "GolfExample_TCAPI/scripts/TinCanDriver"]
+	path = GolfExample_TCAPI/scripts/TinCanDriver
 	url = git@github.com:RusticiSoftware/TinCanDriver
-[submodule "ClientPrototypes/JsTetris_TCAPI/TinCanDriver"]
-	path = ClientPrototypes/JsTetris_TCAPI/TinCanDriver
+[submodule "JsTetris_TCAPI/TinCanDriver"]
+	path = JsTetris_TCAPI/TinCanDriver
 	url = git@github.com:RusticiSoftware/TinCanDriver
-[submodule "ClientPrototypes/Locator_TCAPI/scripts/TinCanDriver"]
-	path = ClientPrototypes/Locator_TCAPI/scripts/TinCanDriver
+[submodule "Locator_TCAPI/scripts/TinCanDriver"]
+	path = Locator_TCAPI/scripts/TinCanDriver
 	url = git@github.com:RusticiSoftware/TinCanDriver
-[submodule "ClientPrototypes/ReportSample/scripts/TinCanDriver"]
-	path = ClientPrototypes/ReportSample/scripts/TinCanDriver
+[submodule "ReportSample/scripts/TinCanDriver"]
+	path = ReportSample/scripts/TinCanDriver
 	url = git@github.com:RusticiSoftware/TinCanDriver

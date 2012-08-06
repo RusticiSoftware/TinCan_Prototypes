@@ -1,5 +1,4 @@
-tests/config.js
-ClientPrototypes/config.js
+config.js
 *~
 *.suo
 *.swp
