@@ -2,17 +2,17 @@
 	path = tests
 	url = git@github.com:RusticiSoftware/TinCanTests
 [submodule "ClientPrototypes/StatementViewer"]
-    path = ClientPrototypes/StatementViewer
-    url = git@github.com:RusticiSoftware/TinCanStatementViewer
+	path = ClientPrototypes/StatementViewer
+	url = git@github.com:RusticiSoftware/TinCanStatementViewer
 [submodule "ClientPrototypes/GolfExample_TCAPI/scripts/TinCanDriver"]
-    path = ClientPrototypes/GolfExample_TCAPI/scripts/TinCanDriver
-    url = git@github.com:RusticiSoftware/TinCanDriver
+	path = ClientPrototypes/GolfExample_TCAPI/scripts/TinCanDriver
+	url = git@github.com:RusticiSoftware/TinCanDriver
 [submodule "ClientPrototypes/JsTetris_TCAPI/TinCanDriver"]
-    path = ClientPrototypes/JsTetris_TCAPI/TinCanDriver
-    url = git@github.com:RusticiSoftware/TinCanDriver
+	path = ClientPrototypes/JsTetris_TCAPI/TinCanDriver
+	url = git@github.com:RusticiSoftware/TinCanDriver
 [submodule "ClientPrototypes/Locator_TCAPI/scripts/TinCanDriver"]
-    path = ClientPrototypes/Locator_TCAPI/scripts/TinCanDriver
-    url = git@github.com:RusticiSoftware/TinCanDriver
+	path = ClientPrototypes/Locator_TCAPI/scripts/TinCanDriver
+	url = git@github.com:RusticiSoftware/TinCanDriver
 [submodule "ClientPrototypes/ReportSample/scripts/TinCanDriver"]
-    path = ClientPrototypes/ReportSample/scripts/TinCanDriver
-    url = git@github.com:RusticiSoftware/TinCanDriver
+	path = ClientPrototypes/ReportSample/scripts/TinCanDriver
+	url = git@github.com:RusticiSoftware/TinCanDriver
