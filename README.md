@@ -14,7 +14,7 @@
 
 ##Client Samples Installation
 
-Make sure to fetch all the code dependencies by running fetch-dependencies.sh.
+Make sure to fetch all the code dependencies by running "git submodule init" and "git submodule update".
 Place the prototypes folder on a web server, and note the URL to index.html.
 This is the url you will launch in your browser to run the client prototypes.
 

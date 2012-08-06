@@ -13,3 +13,6 @@
 [submodule "StatementViewer/resources"]
 	path = StatementViewer/resources
 	url = git@github.com:RusticiSoftware/TinCanStatementViewer
+[submodule "StatementViewer/TinCanDriver"]
+	path = StatementViewer/TinCanDriver
+	url = git@github.com:RusticiSoftware/TinCanDriver
