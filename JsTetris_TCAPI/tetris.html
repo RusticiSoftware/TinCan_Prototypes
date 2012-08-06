@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>JsTetris	- javascript tetris - open source</title>
+	<meta http-equiv="Content-Type"	content="text/html;	charset=utf-8">
+	<link href="tetris.css"	rel="stylesheet" type="text/css">
+	<link href="TC_tetris.css"	rel="stylesheet" type="text/css">
+	<link href="tetris.ico" rel="shortcut icon">
+	<script	type="text/javascript" src="jquery-1.6.4.min.js"></script>
+	<script	type="text/javascript" src="tetris.js"></script>
+	<script type="text/javascript" src="2.5.3-crypto-sha1.js"></script>
+	<script	type="text/javascript" src="TinCanDriver/TCDriver.js"></script>
+	<script	type="text/javascript" src="TC_tetris.js"></script>
+	<style type="text/css">
+	html, body { height: 100%; }
+	#tetris	{ margin: 0	auto; }
+	.warning {font-weight:bold; color:red;}
+	</style>
+</head>
+<body>
+<div style="position: absolute; text-align:center; width:95%;font-size:200%;margin:15px;"><a style="" href="http://scorm.com/tincan">TinCan Home</a></div> 
+<table style="width: 100%; height: 100%;" cellspacing="0" cellpadding="0"><tr><td style="vertical-align: middle;">
+	<div id="tetris">
+		<div class="left">
+			<h1><a href="http://www.gosu.pl/tetris/">Js	Tetris 1.19</a></h1>
+			<div class="menu">
+				<div><a href="javascript:void(0)" id="tetris-menu-start">New Game</a></div>
+				<div id="tetris-pause">
+					<a href="javascript:void(0)" id="tetris-menu-pause">Pause</a>
+				</div>
+				<div style="display: none;" id="tetris-resume">
+					<a href="javascript:void(0)" id="tetris-menu-resume">Resume</a>
+				</div>
+				<div><a href="javascript:void(0)" id="tetris-menu-highscores">Highscores</a></div>
+				<div><a href="javascript:void(0)" id="tetris-menu-help">About</a></div>
+			</div>
+			<div id="tetris-nextpuzzle"></div>
+			<div id="tetris-gameover">Game Over</div>
+			<div id="tetris-keys">
+				<div class="h5">Keyboard:</div>
+				<table cellspacing="0" cellpadding="0">
+				<tr>
+					<td>Rotate:</td>
+					<td></td>
+					<td><img src="key-up.gif" width="14" height="14" alt=""></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Move:</td>
+					<td><img src="key-left.gif" width="14" height="14" alt=""></td>
+					<td><img src="key-down.gif" width="14" height="14" alt=""></td>
+					<td><img src="key-right.gif" width="14" height="14" alt=""></td>
+				</tr>
+				<tr>
+					<td>Fall:</td>
+					<td colspan="3">
+						<img src="key-space.gif" width="44" height="13" alt="">
+					</td>
+				</tr>
+				</table>
+			</div>
+			<div class="stats">
+				<div class="h5">Statistics:</div>
+				<table cellspacing="0" cellpadding="0">
+				<tr>
+					<td	class="level">Level:</td>
+					<td><span id="tetris-stats-level">1</span></td>
+				</tr>
+				<tr>
+					<td	class="score">Score:</td>
+					<td><span id="tetris-stats-score">0</span></td>
+				</tr>
+				<tr>
+					<td	class="lines">Lines:</td>
+					<td><span id="tetris-stats-lines">0</span></td>
+				</tr>
+				<tr>
+					<td	class="apm">APM:</td>
+					<td><span id="tetris-stats-apm">0</span></td>
+				</tr>
+				<tr>
+					<td	class="time">Time:</td>
+					<td><span id="tetris-stats-time">0</span></td>
+				</tr>
+
+				</table>
+			</div>
+		</div>
+		<div class="left-border"></div>
+		<div id="tetris-area">
+			<div class="grid1"></div>
+			<div class="grid2"></div>
+			<div class="grid3"></div>
+			<div class="grid4"></div>
+			<div class="grid5"></div>
+			<div class="grid6"></div>
+		</div>
+		<div id="tetris-help" class="window">
+			<div class="top">
+				About <span id="tetris-help-close" class="close">x</span>
+			</div>
+			<div class="content" style="margin-top:	1em;">
+				<div style="margin-top:	1em;">
+				<div>JsTetris is a highly customizable tetris game written in javascript,
+				full sources available, it is free to modify.
+				</div>
+				<br>
+				<div>Author: Cezary Tomczak</div>
+				<div>Site: <a href="http://www.gosu.pl/tetris/">www.gosu.pl/tetris/</a></div>
+				<br>
+				<div>License: BSD revised (free for any use)</div>
+				<br>
+				<div>Tin Can additions by Rustici Software : <a href="http://scorm.com/tincan/">Project Tin Can</a></div>
+				</div>
+			</div>
+		</div>
+		<div id="tetris-highscores"	class="window">
+			<div class="top">
+				Highscores <span id="tetris-highscores-close" class="close">x</span>
+			</div>
+			<div class="content">
+				<div id="tetris-highscores-content"></div>
+				
+			</div>
+		</div>
+	</div>
+	<div class="tinCanDiv">
+		<input type="checkbox" id="activateTinCan"/>
+		Post your game info to Tin Can.
+		
+		<div id="tc_actorprompt" class="tc_actordiv">
+			<span class="warning">WARNING: Name and email will appear in the LRS viewer. Use default or made-up names & email if you don't want yours to appear.</span><br/><br/>
+			Name: <input type="text" id="tc_nameInput"/ > 
+			&nbsp;&nbsp;&nbsp;
+			Email: <input type="text" id="tc_emailInput"/ > 
+			&nbsp;
+			<button id="tc_submitActor">Submit</button>
+		</div>
+		<div id="tc_actor" class="tc_actordiv">
+			Playing as: <span id="tc_name"></span>
+			&nbsp;&nbsp;&nbsp;
+			(<span id="tc_email"></span>)  <a href="javascript:void(0)" id="tc_changeactor">change</a>
+		</div>
+	</div>
+</td></tr></table>
+	<script	type="text/javascript">
+	var tetris = new Tetris();
+	tetris.unit = 14;
+	tetris.areaX = 12;
+	tetris.areaY = 22;
+	</script>
+
+</body>
+</html>

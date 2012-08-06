@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <title>Tin Can Viewer</title>
+        
+        <link rel="stylesheet" href="resources/css/base.css">
+		<link rel="stylesheet" href="resources/css/skeleton.css">
+		<link rel="stylesheet" href="resources/css/layout.css">
+		<link rel="stylesheet" href="resources/css/TinCanViewer.css">
+		<link rel="stylesheet" href="resources/css/smoothness/jquery-ui-1.8.17.custom.css">
+		
+		<script type="text/javascript" src="../config.js"></script>
+
+        <script type="text/javascript" src="resources/scripts/jquery-1.6.3.min.js"></script>
+        <script type="text/javascript" src="resources/scripts/jquery-ui-1.8.17.custom.min.js"></script>
+		<script type="text/javascript" src="resources/scripts/tabs.js"></script>
+		<script type="text/javascript" src="resources/scripts/base64.js"></script>
+		<script type="text/javascript" src="resources/scripts/TinCanDriver/TCDriver.js"></script>
+		<script type="text/javascript" src="resources/scripts/TinCanViewer.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+                TC_VIEWER = new TINCAN.Viewer();
+                TC_VIEWER.pageInitialize();
+                TC_VIEWER.searchStatements();
+            });
+        </script>
+        
+    </head>
+    
+    
+    <body>
+		
+       
+		<div class="container">
+			<h1>Tin Can Statement Viewer</h1>
+			
+			<!-- <ul class="tabs"> -->
+			  <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
+			  <!-- <li><a class="active" href="#statements">Statements</a></li>
+			  <li><a href="#activities">Activities</a></li>
+			  <li><a href="#actors">Actors</a></li>
+			</ul> -->
+
+			<!-- Standard <ul> with class of "tabs-content" -->
+			<!-- <ul class="tabs-content"> -->
+			  <!-- Give ID that matches HREF of above anchors -->
+			  	<!-- <li class="active" id="statements"> -->
+					Click on a statement to see the raw statement data.
+					<br/><br/>
+					<div id="searchBox">
+						<table id="searchBoxTable" class="searchBoxTable">
+							<tr>
+								<td><label>Actor Email</label><input id="actorEmail" type="text" placeholder="Email Address"></input></td>
+								<td><label>Verb</label><input id="verb" type="text" placeholder="Verb"></input></td>
+								<td><label>Activity ID</label><input id="activityId" type="text" placeholder="Activity ID"></input></td>
+								<td><label>Use Context Activities</label><input id="context" type="checkbox"></input></td>
+								
+							</tr>
+						</table>
+						<table id="advancedSearchTable" class="searchBoxTable" style="display:none">
+							<tr>
+								<td><label>Since</label><input id="since" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></input></td>
+								<td><label>Until</label><input id="until" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></input></td>
+								<td><label>Registration</label><input id="registration" type="text" placeholder="TinCan Registration ID"></input></td>
+								<td><label>Authoritative Only</label><input id="authoritative" type="checkbox"></input></td>
+							</tr>
+							<tr>
+								<td><label>Actor JSON</label><input id="actorJson" type="text" placeholder="Actor JSON"></input></td>
+								<td><label>Object JSON</label><input id="objectJson" type="text" placeholder="Object JSON"></input></td>
+								<td><label>Instructor JSON</label><input id="instructorJson" type="text" placeholder="Instructor JSON"></input></td>
+								<td><label>Sparse</label><input id="sparse" type="checkbox"></input></td>
+							</tr>
+						</table>
+						
+						<div id="TCAPIQuery" style="display:none"><label>TCAPI Query</label><textarea readonly="true" id="TCAPIQueryText"></textarea></div>
+						
+						<button id='refreshStatements'>Refresh</button>
+						<button id="showAdvancedOptions">Show Advanced Options</button>
+						<button id="showQuery">Show TCAPI Query</button>
+					</div>
+					
+					
+
+					<div id='theStatements'></div>
+                    <div id='statementsLoading'>
+                        <img src="resources/img/loading.gif"></img>
+                    </div>
+					<button id='showAllStatements'>More...</button>
+					
+					
+				<!-- </li>
+			  
+				<li id="activities">
+					<div class="heading">Activities</div>
+					<div id='activityData' ></div>
+					<button id='refreshActivityData'>Refresh</button>
+				</li>
+			  	
+				<li id="actors">
+					<div class="heading">Actors</div>
+					<div id='actorData' ></div>
+					<button id='refreshHighScores'>Refresh</button>
+			  	</li>
+			
+			  	<li id='lrsUtils'>
+					Here you have the ability to clear out your Learning Record Store.  Please do so with caution.  
+					This will clear all of your stored LRS data.
+					
+					<br/><br/>
+					<button id='deleteAllData'>Delete LRS Data</button>
+				</li>
+			
+			</ul> -->
+			
+		</div>
+
+    </body>
+</html>
