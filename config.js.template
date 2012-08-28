@@ -7,3 +7,4 @@ Config.endpoint = "<TCAPI end point (ending with slash)>";
 Config.authUser = "<account id>";
 Config.authPassword = "<password>";
 Config.actor = { "mbox":["<learner email>"], "name":["<Learner Name>"] };
+Config.registration = "<registration-uuid>";
