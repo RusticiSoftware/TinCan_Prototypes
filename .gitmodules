@@ -1,18 +1,18 @@
 [submodule "GolfExample_TCAPI/scripts/TinCanDriver"]
 	path = GolfExample_TCAPI/scripts/TinCanDriver
-	url = git@github.com:RusticiSoftware/TinCanDriver
+	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "JsTetris_TCAPI/TinCanDriver"]
 	path = JsTetris_TCAPI/TinCanDriver
-	url = git@github.com:RusticiSoftware/TinCanDriver
+	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "Locator_TCAPI/scripts/TinCanDriver"]
 	path = Locator_TCAPI/scripts/TinCanDriver
-	url = git@github.com:RusticiSoftware/TinCanDriver
+	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "ReportSample/scripts/TinCanDriver"]
 	path = ReportSample/scripts/TinCanDriver
-	url = git@github.com:RusticiSoftware/TinCanDriver
+	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "StatementViewer/resources"]
 	path = StatementViewer/resources
-	url = git@github.com:RusticiSoftware/TinCanStatementViewer
+	url = git://github.com/RusticiSoftware/TinCanStatementViewer.git
 [submodule "StatementViewer/TinCanDriver"]
 	path = StatementViewer/TinCanDriver
-	url = git@github.com:RusticiSoftware/TinCanDriver
+	url = git://github.com/RusticiSoftware/TinCanDriver.git
