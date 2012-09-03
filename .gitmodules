@@ -1,6 +1,3 @@
-[submodule "GolfExample_TCAPI/scripts/TinCanDriver"]
-	path = GolfExample_TCAPI/scripts/TinCanDriver
-	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "JsTetris_TCAPI/TinCanDriver"]
 	path = JsTetris_TCAPI/TinCanDriver
 	url = git://github.com/RusticiSoftware/TinCanDriver.git
@@ -15,4 +12,7 @@
 	url = git://github.com/RusticiSoftware/TinCanStatementViewer.git
 [submodule "StatementViewer/TinCanJS"]
 	path = StatementViewer/TinCanJS
+	url = git://github.com/RusticiSoftware/TinCanJS.git
+[submodule "GolfExample_TCAPI/scripts/TinCanJS"]
+	path = GolfExample_TCAPI/scripts/TinCanJS
 	url = git://github.com/RusticiSoftware/TinCanJS.git
