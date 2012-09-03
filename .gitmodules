@@ -1,6 +1,3 @@
-[submodule "ReportSample/scripts/TinCanDriver"]
-	path = ReportSample/scripts/TinCanDriver
-	url = git://github.com/RusticiSoftware/TinCanDriver.git
 [submodule "StatementViewer/resources"]
 	path = StatementViewer/resources
 	url = git://github.com/RusticiSoftware/TinCanStatementViewer.git
@@ -15,4 +12,7 @@
 	url = git://github.com/RusticiSoftware/TinCanJS.git
 [submodule "Locator_TCAPI/scripts/TinCanJS"]
 	path = Locator_TCAPI/scripts/TinCanJS
+	url = git://github.com/RusticiSoftware/TinCanJS.git
+[submodule "ReportSample/scripts/TinCanJS"]
+	path = ReportSample/scripts/TinCanJS
 	url = git://github.com/RusticiSoftware/TinCanJS.git
