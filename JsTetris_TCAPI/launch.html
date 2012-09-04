@@ -8,6 +8,10 @@
             "&auth=" + encodeURIComponent(auth) + 
             "&actor=" + encodeURIComponent(JSON.stringify(Config.actor));
 
+        if (Config.registration != undefined ) {
+        	link = link + "&registration=" + encodeURIComponent(Config.registration);
+        }
+        
         function onLoad(){
             document.getElementById("launchLink").setAttribute('href',link);
         }
