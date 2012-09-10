@@ -19,9 +19,14 @@
 var firstStored = null;
 var moreStatementsUrl = null;
 
-var tc_driver = {};
-tc_driver.endpoint = Config.endpoint;
-tc_driver.auth = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
+var tc_driver = TCDriver_ConfigObject();
+TCDriver_AddRecordStore(
+    tc_driver,
+    {
+        endpoint: Config.endpoint,
+        auth: 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword)
+    }
+);
 
 google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -103,20 +108,15 @@ function TC_GetStatements (num,verb,activityId,callbackFunction, nextPage, isCon
 	    }
     }
 
-	_TCDriver_XHR_request(tc_driver, url, "GET", null, callbackFunction);
+	_TCDriver_XHR_request(tc_driver.recordStores[0], url, "GET", null, callbackFunction);
 }
 
 function TC_GetActivityProfile (activityId, profileKey, callbackFunction) {
-		var url = "activities/profile?activityId=<activity ID>&profileId=<profilekey>";
-		
-		url = url.replace('<activity ID>',encodeURIComponent(activityId));
-		url = url.replace('<profilekey>',encodeURIComponent(profileKey));
-		
-		_TCDriver_XHR_request(tc_driver, url, "GET", null, callbackFunction, true);
+    TCDriver_GetActivityProfile(tc_driver, activityId, profileKey, callbackFunction);
 }
 
 function TC_DeleteLRS(){
-	_TCDriver_XHR_request(tc_driver, "", "DELETE", null, function () {
+	_TCDriver_XHR_request(tc_driver.recordStores[0], "", "DELETE", null, function () {
 		window.location = window.location;
 	});
 }
