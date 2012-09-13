@@ -63,11 +63,14 @@
 
 <script type="text/javascript">
     var queryString = new String(document.location.search);
-    var includeFiles = queryString.split("&");
-    for (var i=0; i<includeFiles.length; i++){
-        if(includeFiles[i].indexOf("questions=") >= 0){
-            var questionsFile = includeFiles[i].replace("questions=", "");
-            document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
+    if(queryString.length > 0){
+        queryString = queryString.substring(1);
+        var includeFiles = queryString.split("&");
+        for (var i=0; i<includeFiles.length; i++){
+            if(includeFiles[i].indexOf("questions=") >= 0){
+                var questionsFile = includeFiles[i].replace("questions=", "");
+                document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
+            }
         }
     }
 </script>
