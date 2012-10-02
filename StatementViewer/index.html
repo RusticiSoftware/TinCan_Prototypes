@@ -38,6 +38,15 @@
                         <td><label>Instructor JSON</label><input id="instructorJson" type="text" placeholder="Instructor JSON"></td>
                         <td><label>Sparse</label><input id="sparse" type="checkbox"></td>
                     </tr>
+                    <tr>
+                        <td>
+                            <label>TCAPI Version:</label>
+                            <select id="versionSelect">
+                                <option value="0.9">0.9</option>
+                                <option selected="selected" value="0.95">0.95</option>
+                            </select>
+                        </td>
+                    </tr>
                 </table>
 
                 <div id="TCAPIQuery" style="display:none"><label>TCAPI Query</label><textarea readonly="true" id="TCAPIQueryText"></textarea></div>
@@ -45,6 +54,8 @@
                 <button id='refreshStatements'>Refresh</button>
                 <button id="showAdvancedOptions">Show Advanced Options</button>
                 <button id="showQuery">Show TCAPI Query</button>
+
+
             </div>
             <div id='theStatements'></div>
             <div id='statementsLoading'>
