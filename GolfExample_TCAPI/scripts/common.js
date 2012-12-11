@@ -1,8 +1,7 @@
 GolfExample = { };
 
-GolfExample.CourseActivity = 
-{
-    "id":"scorm.com/GolfExample_TCAPI", 
+GolfExample.CourseActivity = {
+    "id":"scorm.com/GolfExample_TCAPI",
     "definition":{
     	"type":"Course",
     	"name":{"en-US":"Golf Example - Tin Can Course"},
