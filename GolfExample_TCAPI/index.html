@@ -3,28 +3,23 @@
 <head>
     <meta charset="utf-8">
     <title>Course Launch Page</title>
-    <script src="scripts/TinCanJS/src/tincan.js" type="text/javascript"></script>
+    <script src="scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
     <script src="scripts/common.js" type="text/javascript"></script>
     <script type="text/javascript">
-        var tc_driver = TCDriver_ConfigObject();
-
-        var courseObj = {
-            "id":"scorm.com/GolfExample_TCAPI",
-            "definition":{
-                "type":"Course",
-                "name":{"en-US":"Golf Example - Tin Can Course"},
-                "description":{"en-US":"An overview of how to play the great game of golf."}
+        TinCan.enableDebug();
+        var tincan = new TinCan (
+            {
+                url: window.location.href,
+                activity: GolfExample.CourseActivity
             }
-        };
+        );
 
         var stmt = {
-            "verb":"attempted",
-            "inProgress":true,
-            "object":courseObj,
-            "context":GolfExample.getContext()
+            verb: "http://adlnet.gov/expapi/verbs/attempted",
+            context: GolfExample.getContext()
         };
 
-        TCDriver_SendStatement(tc_driver, stmt);
+        tincan.sendStatement(stmt);
 
         /*************************************/
         //functions for sizing the iFrame
@@ -87,6 +82,7 @@
         //navigation functions
         /*************************************/
 
+        // TODO: these are all globals, globals are bad (not to mention they get hoisted)
         var currentPage = null;
         var startTimeStamp = null;
         var processedUnload = false;
@@ -98,30 +94,24 @@
             SetupIFrame();
 
             //get activity_id bookmark if it exists
-               var bookmark = TCDriver_GetState(tc_driver, "scorm.com/GolfExample_TCAPI", "location");
-
-            //if there isn't a stored bookmark, start the user at the first page
-            if (bookmark === undefined || bookmark === null || bookmark == ""){
-                currentPage = 0;
+            var stateResult = tincan.getState("location");
+            if (stateResult.err === null && stateResult.state !== null && stateResult.state !== "") {
+                if (confirm("Would you like to resume from where you previously left off? ")) {
+                    currentPage = parseInt(stateResult.state.contents, 10);
+                }
             }
-            else{
-                //if there is a stored bookmark, prompt the user to resume from the previous location
-                if (confirm("Would you like to resume from where you previously left off? ")){
-                    currentPage = parseInt(bookmark, 10);
-                }
-                else{
-                    currentPage = 0;
-                }
+            else {
+                // if there isn't a stored bookmark, start the user at the first page
+                currentPage = 0;
             }
 
             goToPage();
         }
 
         function goToPage(){
-            var theIframe = document.getElementById("contentFrame");
-            var prevButton = document.getElementById("butPrevious");
-            var nextButton = document.getElementById("butNext");
-
+            var theIframe = document.getElementById("contentFrame"),
+                prevButton = document.getElementById("butPrevious"),
+                nextButton = document.getElementById("butNext");
 
             //pass the TC arguments to the iframe
             var tc_argStr = (pageArray[currentPage].indexOf("?") != -1) ? "&" + location.search.slice(1) : location.search;
@@ -143,8 +133,8 @@
                 prevButton.disabled = false;
             }
 
-            //save the current location as the bookmark
-            TCDriver_SetState(tc_driver, "scorm.com/GolfExample_TCAPI", "location", currentPage);
+            // save the current location as the bookmark
+            tincan.setState("location", currentPage, function () {});
         }
 
         function doFinish(){
@@ -164,30 +154,28 @@
             goToPage();
         }
 
-        function setBookmark(){
-            TCDriver_SetState (tc_driver, "scorm.com/GolfExample_TCAPI", "location", currentPage);
-        }
-
         //called from the assessmenttemplate.html page to record the results of a test
         //passes in score as a percentage
-        function GetRecordTestStatement(score,activityId){
+        function GetRecordTestStatement(score, activityId){
             // send score
-            var scaledScore = score / 100;
-            var success = (scaledScore >= 0.8);
+            var scaledScore = score / 100,
+                success = (scaledScore >= 0.8);
 
             var stmt = {
-                "verb":"completed",
-                "object": {"id" : activityId },
-                "result": {
-                    "score":{
-                        "scaled":scaledScore,
-                        "raw":score,
-                        "min":0,
-                        "max":100
-                    },
-                    "success":success
+                verb: "http://adlnet.gov/expapi/verbs/completed",
+                object: {
+                    id: activityId
                 },
-                "context":GolfExample.getContext(GolfExample.CourseActivity.id)
+                result: {
+                    score: {
+                        scaled: scaledScore,
+                        raw: score,
+                        min: 0,
+                        max: 100
+                    },
+                    success: success
+                },
+                context: GolfExample.getContext(GolfExample.CourseActivity.id)
             };
 
             return stmt;
@@ -201,12 +189,16 @@
 
             //send question info
             var qObj = {
-                "id":id,
-                "definition":{
-                    "type":"cmi.interaction",
-                    "description":{"en-US":questionText},
-                    "interactionType":questionType,
-                    "correctResponsesPattern":[String(correctAnswer)]
+                id: id,
+                definition: {
+                    type: "http://adlnet.gov/expapi/activities/cmi.interaction",
+                    description: {
+                        "en-US": questionText
+                    },
+                    interactionType: questionType,
+                    correctResponsesPattern: [
+                        String(correctAnswer)
+                    ]
                 }
             };
 
@@ -214,22 +206,29 @@
                 var choices = [];
                 for(var i = 0; i < questionChoices.length; i++){
                     var choice = questionChoices[i];
-                    choices.push({"id":choice, "description":{"en-US":choice}});
+                    choices.push(
+                        {
+                            id: choice,
+                            description: {
+                                "en-US": choice
+                            }
+                        }
+                    );
                 }
                 if (typeof console !== 'undefined') {
                     console.log(qObj);
                 }
-                qObj["definition"]["choices"] = choices;
+                qObj.definition.choices = choices;
             }
 
             return {
-                "verb":"answered",
-                "object":qObj,
-                "result":{
-                    "response":learnerResponse,
-                    "success":wasCorrect
+                verb: "http://adlnet.gov/expapi/verbs/answered",
+                object: qObj,
+                result: {
+                    response: learnerResponse,
+                    success: wasCorrect
                 },
-                "context":GolfExample.getContext(activityId)
+                context: GolfExample.getContext(activityId)
             }
         }
 
@@ -240,11 +239,6 @@
             newValue = newValue.replace(/\W/g, "_");
 
             return newValue;
-        }
-
-        function RoundToPrecision(number, significantDigits){
-            number = parseFloat(number);
-            return (Math.round(number * Math.pow(10, significantDigits)) / Math.pow(10, significantDigits))
         }
     </script>
 </head>
@@ -258,7 +252,6 @@
 <div id="navDiv">
     <input type="button" value="<- Previous" id="butPrevious" onclick="doPrevious();"/>
     <input type="button" value="Next ->" id="butNext" onclick="doNext();"/>
-    <!--<input type="button" value="SetBookmark" id="setBookmark" onclick="setBookmark();"/>-->
 </div>
 
 <script type="text/javascript">
