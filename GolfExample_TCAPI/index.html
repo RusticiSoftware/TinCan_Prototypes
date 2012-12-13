@@ -83,7 +83,7 @@
         /*************************************/
 
         // TODO: these are all globals, globals are bad (not to mention they get hoisted)
-        var currentPage = null;
+        var currentPage = 0;
         var startTimeStamp = null;
         var processedUnload = false;
         var reachedEnd = false;
@@ -120,11 +120,11 @@
             theIframe.src = pageArray[currentPage] + tc_argStr;
 
             //disable the prev/next buttons if we are on the first or last page.
-            if (currentPage == 0){
+            if (currentPage === 0){
                 nextButton.disabled = false;
                 prevButton.disabled = true;
             }
-            else if (currentPage == (pageArray.length - 1)){
+            else if (currentPage === (pageArray.length - 1)){
                 nextButton.disabled = true;
                 prevButton.disabled = false;
             }
