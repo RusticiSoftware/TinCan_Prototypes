@@ -1,31 +1,41 @@
-var TCActive = false,
+TinCan.enableDebug();
+
+var GAME_ID = "http://tincanapi.com/JsTetris_TCAPI",
+    tincan = new TinCan (
+        {
+            url: window.location.href,
+            activity: {
+                id: GAME_ID
+            }
+        }
+    ),
+    TCActive = false,
     actorName = "",
     actorEmail = "",
     gameId = "",
-    GAME_ID = "scorm.com/JsTetris_TCAPI",
-    tc_driver = TCDriver_ConfigObject(),
-    HighScoresArray,
-    LastHighScoresStr = null
+    HighScoresActivityProfile = null,
+    HighScoresArray
 ;
 
 $(document).ready(function () {
     $('#activateTinCan').change(
         function () {
+            var actor;
             if (!$(this).is(':checked')) {
                 TCActive = false;
                 $('#tc_actorprompt').hide();
             }
             else {
                 TCActive = true;
-                if (tc_driver !== undefined && tc_driver.actor !== undefined) {
-                    var actor = tc_driver.actor;
-                    actorName = actor.name[0];
-                    actorEmail = actor.mbox[0];
+                if (typeof tincan !== "undefined" && tincan.actor !== null) {
+                    actor = tincan.actor;
+                    actorName = actor.name;
+                    actorEmail = actor.mbox;
                     $('#tc_name').text(actorName);
                     $('#tc_email').text(actorEmail);
                 }
 
-                if (actorName === "" || actorEmail === ""){
+                if (actorName === "" || actorEmail === "") {
                     $('#tc_actorprompt').show();
                 } else {
                     $('#tc_actor').show();
@@ -46,11 +56,12 @@ $(document).ready(function () {
             actorName = $('#tc_nameInput').val();
             actorEmail = $('#tc_emailInput').val();
 
-            tc_driver.actor = {
-                name: [ actorName ],
-                mbox: [ "mailto:" + actorEmail ]
-            };
-            tc_driver.actorJSON = JSON.stringify(tc_driver.actor);
+            tincan.actor = new TinCan.Agent(
+                {
+                    name: actorName,
+                    mbox: actorEmail
+                }
+            );
 
             $('#tc_name').text(actorName);
             $('#tc_email').text(actorEmail);
@@ -58,7 +69,7 @@ $(document).ready(function () {
             $('#tc_actorprompt').hide();
             $('#tc_actor').show();
 
-            if (tetris.puzzle){
+            if (tetris.puzzle) {
                 tc_sendStatment_StartNewGame();
             }
         }
@@ -87,7 +98,8 @@ function tc_getContext (registrationId) {
 
 function tc_sendStatementWithContext (stmt) {
     stmt.context = tc_getContext(gameId);
-    TCDriver_SendStatement(tc_driver, stmt);
+
+    tincan.sendStatement(stmt, function () {});
 }
 
 function tc_sendStatment_StartNewGame () {
@@ -95,15 +107,15 @@ function tc_sendStatment_StartNewGame () {
         return;
     }
 
-    gameId = __ruuid();
+    gameId = TinCan.Utils.getUUID();
 
     tc_sendStatementWithContext(
         {
-            verb: "attempted",
+            verb: "http://adlnet.gov/expapi/verbs/attempted",
             object: {
                 id: GAME_ID,
                 definition: {
-                    type: "media",
+                    type: "http://adlnet.gov/expapi/activities/media",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -117,17 +129,23 @@ function tc_sendStatment_StartNewGame () {
 }
 
 function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
+    var extensions = {};
+
     if (! TCActive) {
         return;
     }
 
+    extensions[GAME_ID + "/time"] = time;
+    extensions[GAME_ID + "/apm"] = apm;
+    extensions[GAME_ID + "/lines"] = lines;
+
     tc_sendStatementWithContext(
         {
-            verb: "completed",
+            verb: "http://adlnet.gov/expapi/verbs/completed",
             object: {
-                id: "scorm.com/JsTetris_TCAPI/level" + level,
+                id: GAME_ID + "/level" + level,
                 definition: {
-                    type: "media",
+                    type: "http://adlnet.gov/expapi/activities/media",
                     name: {
                         "en-US": "Js Tetris Level" + level
                     },
@@ -137,11 +155,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                 }
             },
             result: {
-                extensions: {
-                    time: time,
-                    apm: apm,
-                    lines: lines
-                },
+                extensions: extensions,
                 score: {
                     raw: score,
                     min: 0
@@ -152,17 +166,24 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
 }
 
 function tc_sendStatment_EndGame (level, time, apm, lines, score) {
+    var extensions = {};
+
     if (! TCActive) {
         return;
     }
 
+    extensions[GAME_ID + "/level"] = level;
+    extensions[GAME_ID + "/time"] = time;
+    extensions[GAME_ID + "/apm"] = apm;
+    extensions[GAME_ID + "/lines"] = lines;
+
     tc_sendStatementWithContext(
         {
-            verb: "completed",
+            verb: "http://adlnet.gov/expapi/verbs/completed",
             object: {
                 id: GAME_ID,
                 definition: {
-                    type: "media",
+                    type: "http://adlnet.gov/expapi/activities/media",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -176,12 +197,7 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
                     raw: score,
                     min: 0
                 },
-                extensions:{
-                    level: level,
-                    time: time,
-                    apm: apm,
-                    lines: lines
-                }
+                extensions: extensions
             }
         }
     );
@@ -189,22 +205,20 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
     // update high score
     tc_addScoreToLeaderBoard(
         {
-            actor: tc_driver.actor,
+            actor: {
+                name: tincan.actor.toString(),
+            },
             score: score,
-            date: TCDriver_ISODateString(new Date())
+            date: TinCan.Utils.getISODateString(new Date())
         },
         0
     );
 }
 
 function tc_addScoreToLeaderBoard (newScoreObj, attemptCount) {
-    var highScorePos,
-        // Use this to respect concurrency control in profile API
-        lastSha1Hash = null,
-        digestBytes
-    ;
+    var highScorePos;
 
-    if (attemptCount === undefined || attemptCount === null){
+    if (typeof attemptCount === "undefined" || attemptCount === null){
         attemptCount = 0;
     }
     if (attemptCount > 3) {
@@ -221,21 +235,16 @@ function tc_addScoreToLeaderBoard (newScoreObj, attemptCount) {
             HighScoresArray.pop();
         }
 
-        if (LastHighScoresStr !== null){
-            digestBytes = Crypto.SHA1(LastHighScoresStr, { asBytes: true });
-            lastSha1Hash = Crypto.util.bytesToHex(digestBytes);
-        }
-
-        TCDriver_SendActivityProfile(
-            tc_driver,
-            GAME_ID,
+        tincan.setActivityProfile(
             "highscores",
             JSON.stringify(HighScoresArray),
-            lastSha1Hash,
-            function (xhr) {
-                // If we hit a conflict just try this whole thing again...
-                if (xhr.status === 409 || xhr.status === 412) {
-                    tc_addScoreToLeaderBoard(newScoreObj, attemptCount + 1);
+            {
+                lastSHA1: (HighScoresActivityProfile !== null ? HighScoresActivityProfile.etag : null),
+                callback: function (err, xhr) {
+                    // If we hit a conflict just try this whole thing again...
+                    if (xhr.status === 409 || xhr.status === 412) {
+                        tc_addScoreToLeaderBoard(newScoreObj, attemptCount + 1);
+                    }
                 }
             }
         );
@@ -243,14 +252,14 @@ function tc_addScoreToLeaderBoard (newScoreObj, attemptCount) {
 }
 
 function tc_InitHighScoresObject () {
-    var lrsHighScoresStr = TCDriver_GetActivityProfile(tc_driver, GAME_ID, "highscores");
+    var result = tincan.getActivityProfile("highscores");
 
-    if (lrsHighScoresStr === undefined || lrsHighScoresStr === null || lrsHighScoresStr === ""){
-        HighScoresArray = [];
+    if (result.err === null && result.profile !== null && result.profile.contents !== null && result.profile.contents !== "") {
+        HighScoresActivityProfile = result.profile;
+        HighScoresArray = JSON.parse(result.profile.contents);
     }
     else {
-        LastHighScoresStr = lrsHighScoresStr;
-        HighScoresArray = JSON.parse(lrsHighScoresStr);
+        HighScoresArray = [];
     }
 }
 
