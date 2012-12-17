@@ -1,11 +1,8 @@
-
-
 .statement {margin:3px 0;}
 
 .statement table {width:100%;}
 .statement td {vertical-align:top;padding:2px;}
 .statement td.date{width:100px;}
-
 
 .statement .date {font-size:.7em;color:#666666;}
 .statement .actor {color:#222222;}
@@ -23,11 +20,9 @@ tr.statement {cursor:pointer;}
 
 .heading {font-size:1.1em;font-weight:bold;color:#000000;margin-bottom:10px;}
 
-.lrsUtils a {color:#888888;}
-
 .highScoreRow .scoreRank{width:25px;}
 .highScoreRow .actor{padding:0 5px;}
-.highScoreRow .score{padding:0 5px;font-weight:bold;}
+.highScoreRow .score{padding:0 5px;font-weight:bold;text-align: right;}
 .highScoreRow .date{font-size:.7em;color:#666666;width:120px;text-align:right;}
 
 #golfCourseData table {width:300px;}

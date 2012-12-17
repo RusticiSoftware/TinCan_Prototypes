@@ -6,30 +6,36 @@
     <style type="text/css" media="screen">
 		@import url( ../css/style.css );
 	</style>
-	<script src="../scripts/TinCanJS/src/tincan.js" type="text/javascript"></script>
+	<script src="../scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
 	<script src="../scripts/common.js" type="text/javascript"></script>
 	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
 	<script type="text/javascript">
-
-        var tc_driver = TCDriver_ConfigObject();
-
-		var pageObj = {
-                "id":"scorm.com/GolfExample_TCAPI/Etiquette/Play.html",
-			    "definition":{
-				    "name":{"en-US":"Etiquette - Playing"},
-				    "description":{"en-US":"An overview of golf etiquette as it pertains to game play."}
+        var tincan = new TinCan (
+            {
+                url: window.location.href,
+                activity: {
+                    id: GolfExample.CourseActivity.id + "/Etiquette/Play.html",
+                    definition: {
+                        name: {
+                            "en-US": "Etiquette - Playing"
+                        },
+                        description: {
+                            "en-US": "An overview of golf etiquette as it pertains to game play."
+                        }
+                    }
                 }
-        };
+            }
+        );
 
-		var stmt = {
-            "verb": "experienced",
-            "object": pageObj,
-            "context": GolfExample.getContext(
-                            GolfExample.CourseActivity.id)
-        };
-
-        TCDriver_SendStatement(tc_driver, stmt);
-
+        tincan.sendStatement(
+            {
+                verb: "http://adlnet.gov/expapi/verbs/experienced",
+                context: GolfExample.getContext(
+                    GolfExample.CourseActivity.id
+                )
+            },
+            function () {}
+        );
 	</script>
 </head>
 <body>

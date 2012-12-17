@@ -5,37 +5,31 @@
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
     <meta name="viewport" content="width=device-width initial-scale=1.0" />
     <title></title>
-    
+
     <link rel="stylesheet" href="css/locationsco.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    
+
     <script src="scripts/modernizr.custom.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="scripts/jquery-1.6.4.min.js"></script>
-    <script type="text/javascript" src="scripts/TinCanJS/src/tincan.js"></script>
-    <script type="text/javascript"
-        src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true">
-    </script>
+    <script type="text/javascript" src="scripts/TinCanJS/build/tincan-min.js"></script>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"></script>
     <script src="scripts/scavenger.js" type="text/javascript" charset="utf-8"></script>
     <script src="locations.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
     <div class="headerDiv">
-       <div style="text-align:center; width:100%;margin:10px;"><a style="" href="http://scorm.com/tincan">TinCan Home</a></div>  
-        
+       <div style="text-align:center; width:100%;margin:10px;"><a style="" href="http://scorm.com/tincan">TinCan Home</a></div>
+
         <div class="title"></div>
         <div id="enableLocButtonDiv"><button id="WatchingLocationAction">Disable Location Tracking</button></div>
-        
+
         <div class='clear'></div>
-        
+
         <div class='locationsDiv '>
-            
             <div id="locationListings">
-                
-            
             </div>
             <div class='clear'></div>
         </div>
         <div class="exerciseComplete">Exercise Complete!</div>
-        
     </div>
     <div id="map_canvas"></div>
     <div id="info">
@@ -55,26 +49,43 @@
         <div class='clear'></div>
     </div>
     <script>
-        var tc_driver = TCDriver_ConfigObject();
-    
+        TinCan.enableDebug();
+        var tincan = new TinCan (
+            {
+                url: window.location.href,
+                activity: {
+                    id: COURSE_ID,
+                    definition: {
+                        type: "http://adlnet.gov/expapi/activities/course",
+                        name: {
+                            "en-US": COURSE_NAME
+                        },
+                        description: {
+                            "en-US": COURSE_DESC
+                        }
+                    }
+                }
+            }
+        );
+
         $(document).ready(function(){
             $('title').text(COURSE_NAME);
             $('div.title').text(COURSE_NAME);
-            
+
             SendCourseInit();
-            
+
             InitLocationsState();
             Scavenger.startWatchingLocation();
             Scavenger.onCurrentPlacemarkCallback = onPlacemark;
             Scavenger.onNoPlacemarksCallback = noPlacemarks;
-            
+
             $('.btnSaveLocationToLRS').click(function(){
                 SaveLocationToLRS();
             });
 
             $('#WatchingLocationAction').click(function(){
                 if(Scavenger.watching){
-                    Scavenger.stopWatchingLocation();   
+                    Scavenger.stopWatchingLocation();
                     $(this).text('Enable Location Tracking');
                 }else{
                     Scavenger.startWatchingLocation();
@@ -82,162 +93,152 @@
                 }
                 //$('#locations').append('all visisted? '+CheckForAllVisited());
             });
-            
+
             $(document).keypress(function(event) {
-                if ( event.which == 63 ) Scavenger.useLocationCheat = !Scavenger.useLocationCheat;
+                if ( event.which === 63 ) Scavenger.useLocationCheat = !Scavenger.useLocationCheat;
                 if (Scavenger.watching){
                     Scavenger.showLocation(Scavenger.currentPosition);
                 }
             });
-            
-            
         });
-        
+
         function onPlacemark(){
             $('.loc').removeClass('onPlacemark');
             $('.loc[name="' + Scavenger.currentPlacemark.name + '"]').addClass('onPlacemark');
         }
-        
+
         function noPlacemarks(){
             $('.loc').removeClass('onPlacemark');
         }
-        
+
         function SaveLocationToLRS() {
             position = Scavenger.currentPosition;
-    
-            if (Scavenger.currentPlacemark != null){
-                var pmrk = Scavenger.currentPlacemark;
-                
-                //save to Tin Can
-                var tcPosObj = {
-                    "id":pmrk.tc_id,
-                    "definition":{
-                    	"type":"objective",
-                        "name":{"en-US":pmrk.name},
-                        "description":{"en-US":pmrk.description}
-                    }
-                };
-                var contextObj = {
-                    "contextActivities":{
-                        "grouping":{"id":COURSE_ID}
-                    },
-                    "extensions":{
-                        "latitude":position.coords.latitude,
-                        "longitude":position.coords.longitude
-                    }
-                };
-                var stmt = {
-                    "verb":"experienced",
-                    "object":tcPosObj,
-                    "context":contextObj
-                };
 
-                TCDriver_SendStatement(tc_driver, stmt);
-                
+            if (Scavenger.currentPlacemark !== null){
+                var pmrk = Scavenger.currentPlacemark;
+
+                var stmt = {
+                    verb: "http://adlnet.gov/expapi/verbs/experienced",
+                    object: {
+                        id: pmrk.tc_id,
+                        definition: {
+                            type: "http://adlnet.gov/expapi/activities/objective",
+                            name: {
+                                "en-US": pmrk.name
+                            },
+                            description: {
+                                "en-US": pmrk.description
+                            }
+                        }
+                    },
+                    context: {
+                        contextActivities: {
+                            grouping: {
+                                id: COURSE_ID
+                            }
+                        },
+                        extensions: {}
+                    }
+                };
+                stmt.context.extensions[COURSE_ID + "/latitude"] = position.coords.latitude;
+                stmt.context.extensions[COURSE_ID + "/longitude"] = position.coords.longitude;
+
+                tincan.sendStatement(stmt, function () {});
+
                 pmrk.visited = true;
                 pmrk.gmarker.setIcon(Scavenger.currentVisitedIcon);
-                
-                $('.loc[name="' + pmrk.name + '"]').addClass('visited'); 
-                
-                CheckForAllVisited();   
+
+                $('.loc[name="' + pmrk.name + '"]').addClass('visited');
+
+                CheckForAllVisited();
 
                 if (Scavenger.useLocationCheat){
                     Scavenger.showLocation(position);
-
-                }               
-            } 
+                }
+            }
         }
-    
+
         function CheckForAllVisited() {
-            var allVisited = true; //default to true and change to false if a placemark is not visited
-            for(pmrk in Scavenger.config.Placemarks) {
-                if(Scavenger.config.Placemarks[pmrk].visited===false) {
+            var pmrk,
+                // default to true and change to false if a placemark is not visited
+                allVisited = true,
+                stmt
+            ;
+            for (pmrk in Scavenger.config.Placemarks) {
+                if (Scavenger.config.Placemarks[pmrk].visited === false) {
                     allVisited = false;
                 }
             }
-            if (allVisited){
-                var tcCourseObj = {
-                    "id":COURSE_ID,
-                    "definition":{
-                    	"type":"Course",
-                        "name":{"en-US":COURSE_NAME},
-                        "description":{"en-US":COURSE_DESC}
+            if (allVisited) {
+                tincan.sendStatement(
+                    {
+                        verb: "http://adlnet.gov/expapi/verbs/completed"
                     }
-                };
-                var contextObj = {
-                    "contextActivities":{
-                        "grouping":{"id":COURSE_ID}
-                    }
-                };
-                var stmt = {
-                    "verb":"completed",
-                    "object":tcCourseObj,
-                    "context":contextObj
-                };
+                );
 
-                TCDriver_SendStatement(tc_driver, stmt);
-                
                 $(".exerciseComplete").show();
             }
-            
+
             return allVisited;
         }
-        
-        
-        function InitLocationsState(){
-            
-            var Placemarks = Scavenger.config.Placemarks;
-            var idx = 0;
-            
+
+        function InitLocationsState() {
+            var Placemarks = Scavenger.config.Placemarks,
+                idx = 0,
+                itm,
+                visited,
+                result,
+                html
+            ;
+
             for (itm in Placemarks) {
                 idx++;
-                var visited = "";
-                var stmts = eval( '(' + TCDriver_GetStatements(tc_driver, true,"experienced",Placemarks[itm].tc_id) + ')');
-                if (stmts.length > 0){
-                    Placemarks[itm].visited = true;
-                    Placemarks[itm].icon = Scavenger.visitedIcon;
-                    visited = "visited";
+                visited = "";
+                result = tincan.getStatements(
+                    {
+                        sendActor: true,
+                        params: {
+                            verb: {
+                                id: "http://adlnet.gov/expapi/verbs/experienced"
+                            },
+                            activity: new TinCan.Activity (
+                                {
+                                    id: Placemarks[itm].tc_id
+                                }
+                            )
+                        }
+                    }
+                );
+                if (result.err === null) {
+                    if (result.statementsResult.statements.length > 0) {
+                        Placemarks[itm].visited = true;
+                        Placemarks[itm].icon = Scavenger.visitedIcon;
+                        visited = "visited";
+                    }
+
+                    html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
+                    html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
+                    if (Placemarks[itm].website != undefined && Placemarks[itm].website !== "") {
+                        html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
+                    }
+                    html += "</div>";
                 }
-                
-                var html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
-                html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
-                if (Placemarks[itm].website != undefined && Placemarks[itm].website != "")
-                    html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
-                html += "</div>";
-                
+                else {
+                    html = "Error occurred fetching statements for " + Placemarks[itm].name;
+                }
                 $("#locationListings").append(html);
-                
             }
-            
+
             CheckForAllVisited();
-            
-            
-        }
-        
-        function SendCourseInit(){
-            var tcCourseObj = {
-                "id":COURSE_ID,
-                "definition":{
-                	"type":"Course",
-                    "name":{"en-US":COURSE_NAME},
-                    "description":{"en-US":COURSE_DESC}
-                }
-            };
-            var contextObj = {
-                "contextActivities":{
-                    "grouping":{"id":COURSE_ID}
-                }
-            };
-            var stmt = {
-                "verb":"attempted",
-                "inProgress":"true",
-                "object":tcCourseObj,
-                "context":contextObj
-            };
-
-            TCDriver_SendStatement(tc_driver, stmt);
         }
 
+        function SendCourseInit() {
+            tincan.sendStatement(
+                {
+                    verb: "http://adlnet.gov/expapi/verbs/attempted"
+                }
+            );
+        }
     </script>
 </body>
 </html>
