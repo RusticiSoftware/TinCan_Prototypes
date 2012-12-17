@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <tincan xmlns="http://projecttincan.com/tincan.xsd">
 	<activities>
-		<activity id="scorm.com/JsTetris_TCAPI" type="course">
+		<activity id="http://tincanapi.com/JsTetris_TCAPI" type="http://adlnet.gov/expapi/activities/course">
 			<name>Tin Can Tetris Example</name>
 			<description lang="en-US">A game of Tetris</description>
 			<launch lang="en-us">tetris.html</launch>

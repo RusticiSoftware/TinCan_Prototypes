@@ -1299,7 +1299,7 @@ function Tetris()
 			
 			var s = '<table cellspacing="0" cellpadding="2"><tr><th></th><th>Name</th><th>Score</th></tr>';
 			for (var i = 0; i < HighScoresArray.length; ++i) {
-				s += '<tr><td>?.</td><td>?</td><td>?</td></tr>'.format(i+1, HighScoresArray[i].actor.name, HighScoresArray[i].score);
+				s += '<tr><td>?.</td><td>?</td><td>?</td></tr>'.format(i+1, (typeof HighScoresArray[i].actor !== "undefined" ? HighScoresArray[i].actor.name : ""), HighScoresArray[i].score);
 			}
 			s += '</table>';
 			return s;

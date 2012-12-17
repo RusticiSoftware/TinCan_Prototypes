@@ -4,259 +4,255 @@
     <meta charset="utf-8">
     <title>Assessment</title>
     <style type="text/css" media="screen">
-		@import url( css/style.css );
-	</style>
-	
-	<script src="scripts/TinCanJS/src/tincan.js" type="text/javascript"></script>
-	<script src="scripts/common.js" type="text/javascript"></script>
-	<script type="text/javascript">
+        @import url( css/style.css );
+    </style>
 
-        var tc_driver = TCDriver_ConfigObject();
+    <script src="scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
+    <script src="scripts/common.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var activityId = GolfExample.CourseActivity.id + "/GolfAssessment.html";
+        var testObj = {
+            id: activityId,
+            definition: {
+                name: {
+                    "en-US": "Golf Example Assessment"
+                },
+                description: {
+                    "en-US": "An Assessment for the Golf Example course."
+                },
+                type: "http://adlnet.gov/expapi/activities/assessment"
+            }
+        };
 
-        var activityId = "scorm.com/GolfExample_TCAPI/GolfAssessment.html";
+        var tincan = new TinCan (
+            {
+                url: window.location.href,
+                activity: testObj
+            }
+        );
 
-		var testObj = {
-                "id":activityId,
-			    "definition":{
-				    "name":{"en-US":"Golf Example Assessment"},
-				    "description":{"en-US":"An Assessment for the Golf Example course."},
-                    "type":"Assessment"
+        var stmt = {
+            verb: "http://adlnet.gov/expapi/verbs/attempted",
+            object: testObj,
+            context: GolfExample.getContext(
+                GolfExample.CourseActivity.id
+            )
+        };
+
+        tincan.sendStatement(stmt);
+
+        var QUESTION_TYPE_CHOICE = "choice",
+            QUESTION_TYPE_TF = "true-false",
+            QUESTION_TYPE_NUMERIC = "numeric";
+
+        function Question(id, text, type, answers, correctAnswer, objectiveId){
+            this.Id = id;
+            this.Text = text;
+            this.Type = type;
+            this.Answers = answers;
+            this.CorrectAnswer = correctAnswer;
+            this.ObjectiveId = objectiveId;
+        }
+
+        function Test(questions){
+            this.Questions = questions;
+        }
+        Test.prototype.AddQuestion = function(question) {
+            this.Questions[this.Questions.length] = question;
+        }
+
+        var test = new Test([]);
+
+        var queryString = new String(document.location.search);
+        if (queryString.length > 0) {
+            queryString = queryString.substring(1);
+
+            var includeFiles = queryString.split("&");
+            for (var i = 0; i < includeFiles.length; i++){
+                if (includeFiles[i].indexOf("questions=") >= 0) {
+                    var questionsFile = includeFiles[i].replace("questions=", "");
+                    document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
                 }
-        };
-
-
-		var stmt = {
-            "verb": "attempted",
-            "object": testObj,
-            "context": GolfExample.getContext(
-                            GolfExample.CourseActivity.id)
-        };
-
-        TCDriver_SendStatement(tc_driver, stmt);
-
-	</script>
-	
-    <script type="text/javascript">
-    var QUESTION_TYPE_CHOICE = "choice";
-    var QUESTION_TYPE_TF = "true-false";
-    var QUESTION_TYPE_NUMERIC = "numeric";
-    
-    function Question(id, text, type, answers, correctAnswer, objectiveId){
-        this.Id = id;
-        this.Text = text;
-        this.Type = type;
-        this.Answers = answers;
-        this.CorrectAnswer = correctAnswer;
-        this.ObjectiveId = objectiveId;
-    }
-
-    function Test(questions){
-        this.Questions = questions;
-    }
-    Test.prototype.AddQuestion = function(question)
-    {
-        this.Questions[this.Questions.length] = question;
-    }
-    
-    var test = new Test(new Array());
-</script>
-
-<script type="text/javascript">
-    var queryString = new String(document.location.search);
-    if(queryString.length > 0){
-        queryString = queryString.substring(1);
-        var includeFiles = queryString.split("&");
-        for (var i=0; i<includeFiles.length; i++){
-            if(includeFiles[i].indexOf("questions=") >= 0){
-                var questionsFile = includeFiles[i].replace("questions=", "");
-                document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
             }
         }
-    }
-</script>
 
-<script type="text/javascript">
-    function CheckNumeric(obj){
-        var userText = new String(obj.value);
-        var numbersRegEx = /[^0-9]/g;
-        if (userText.search(numbersRegEx) >= 0){
-            alert("Please enter only numeric values.");
-            obj.value = userText.replace(numbersRegEx, "");
+        function CheckNumeric(obj){
+            var userText = new String(obj.value);
+            var numbersRegEx = /[^0-9]/g;
+            if (userText.search(numbersRegEx) >= 0){
+                alert("Please enter only numeric values.");
+                obj.value = userText.replace(numbersRegEx, "");
+            }
         }
-    }
-    function SubmitAnswers(){
-        var correctCount = 0;
-        var totalQuestions = test.Questions.length;
-        
-        var resultsSummary = "";
+        function SubmitAnswers(){
+            var correctCount = 0;
+            var totalQuestions = test.Questions.length;
 
-		var answerStatements = new Array();
-        
-        for (var i in test.Questions){
-            var question = test.Questions[i];
-            
-            var wasCorrect = false;
-            var correctAnswer = null;
-            var learnerResponse = "";
+            var resultsSummary = "";
 
-            
-            switch (question.Type){
-                case QUESTION_TYPE_CHOICE:
+            var answerStatements = [];
 
-                    for (var answerIndex = 0; answerIndex < question.Answers.length; answerIndex++){
-                        
-                        if (question.CorrectAnswer == question.Answers[answerIndex]){
-                            correctAnswer = question.Answers[answerIndex];
+            for (var i in test.Questions){
+                var question = test.Questions[i];
+
+                var wasCorrect = false;
+                var correctAnswer = null;
+                var learnerResponse = "";
+
+                switch (question.Type){
+                    case QUESTION_TYPE_CHOICE:
+
+                        for (var answerIndex = 0; answerIndex < question.Answers.length; answerIndex++){
+                            if (question.CorrectAnswer == question.Answers[answerIndex]){
+                                correctAnswer = question.Answers[answerIndex];
+                            }
+                            if (document.getElementById("question_" + question.Id + "_" + answerIndex).checked == true){
+                                learnerResponse = question.Answers[answerIndex];
+                            }
                         }
-                        if (document.getElementById("question_" + question.Id + "_" + answerIndex).checked == true){
-                            learnerResponse = question.Answers[answerIndex];
+
+                    break;
+
+                    case QUESTION_TYPE_TF:
+
+                        if (document.getElementById("question_" + question.Id + "_True").checked == true){
+                            learnerResponse = "true";
                         }
-                    }
-  
-                break;
-                
-                case QUESTION_TYPE_TF:
-                    
-                    if (document.getElementById("question_" + question.Id + "_True").checked == true){
-                        learnerResponse = "true";
-                    }
-                    if (document.getElementById("question_" + question.Id + "_False").checked == true){
-                       learnerResponse = "false";
-                    } 
-                       
-                    if (question.CorrectAnswer == true){
-                        correctAnswer = "true";
-                    }
-                    else{
-                        correctAnswer = "false"; 
-                    }
-                break;
-                
-                case QUESTION_TYPE_NUMERIC:
-                    correctAnswer = question.CorrectAnswer;
-                    learnerResponse = document.getElementById("question_" + question.Id + "_Text").value;
-                break;
-                
-                default:
-                    alert("invalid question type detected");
-                break;
-            }
-            
-            wasCorrect = (correctAnswer == learnerResponse);
-            if (wasCorrect) {correctCount++;}
-            
-            if (parent.GetQuestionAnswerStatement){
-                answerStatements.unshift(
-                    parent.GetQuestionAnswerStatement(
-                        test.Questions[i].Id, 
-                        test.Questions[i].Text, 
-                        test.Questions[i].Answers, 
-                        test.Questions[i].Type, 
-                        learnerResponse, 
-                        correctAnswer, 
-                        wasCorrect, 
-                        activityId));
-            }
-            
-            resultsSummary += "<div class='questionResult'><h3>Question " + i + "</h3>";
-            if (wasCorrect) {
-                resultsSummary += "<em>Correct</em><br>"
-            }
-            else{
-                resultsSummary += "<em>Incorrect</em><br>"
-                resultsSummary += "Your answer: " + learnerResponse + "<br>"
-                resultsSummary += "Correct answer: " + correctAnswer + "<br>"
-            }
-            resultsSummary += "</div>";
-        }
-        var score = Math.round(correctCount * 100 / totalQuestions);
-        resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
-        document.getElementById("test").innerHTML = resultsSummary;
-		
-        if (parent.GetRecordTestStatement){
-            answerStatements.push(parent.GetRecordTestStatement(score,activityId));
-            answerStatements.push(parent.GetRecordTestStatement(score,"scorm.com/GolfExample_TCAPI"));
-        }
+                        if (document.getElementById("question_" + question.Id + "_False").checked == true){
+                           learnerResponse = "false";
+                        }
 
-		//send question answers
-		TCDriver_SendMultiStatements(tc_driver,answerStatements);
+                        if (question.CorrectAnswer == true){
+                            correctAnswer = "true";
+                        }
+                        else{
+                            correctAnswer = "false";
+                        }
+                    break;
 
-		parent.doFinish();
-    }
-    </script>
-    <script type="text/javascript">
-    function RenderTest(test){
-        
-        document.write ("<div id='test'><form id='frmTest' action='#'>");
-        
-        for (var i in test.Questions){
-            var question = test.Questions[i];
-            
-            document.write ("<div id='question_" + question.Id + "' class='question'>");
-            document.write (question.Text);
-            
-            switch (question.Type){
-                case QUESTION_TYPE_CHOICE:
-                    var ansIndex = 0;
-                    for (var j in question.Answers){
-                        var answer = question.Answers[j];
+                    case QUESTION_TYPE_NUMERIC:
+                        correctAnswer = question.CorrectAnswer;
+                        learnerResponse = document.getElementById("question_" + question.Id + "_Text").value;
+                    break;
+
+                    default:
+                        alert("invalid question type detected");
+                    break;
+                }
+
+                wasCorrect = (correctAnswer == learnerResponse);
+                if (wasCorrect) {correctCount++;}
+
+                if (parent.GetQuestionAnswerStatement){
+                    answerStatements.unshift(
+                        parent.GetQuestionAnswerStatement(
+                            test.Questions[i].Id,
+                            test.Questions[i].Text,
+                            test.Questions[i].Answers,
+                            test.Questions[i].Type,
+                            learnerResponse,
+                            correctAnswer,
+                            wasCorrect,
+                            activityId
+                        )
+                    );
+                }
+
+                resultsSummary += "<div class='questionResult'><h3>Question " + i + "</h3>";
+                if (wasCorrect) {
+                    resultsSummary += "<em>Correct</em><br>"
+                }
+                else{
+                    resultsSummary += "<em>Incorrect</em><br>"
+                    resultsSummary += "Your answer: " + learnerResponse + "<br>"
+                    resultsSummary += "Correct answer: " + correctAnswer + "<br>"
+                }
+                resultsSummary += "</div>";
+            }
+            var score = Math.round(correctCount * 100 / totalQuestions);
+            resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
+            document.getElementById("test").innerHTML = resultsSummary;
+
+            if (parent.GetRecordTestStatement){
+                answerStatements.push(parent.GetRecordTestStatement(score, activityId));
+                answerStatements.push(parent.GetRecordTestStatement(score, GolfExample.CourseActivity.id));
+            }
+
+            //send question answers
+            parent.tincan.sendStatements(answerStatements);
+
+            parent.doFinish();
+        }
+        function RenderTest(test){
+            document.write ("<div id='test'><form id='frmTest' action='#'>");
+
+            for (var i in test.Questions){
+                var question = test.Questions[i];
+
+                document.write ("<div id='question_" + question.Id + "' class='question'>");
+                document.write (question.Text);
+
+                switch (question.Type){
+                    case QUESTION_TYPE_CHOICE:
+                        var ansIndex = 0;
+                        for (var j in question.Answers){
+                            var answer = question.Answers[j];
+                            document.write("<div ");
+                            if (question.CorrectAnswer == answer) {document.write("class='correctAnswer'");} else{document.write("class='answer'");}
+                            document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_" + ansIndex + "'/>" + answer + "</div>");
+                            ansIndex++;
+                        }
+
+                    break;
+
+                    case QUESTION_TYPE_TF:
+
                         document.write("<div ");
-                        if (question.CorrectAnswer == answer) {document.write("class='correctAnswer'");} else{document.write("class='answer'");}
-                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_" + ansIndex + "'/>" + answer + "</div>");
-                        ansIndex++;
-                    }
-					
-                break;
-                
-                case QUESTION_TYPE_TF:
-                    
-                    document.write("<div ");
-                    if (question.CorrectAnswer == true) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
-                    document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_True'/>True</div>");
-                    
-                    document.write("<div ");
-                    if (question.CorrectAnswer == false) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
-                    document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_False'/>False</div>");
+                        if (question.CorrectAnswer == true) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
+                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_True'/>True</div>");
 
-					
-					
-                break;
-                
-                case QUESTION_TYPE_NUMERIC:
-                    document.write("<div class='correctAnswer'><input type='text' value='' id='question_" + question.Id + "_Text' onchange='CheckNumeric(this)'/> (");
-                    document.write(question.CorrectAnswer + ")</div>");
-                break;
-                
-                default:
-                    alert("invalid question type detected");
-                break;
-            }
-            document.write ("</div>");      //close out question div
+                        document.write("<div ");
+                        if (question.CorrectAnswer == false) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
+                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_False'/>False</div>");
 
-            //define the question in the assessment
-			/*var qObj = {
-                "id":question.Id,
-				"definition":{
-                    "type":"question",
-					"description":question.Text,
-					"interactionType":question.Type,
-					"correctResponsesPattern",[String(question.CorrectAnswer)]
+                    break;
+
+                    case QUESTION_TYPE_NUMERIC:
+                        document.write("<div class='correctAnswer'><input type='text' value='' id='question_" + question.Id + "_Text' onchange='CheckNumeric(this)'/> (");
+                        document.write(question.CorrectAnswer + ")</div>");
+                    break;
+
+                    default:
+                        alert("invalid question type detected");
+                    break;
                 }
-            };
-			testObj.definition.children.push(qObj);*/
+                document.write ("</div>");      //close out question div
 
+                //define the question in the assessment
+                /*var qObj = {
+                    "id":question.Id,
+                    "definition":{
+                        "type":"question",
+                        "description":question.Text,
+                        "interactionType":question.Type,
+                        "correctResponsesPattern",[String(question.CorrectAnswer)]
+                    }
+                };
+                testObj.definition.children.push(qObj);*/
+
+            }
+            document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
+            document.write ("</form></div>");      //close out test div
         }
-        document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
-        document.write ("</form></div>");      //close out test div
-        
-    }
     </script>
     <script src="scripts/contentfunctions.js" type="text/javascript"></script>
 </head>
+
 <body>
+
 <h1>Knowledge Check</h1>
 <script type="text/javascript">
-RenderTest(test);
+    RenderTest(test);
 </script>
 </body>
 </html>
