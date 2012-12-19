@@ -95,7 +95,7 @@
 
             //get activity_id bookmark if it exists
             var stateResult = tincan.getState("location");
-            if (stateResult.err === null && stateResult.state !== null && stateResult.state !== "") {
+            if (stateResult.err === null && stateResult.state !== null && stateResult.state.contents !== "") {
                 if (confirm("Would you like to resume from where you previously left off? ")) {
                     currentPage = parseInt(stateResult.state.contents, 10);
                 }
