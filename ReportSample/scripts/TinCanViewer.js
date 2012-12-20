@@ -239,7 +239,7 @@ function RenderStatements (err, result) {
 
         stmtStr += "<tr class='statement' tcid='" + statements[i].id + "'>";
         stmtStr += "<td class='date'>"+ dt.toLocaleDateString() + " " + dt.toLocaleTimeString()  +"</td>";
-        stmtStr += "<td > <span class='actor'>"+ name +"</span>";
+        stmtStr += "<td> <span class='actor'>"+ name +"</span>";
 
         obj = statements[i].target.id;
         if (statements[i].target.definition !== null) {
@@ -267,6 +267,7 @@ function RenderStatements (err, result) {
                 stmtStr += corrAnswer;
             } else if (statements[i].verb.id === "http://adlnet.gov/expapi/verbs/experienced" && statements[i].target.definition.type !== null && statements[i].target.definition.type === "Location") {
                 obj = (statements[i].target.definition.name != undefined) ? statements[i].target.definition.name["en-US"] : obj;
+                stmtStr += " <span class='verb'>" + statements[i].verb.toString() + "</span>";
                 stmtStr += " <span class='object'>"+ obj +"</span>";
             } else {
                 if (statements[i].context !== null && statements[i].context.extensions !== null && typeof statements[i].context.extensions.latitude !== "undefined" && typeof statements[i].context.extensions.longitude !== "undefined") {
@@ -279,6 +280,10 @@ function RenderStatements (err, result) {
                 }
                 stmtStr += " <span class='object'>" + obj +" </span>";
             }
+        }
+        else {
+            stmtStr += " <span class='verb'>" + statements[i].verb.toString() + "</span>";
+            stmtStr += " <span class='object'>" + statements[i].target.toString() + "</span>";
         }
 
         if (statements[i].result !== null) {

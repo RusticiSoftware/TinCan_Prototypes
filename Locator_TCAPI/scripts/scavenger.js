@@ -86,8 +86,6 @@ window.Scavenger = (function () {
 			scavenger.showMap(position.coords.latitude, position.coords.longitude);
 			//update the location properties
 			scavenger.lastloc = newloc;
-		} else {
-			console.log('no change: ' + scavenger.lastdist);
 		}
 
 		//check to see if we're close to a Placemark
@@ -155,9 +153,7 @@ window.Scavenger = (function () {
 			// already created, just re-center
 			scavenger.map.panTo(latlng);
 			scavenger.homeMarker.setPosition(latlng);
-			console.log('recenter: '+ latlng);
 		} else {
-			console.log('new map: '+ latlng);
 			//should probably create this map_canvas div automatically
 			scavenger.map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
