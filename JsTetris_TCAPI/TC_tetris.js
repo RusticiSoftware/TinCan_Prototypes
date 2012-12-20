@@ -1,4 +1,4 @@
-TinCan.enableDebug();
+//TinCan.enableDebug();
 
 var GAME_ID = "http://tincanapi.com/JsTetris_TCAPI",
     tincan = new TinCan (
