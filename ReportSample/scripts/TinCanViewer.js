@@ -309,7 +309,7 @@ function RenderHighScores (err, result) {
         return;
     }
 
-    if (result !== null) {
+    if (result !== null && result.contents !== null && result.contents !== "") {
         scores = JSON.parse(result.contents);
         if (scores.length > 0){
             $("#tetrisHighScoreData").empty();
