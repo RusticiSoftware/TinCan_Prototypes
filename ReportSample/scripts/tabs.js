@@ -22,21 +22,25 @@ $(document).ready(function() {
 		tab.click(function(e) {
 
 			//Get Location of tab's content
-			var contentLocation = $(this).attr('href');
+			var href = $(this).attr('href'),
+                hashStart = href.indexOf("#"),
+                contentLocation;
 
 			//Let go if not a hashed one
-			if(contentLocation.charAt(0)=="#") {
+			if (hashStart === -1) {
+                return;
+            }
 
-				e.preventDefault();
+            e.preventDefault();
 
-				//Make Tab Active
-				tab.removeClass('active');
-				$(this).addClass('active');
+            contentLocation = href.substring(hashStart);
 
-				//Show Tab Content & add active class
-				$(contentLocation).show().addClass('active').siblings().hide().removeClass('active');
+            //Make Tab Active
+            tab.removeClass('active');
+            $(this).addClass('active');
 
-			}
+            //Show Tab Content & add active class
+            $(contentLocation).show().addClass('active').siblings().hide().removeClass('active');
 		});
 	});
 });
