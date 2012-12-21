@@ -10,24 +10,24 @@
 
 $(document).ready(function() {
 
-	/* Tabs Activiation
-	================================================== */
+    /* Tabs Activiation
+    ================================================== */
 
-	var tabs = $('ul.tabs');
+    var tabs = $('ul.tabs');
 
-	tabs.each(function(i) {
+    tabs.each(function(i) {
 
-		//Get all tabs
-		var tab = $(this).find('> li > a');
-		tab.click(function(e) {
+        //Get all tabs
+        var tab = $(this).find('> li > a');
+        tab.click(function(e) {
 
-			//Get Location of tab's content
-			var href = $(this).attr('href'),
+            //Get Location of tab's content
+            var href = $(this).attr('href'),
                 hashStart = href.indexOf("#"),
                 contentLocation;
 
-			//Let go if not a hashed one
-			if (hashStart === -1) {
+            //Let go if not a hashed one
+            if (hashStart === -1) {
                 return;
             }
 
@@ -41,6 +41,6 @@ $(document).ready(function() {
 
             //Show Tab Content & add active class
             $(contentLocation).show().addClass('active').siblings().hide().removeClass('active');
-		});
-	});
+        });
+    });
 });
