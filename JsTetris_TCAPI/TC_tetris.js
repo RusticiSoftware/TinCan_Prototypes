@@ -111,7 +111,7 @@ function tc_sendStatment_StartNewGame () {
 
     tc_sendStatementWithContext(
         {
-            verb: "http://adlnet.gov/expapi/verbs/attempted",
+            verb: "attempted",
             object: {
                 id: GAME_ID,
                 definition: {
@@ -141,7 +141,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
 
     tc_sendStatementWithContext(
         {
-            verb: "http://adlnet.gov/expapi/verbs/completed",
+            verb: "completed",
             object: {
                 id: GAME_ID + "/level" + level,
                 definition: {
@@ -179,7 +179,7 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
 
     tc_sendStatementWithContext(
         {
-            verb: "http://adlnet.gov/expapi/verbs/completed",
+            verb: "completed",
             object: {
                 id: GAME_ID,
                 definition: {

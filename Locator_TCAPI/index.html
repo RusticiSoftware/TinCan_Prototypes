@@ -118,7 +118,7 @@
                 var pmrk = Scavenger.currentPlacemark;
 
                 var stmt = {
-                    verb: "http://adlnet.gov/expapi/verbs/experienced",
+                    verb: "experienced",
                     object: {
                         id: pmrk.tc_id,
                         definition: {
@@ -172,7 +172,7 @@
             if (allVisited) {
                 tincan.sendStatement(
                     {
-                        verb: "http://adlnet.gov/expapi/verbs/completed"
+                        verb: "completed"
                     }
                 );
 
@@ -199,7 +199,7 @@
                         sendActor: true,
                         params: {
                             verb: {
-                                id: "http://adlnet.gov/expapi/verbs/experienced"
+                                id: "experienced"
                             },
                             activity: new TinCan.Activity (
                                 {
@@ -235,7 +235,7 @@
         function SendCourseInit() {
             tincan.sendStatement(
                 {
-                    verb: "http://adlnet.gov/expapi/verbs/attempted"
+                    verb: "attempted"
                 }
             );
         }
