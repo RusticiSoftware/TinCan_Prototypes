@@ -7,23 +7,50 @@
     <script src="scripts/common.js" type="text/javascript"></script>
     <script type="text/javascript">
         //TinCan.enableDebug();
-        var tincan = new TinCan (
+
+        //
+        // content definition
+        //
+        var pageArray = [
+                "Playing/Playing.html",
+                "Playing/Par.html",
+                "Playing/Scoring.html",
+                "Playing/OtherScoring.html",
+                "Playing/RulesOfGolf.html",
+                "Etiquette/Course.html",
+                "Etiquette/Distracting.html",
+                "Etiquette/Play.html",
+                "Handicapping/Overview.html",
+                "Handicapping/CalculatingHandicap.html",
+                "Handicapping/CalculatingScore.html",
+                "Handicapping/Example.html",
+                "HavingFun/HowToHaveFun.html",
+                "HavingFun/MakeFriends.html",
+                "HavingFun/HowToBeStylish.html",
+                "assessmenttemplate.html?questions=Playing&questions=Etiquette&questions=Handicapping&questions=HavingFun"
+            ],
+            currentPage = 0,
+            startTimeStamp = null,
+            processedUnload = false,
+            reachedEnd = false,
+            maxPageReached = 0,
+            tincan = new TinCan (
+                {
+                    url: window.location.href,
+                    activity: GolfExample.CourseActivity
+                }
+            );
+
+        tincan.sendStatement(
             {
-                url: window.location.href,
-                activity: GolfExample.CourseActivity
+                verb: "http://adlnet.gov/expapi/verbs/attempted",
+                context: GolfExample.getContext()
             }
         );
 
-        var stmt = {
-            verb: "http://adlnet.gov/expapi/verbs/attempted",
-            context: GolfExample.getContext()
-        };
-
-        tincan.sendStatement(stmt);
-
-        /*************************************/
-        //functions for sizing the iFrame
-        /*************************************/
+        //
+        // functions for sizing the iFrame
+        //
         function setIframeHeight(id, navWidth) {
             if ( document.getElementById ) {
                 var theIframe = document.getElementById(id);
@@ -56,39 +83,9 @@
             window.onresize = function() { setIframeHeight("contentFrame", navWidth); }
         }
 
-        /*************************************/
-        //content definition
-        /*************************************/
-        var pageArray = new Array(16);
-
-        pageArray[0] = "Playing/Playing.html";
-        pageArray[1] = "Playing/Par.html";
-        pageArray[2] = "Playing/Scoring.html";
-        pageArray[3] = "Playing/OtherScoring.html";
-        pageArray[4] = "Playing/RulesOfGolf.html";
-        pageArray[5] = "Etiquette/Course.html";
-        pageArray[6] = "Etiquette/Distracting.html";
-        pageArray[7] = "Etiquette/Play.html";
-        pageArray[8] = "Handicapping/Overview.html";
-        pageArray[9] = "Handicapping/CalculatingHandicap.html";
-        pageArray[10] = "Handicapping/CalculatingScore.html";
-        pageArray[11] = "Handicapping/Example.html";
-        pageArray[12] = "HavingFun/HowToHaveFun.html";
-        pageArray[13] = "HavingFun/MakeFriends.html";
-        pageArray[14] = "HavingFun/HowToBeStylish.html";
-        pageArray[15] = "assessmenttemplate.html?questions=Playing&questions=Etiquette&questions=Handicapping&questions=HavingFun";
-
-        /*************************************/
-        //navigation functions
-        /*************************************/
-
-        // TODO: these are all globals, globals are bad (not to mention they get hoisted)
-        var currentPage = 0;
-        var startTimeStamp = null;
-        var processedUnload = false;
-        var reachedEnd = false;
-        var maxPageReached = 0;
-
+        //
+        // navigation functions
+        //
         function doStart(){
             //get the iFrame sized correctly and set up
             SetupIFrame();
