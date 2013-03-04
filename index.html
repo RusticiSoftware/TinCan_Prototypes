@@ -76,7 +76,42 @@
 		
         
         <script type="text/javascript">
-        
+
+        /*
+         * Make JSON safe for IE6
+         * https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/JSON#Browser_compatibility
+        */
+        if (!window.JSON) {
+            window.JSON = {
+                parse: function (sJSON) {
+                    /*jslint evil: true */
+                    return eval("(" + sJSON + ")");
+                },
+                stringify: function (vContent) {
+                    var sOutput = "",
+                        nId,
+                        sProp
+                    ;
+                    if (vContent instanceof Object) {
+                        if (vContent.constructor === Array) {
+                            for (nId = 0; nId < vContent.length; nId += 1) {
+                                sOutput += this.stringify(vContent[nId]) + ",";
+                            }
+                            return "[" + sOutput.substr(0, sOutput.length - 1) + "]";
+                        }
+                        if (vContent.toString !== Object.prototype.toString) { return "\"" + vContent.toString().replace(/"/g, "\\$&") + "\""; }
+                        for (sProp in vContent) {
+                            if (vContent.hasOwnProperty(sProp)) {
+                                sOutput += "\"" + sProp.replace(/"/g, "\\$&") + "\":" + this.stringify(vContent[sProp]) + ",";
+                            }
+                        }
+                        return "{" + sOutput.substr(0, sOutput.length - 1) + "}";
+                    }
+                    return typeof vContent === "string" ? "\"" + vContent.replace(/"/g, "\\$&") + "\"" : String(vContent);
+                }
+            };
+        }
+
 		$(document).ready(function(){
 			
             var PROTOTYPE_SHOW_CONFIG_INFO = true;
