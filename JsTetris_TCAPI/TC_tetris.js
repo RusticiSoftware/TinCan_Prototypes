@@ -1,11 +1,11 @@
 //TinCan.enableDebug();
 
-var GAME_ID = "http://tincanapi.com/JsTetris_TCAPI",
+var ROOT_ACTIVITY_ID = "http://tincanapi.com/JsTetris_TCAPI",
     tincan = new TinCan (
         {
             url: window.location.href,
             activity: {
-                id: GAME_ID
+                id: ROOT_ACTIVITY_ID
             }
         }
     ),
@@ -87,12 +87,12 @@ $(document).ready(function () {
 
 function tc_getContext () {
     var extensions = {};
-    extensions[GAME_ID + "/gameId"] = gameId;
+    extensions[ROOT_ACTIVITY_ID + "/gameId"] = gameId;
 
     return {
         contextActivities: {
             grouping: {
-                id: GAME_ID
+                id: ROOT_ACTIVITY_ID
             }
         },
         extensions: extensions
@@ -116,7 +116,7 @@ function tc_sendStatment_StartNewGame () {
         {
             verb: "attempted",
             object: {
-                id: GAME_ID,
+                id: ROOT_ACTIVITY_ID,
                 definition: {
                     type: "http://adlnet.gov/expapi/activities/media",
                     name: {
@@ -138,15 +138,15 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
         return;
     }
 
-    extensions[GAME_ID + "/time"] = time;
-    extensions[GAME_ID + "/apm"] = apm;
-    extensions[GAME_ID + "/lines"] = lines;
+    extensions[ROOT_ACTIVITY_ID + "/time"] = time;
+    extensions[ROOT_ACTIVITY_ID + "/apm"] = apm;
+    extensions[ROOT_ACTIVITY_ID + "/lines"] = lines;
 
     tc_sendStatementWithContext(
         {
             verb: "completed",
             object: {
-                id: GAME_ID + "/level" + level,
+                id: ROOT_ACTIVITY_ID + "/level" + level,
                 definition: {
                     type: "http://adlnet.gov/expapi/activities/media",
                     name: {
@@ -175,16 +175,16 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
         return;
     }
 
-    extensions[GAME_ID + "/level"] = level;
-    extensions[GAME_ID + "/time"] = time;
-    extensions[GAME_ID + "/apm"] = apm;
-    extensions[GAME_ID + "/lines"] = lines;
+    extensions[ROOT_ACTIVITY_ID + "/level"] = level;
+    extensions[ROOT_ACTIVITY_ID + "/time"] = time;
+    extensions[ROOT_ACTIVITY_ID + "/apm"] = apm;
+    extensions[ROOT_ACTIVITY_ID + "/lines"] = lines;
 
     tc_sendStatementWithContext(
         {
             verb: "completed",
             object: {
-                id: GAME_ID,
+                id: ROOT_ACTIVITY_ID,
                 definition: {
                     type: "http://adlnet.gov/expapi/activities/media",
                     name: {
