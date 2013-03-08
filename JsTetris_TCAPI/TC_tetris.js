@@ -85,19 +85,22 @@ $(document).ready(function () {
     $('#activateTinCan').click();
 });
 
-function tc_getContext (registrationId) {
+function tc_getContext () {
+    var extensions = {};
+    extensions[GAME_ID + "/gameId"] = gameId;
+
     return {
         contextActivities: {
             grouping: {
                 id: GAME_ID
             }
         },
-        registration: registrationId
+        extensions: extensions
     };
 }
 
 function tc_sendStatementWithContext (stmt) {
-    stmt.context = tc_getContext(gameId);
+    stmt.context = tc_getContext();
 
     tincan.sendStatement(stmt, function () {});
 }
