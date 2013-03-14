@@ -58,7 +58,7 @@ $(document).ready(function(){
     });
     $('#showAllStatements').click(function(){
         if (moreStatementsUrl !== null) {
-            tincan.recordStores.moreStatements(
+            tincan.recordStores[0].moreStatements(
                 {
                     url: moreStatementsUrl,
                     callback: RenderStatements
