@@ -234,7 +234,7 @@ function RenderStatements (err, result) {
         stmtStr += "<td> <span class='actor'>"+ name +"</span>";
 
         obj = statements[i].target.id;
-        if (statements[i].target.definition !== null) {
+        if (statements[i].target.objectType === "Activity" && statements[i].target.definition !== null) {
             activityType = statements[i].target.definition.type;
 
             if (activityType !== null && (activityType.indexOf("question") >= 0 || activityType.indexOf("interaction") >= 0)) {
