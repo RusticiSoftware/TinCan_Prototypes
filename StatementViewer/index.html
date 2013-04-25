@@ -17,15 +17,28 @@
             Click on a statement to see the raw statement data.
             <br/><br/>
             <div id="searchBox">
-                <table id="searchBoxTable" class="searchBoxTable">
+                <table id="versionTable" class="versionTable">
+                    <tr>
+                        <td>
+                            <label>TCAPI Version:</label>
+                            <select id="version">
+                                <option value="1.0.0">1.0.0</option>
+                                <option value="0.95 + 0.9">0.95 + 0.9</option>
+                                <option value="0.95">0.95</option>
+                                <option value="0.9">0.9</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <table id="searchBoxTable" class="searchBoxTable" style="display: none;">
                     <tr>
                         <td><label>Actor Email</label><input id="actorEmail" type="text" placeholder="Email Address"></td>
-                        <td><label>Verb</label><input id="verb" type="text" placeholder="Verb"></td>
+                        <td><label>Verb ID</label><input id="verb" type="text" placeholder="Verb"></td>
                         <td><label>Activity ID</label><input id="activityId" type="text" placeholder="Activity ID"></td>
                         <td><label>Use Context Activities</label><input id="context" type="checkbox"></td>
                     </tr>
                 </table>
-                <table id="advancedSearchTable" class="searchBoxTable" style="display:none">
+                <table id="advancedSearchTable" class="searchBoxTable" style="display: none;">
                     <tr>
                         <td><label>Since</label><input id="since" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></td>
                         <td><label>Until</label><input id="until" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></td>
@@ -38,25 +51,41 @@
                         <td><label>Instructor JSON</label><input id="instructorJson" type="text" placeholder="Instructor JSON"></td>
                         <td><label>Sparse</label><input id="sparse" type="checkbox"></td>
                     </tr>
+                </table>
+                <table id="searchBoxTable1" class="searchBoxTable">
                     <tr>
                         <td>
-                            <label>TCAPI Version:</label>
-                            <select id="version">
-                                <option selected="selected" value="all">All Available</option>
-                                <option value="0.95">0.95</option>
-                                <option value="0.9">0.9</option>
+                            <label>Agent Property</label>
+                            <select id="agentProperty">
+                                <option value="mbox">mbox</option>
                             </select>
                         </td>
+                        <td><label>Agent Value</label><input id="agentValue" type="text" placeholder="Email Address"></td>
+                        <td><label>Verb ID</label><input id="verb1" type="text" placeholder="Verb"></td>
+                        <td><label>Activity ID</label><input id="activityId1" type="text" placeholder="Activity ID"></td>
+                    </tr>
+                </table>
+                <table id="advancedSearchTable1" class="searchBoxTable" style="display: none;">
+                    <tr>
+                        <td><label>Format </label><select id="format"><option value="">default</option><option value="exact">exact</option><option value="ids">ids</option><option value="canonical">canonical</option></select></td>
+                        <td><label>Since</label><input id="since1" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></td>
+                        <td><label>Until</label><input id="until1" type="text" placeholder="YYYY-MM-ddTHH:mm:ss.SSSZ"></td>
+                        <td><label>Registration</label><input id="registration1" type="text" placeholder="TinCan Registration ID"></td>
+                    </tr>
+                    <tr>
+                        <td><label>Related Agents</label><input id="relatedAgents" type="checkbox"></td>
+                        <td><label>Related Activities</label><input id="relatedActivities" type="checkbox"></td>
+                        <!--<td><label>Attachments</label><input id="attachments" type="checkbox"></td>-->
+                        <td></td>
+                        <td></td>
                     </tr>
                 </table>
 
                 <div id="TCAPIQuery" style="display:none"><label>TCAPI Query</label><textarea readonly="true" id="TCAPIQueryText"></textarea></div>
 
-                <button id='refreshStatements'>Refresh</button>
+                <button id="refreshStatements">Refresh</button>
                 <button id="showAdvancedOptions">Show Advanced Options</button>
                 <button id="showQuery">Show TCAPI Query</button>
-
-
             </div>
             <div id='theStatements'></div>
             <div id='statementsLoading'>
