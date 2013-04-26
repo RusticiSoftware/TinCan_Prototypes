@@ -26,7 +26,7 @@ var firstStored = null,
                 {
                     endpoint: Config.endpoint,
                     auth: 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword),
-                    version: "0.95"
+                    version: "1.0.0"
                 }
             ]
         }
@@ -35,6 +35,43 @@ var firstStored = null,
 google.load('visualization', '1.0', { packages: ['corechart'] });
 
 $(document).ready(function(){
+    var getTetrisStatements = {
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/completed"
+            }
+        },
+        tetrisActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/JsTetris_TCAPI"
+            }
+        ),
+        getGolfStatements = {},
+        golfActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/GolfExample_TCAPI"
+            }
+        ),
+        getTourStatements = {},
+        tourActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
+            }
+        );
+
+    if (tincan.recordStores[0].version === "0.9" || tincan.recordStores[0].version === "0.95") {
+        getTetrisStatements.target = tetrisActivity;
+        getGolfStatements.target = golfActivity;
+        getTourStatements.target = tourActivity;
+    }
+    else {
+        getTetrisStatements.activity = tetrisActivity;
+        getTetrisStatements.related_activities = true;
+        getGolfStatements.activity = golfActivity;
+        getGolfStatements.related_activities = true;
+        getTourStatements.activity = tourActivity;
+        getTourStatements.related_activities = true;
+    }
+
     tincan.getStatements(
         {
             params: {
@@ -80,28 +117,16 @@ $(document).ready(function(){
     tincan.getActivityProfile(
         "highscores",
         {
-            activity: {
-                id: "http://tincanapi.com/JsTetris_TCAPI"
-            },
+            activity: tetrisActivity,
             callback: RenderHighScores
         }
     );
     tincan.getStatements(
         {
-            params: {
-                verb: {
-                    id: "http://adlnet.gov/expapi/verbs/completed"
-                },
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/JsTetris_TCAPI"
-                    }
-                )
-            },
+            params: getTetrisStatements,
             callback: RenderTetrisScoreChart
         }
     );
-
     $("#refreshHighScores").click(function(){
         $("#tetrisHighScoreData").empty();
 
@@ -117,16 +142,7 @@ $(document).ready(function(){
 
         tincan.getStatements(
             {
-                params: {
-                    verb: {
-                        id: "http://adlnet.gov/expapi/verbs/completed"
-                    },
-                    target: new TinCan.Activity (
-                        {
-                            id: "http://tincanapi.com/JsTetris_TCAPI"
-                        }
-                    )
-                },
+                params: getTetrisStatements,
                 callback: RenderTetrisScoreChart
             }
         );
@@ -134,13 +150,7 @@ $(document).ready(function(){
 
     tincan.getStatements(
         {
-            params: {
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/GolfExample_TCAPI"
-                    }
-                )
-            },
+            params: getGolfStatements,
             callback: RenderGolfData
         }
     );
@@ -151,13 +161,7 @@ $(document).ready(function(){
 
         tincan.getStatements(
             {
-                params: {
-                    target: new TinCan.Activity (
-                        {
-                            id: "http://tincanapi.com/GolfExample_TCAPI"
-                        }
-                    )
-                },
+                params: getGolfStatements,
                 callback: RenderGolfData
             }
         );
@@ -168,13 +172,7 @@ $(document).ready(function(){
 
     tincan.getStatements(
         {
-            params: {
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
-                    }
-                )
-            },
+            params: getTourStatements,
             callback: RenderLocationData
         }
     );
@@ -185,13 +183,7 @@ $(document).ready(function(){
 
         tincan.getStatements(
             {
-                params: {
-                    target: new TinCan.Activity (
-                        {
-                            id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
-                        }
-                    )
-                },
+                params: getTourStatements,
                 callback: RenderLocationData
             }
         );
@@ -242,7 +234,7 @@ function RenderStatements (err, result) {
         stmtStr += "<td> <span class='actor'>"+ name +"</span>";
 
         obj = statements[i].target.id;
-        if (statements[i].target.definition !== null) {
+        if (statements[i].target.objectType === "Activity" && statements[i].target.definition !== null) {
             activityType = statements[i].target.definition.type;
 
             if (activityType !== null && (activityType.indexOf("question") >= 0 || activityType.indexOf("interaction") >= 0)) {
@@ -445,7 +437,17 @@ function RenderGolfData (err, result) {
         i,
         j,
         l,
-        mbox;
+        mbox,
+        getStatementsParams = {
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/completed",
+            }
+        },
+        assessmentActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/GolfExample_TCAPI/GolfAssessment.html"
+            }
+        );
 
     if (err !== null) {
         $('#golfCourseData').append("Error occurred: " + err);
@@ -491,18 +493,17 @@ function RenderGolfData (err, result) {
 
     $("#golfCourseData").append(html);
 
+    if (tincan.recordStores[0].version === "0.9" || tincan.recordStores[0].version === "0.95") {
+        getStatementsParams.target = assessmentActivity;
+    }
+    else {
+        getStatementsParams.activity = assessmentActivity;
+        getStatementsParams.related_activities = true;
+    }
+
     tincan.getStatements(
         {
-            params: {
-                verb: {
-                    id: "http://adlnet.gov/expapi/verbs/completed",
-                },
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/GolfExample_TCAPI/GolfAssessment.html"
-                    }
-                )
-            },
+            params: getStatementsParams,
             callback: RenderGolfDataScores
         }
     );
@@ -527,19 +528,29 @@ function RenderGolfDataScores (err, result) {
 }
 
 function RequestGolfQuestions () {
+    var getStatementsParams = {
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/answered"
+            }
+        },
+        assessmentActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/GolfExample_TCAPI"
+            }
+        );
+
+
+    if (tincan.recordStores[0].version === "0.9" || tincan.recordStores[0].version === "0.95") {
+        getStatementsParams.target = assessmentActivity;
+    }
+    else {
+        getStatementsParams.activity = assessmentActivity;
+        getStatementsParams.related_activities = true;
+    }
+
     tincan.getStatements(
         {
-            params: {
-                verb: {
-                    id: "http://adlnet.gov/expapi/verbs/answered",
-                },
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/GolfExample_TCAPI"
-                    }
-                ),
-                context: true
-            },
+            params: getStatementsParams,
             callback: RenderGolfQuestions
         }
     );
@@ -551,7 +562,7 @@ function RenderGolfQuestions (err, result) {
         stmt,
         resultsByQuestion = {},
         questionId,
-        sortedQuestionIds,
+        sortedQuestionIds = [],
         html,
         results;
 
@@ -584,7 +595,10 @@ function RenderGolfQuestions (err, result) {
         }
     }
 
-    sortedQuestionIds = Object.keys(resultsByQuestion).sort();
+    for (prop in resultsByQuestion) {
+        sortedQuestionIds.push(prop);
+    }
+    sortedQuestionIds.sort();
 
     for (i = 0; i < sortedQuestionIds.length; i++) {
         questionId = sortedQuestionIds[i];
@@ -653,19 +667,29 @@ function RenderLocationData (err, result) {
 }
 
 function RequestLocations () {
+    var getStatementsParams = {
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/experienced"
+            }
+        },
+        tourActivity = new TinCan.Activity (
+            {
+                id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
+            }
+        );
+
+
+    if (tincan.recordStores[0].version === "0.9" || tincan.recordStores[0].version === "0.95") {
+        getStatementsParams.target = tourActivity;
+    }
+    else {
+        getStatementsParams.activity = tourActivity;
+        getStatementsParams.related_activities = true;
+    }
+
     tincan.getStatements(
         {
-            params: {
-                verb: {
-                    id: "http://adlnet.gov/expapi/verbs/experienced",
-                },
-                target: new TinCan.Activity (
-                    {
-                        id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
-                    }
-                ),
-                context: true
-            },
+            params: getStatementsParams,
             callback: RenderLocations
         }
     );
@@ -677,7 +701,7 @@ function RenderLocations (err, result) {
         i,
         stmt,
         locationId,
-        sortedLocationIds,
+        sortedLocationIds = [],
         loc,
         html;
 
@@ -702,7 +726,10 @@ function RenderLocations (err, result) {
         resultsByLocationId[locationId].visitors += 1;
     }
 
-    sortedLocationIds = Object.keys(resultsByLocationId).sort();
+    for (prop in resultsByLocationId) {
+        sortedLocationIds.push(prop);
+    }
+    sortedLocationIds.sort();
 
     for (i = 0; i < sortedLocationIds.length; i++) {
         locationId = sortedLocationIds[i];
