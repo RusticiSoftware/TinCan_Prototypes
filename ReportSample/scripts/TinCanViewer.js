@@ -562,7 +562,7 @@ function RenderGolfQuestions (err, result) {
         stmt,
         resultsByQuestion = {},
         questionId,
-        sortedQuestionIds,
+        sortedQuestionIds = [],
         html,
         results;
 
@@ -595,7 +595,10 @@ function RenderGolfQuestions (err, result) {
         }
     }
 
-    sortedQuestionIds = Object.keys(resultsByQuestion).sort();
+    for (prop in resultsByQuestion) {
+        sortedQuestionIds.push(prop);
+    }
+    sortedQuestionIds.sort();
 
     for (i = 0; i < sortedQuestionIds.length; i++) {
         questionId = sortedQuestionIds[i];
@@ -698,7 +701,7 @@ function RenderLocations (err, result) {
         i,
         stmt,
         locationId,
-        sortedLocationIds,
+        sortedLocationIds = [],
         loc,
         html;
 
@@ -723,7 +726,10 @@ function RenderLocations (err, result) {
         resultsByLocationId[locationId].visitors += 1;
     }
 
-    sortedLocationIds = Object.keys(resultsByLocationId).sort();
+    for (prop in resultsByLocationId) {
+        sortedLocationIds.push(prop);
+    }
+    sortedLocationIds.sort();
 
     for (i = 0; i < sortedLocationIds.length; i++) {
         locationId = sortedLocationIds[i];
