@@ -1,0 +1,82 @@
+<![if gte IE 7]>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<![endif]>
+<html>
+<head>
+    <title>Progress Saved</title>
+    <script type="text/javascript" src="vendor/sha1.js"></script>
+    <script type="text/javascript" src="vendor/oauth.js"></script>
+    <script type="text/javascript" src="oauthTest.js"></script>
+    <style media="screen">
+        body { margin:0; padding:20px; padding-left:40px; }
+        #top,#bottom,#left,#right { position:fixed; background:#DFE5EA; }
+        #top,#bottom { left:0; width:100%; height:16px; }
+        #top { top:0; }
+        #bottom { bottom:0; }
+        #left,#right { top:0; height:100%; width:16px; }
+        #left { left:0; }
+        #right { right:0; }
+        #content { text-align:left; width:100%; color:#555555; font-family:'Lucida Grande','Helvetica Neue',Helvetica,Arial,sans-serif;}
+        #content p { font-size:1.2em; width:70%; margin:auto; }
+        #userLogArea { vertical-align: top; width:400px; border-left: 1px solid #ddd; }
+        #userLogArea li { margin-bottom: 10px; }
+        /*#testerTable { padding: 10px; }*/
+        #testerTable td { padding:20px; }
+        button { margin-top: 10px; margin-bottom:10px }
+        #endpoint { width: 240px; }
+        #consumerKey { width: 200px; }
+        #consumerSecret { width: 200px; }
+        input { margin-bottom: 6px; }
+    </style>
+    <!--[if lte IE 6]>
+    <style media="screen">
+        body { border: solid #DFE5EA 16px; }
+        #left,#right,#top,#bottom { display: none; }
+    </style>
+    <![endif]-->
+</head>
+<body>
+    <div id="content">
+        <h1>OAuth Test Page</h1>
+        <table id="testerTable">
+            <tr><td>
+                <h2>Step 1 - Initiate and Authorize</h2>
+                <form id="oauthForm">
+                    Endpoint: <input id="endpoint" type="text" /><br />
+                    Consumer Key: <input id="consumerKey" type="text" /><br />
+                    Consumer Secret: <input id="consumerSecret" type="text" /><br />
+                </form>
+                <button id="authorize">Authorize</button>
+
+                <h2>Step 2 - Fetch Access Token</h2>
+                <form id="oauthVerifyForm">
+                    Verify Code : <input id="verifyCode" type="text" />
+                </form>
+                <button id="fetchToken">Fetch Token</button>
+
+                <h2>Step 3 - Test Access Token</h2>
+                <button id="tryToken">Try Token</button>
+
+            </td><td id="userLogArea">
+                <ul id="userLog"></ul>
+            </td></tr>
+        </table>
+
+        <script type="text/javascript">
+            OAuthSample.init();
+        </script>
+    </div>
+        
+    <div id="top"></div>
+    <div id="bottom"></div>
+    <div id="left"></div>
+    <div id="right"></div>
+</body>
+</html>
+<html>
+    <head>
+    </head>
+    <body>
+    </body>
+</html>
