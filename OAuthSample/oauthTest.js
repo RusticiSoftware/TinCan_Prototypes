@@ -67,7 +67,7 @@
                 self.log(JSON.stringify(self.auth, null, 4));
 
                 self._userLog("Obtained request token, sending to authorize page...");
-                self._userLog("Please fill in veriy code from authorize " +
+                self._userLog("Please fill in verify code from authorize " +
                               "process, and proceed to step 2");
                 
                 self._showAuthorizePage(
