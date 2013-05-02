@@ -1,13 +1,7 @@
-<![if gte IE 7]>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
-<![endif]>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>OAuth Test Page</title>
-    <script type="text/javascript" src="vendor/sha1.js"></script>
-    <script type="text/javascript" src="vendor/oauth.js"></script>
-    <script type="text/javascript" src="oauthTest.js"></script>
     <style media="screen">
         body { margin:0; padding:20px; padding-left:40px; }
         #top,#bottom,#left,#right { position:fixed; background:#DFE5EA; }
@@ -63,20 +57,19 @@
             </td></tr>
         </table>
 
-        <script type="text/javascript">
-            OAuthSample.init();
-        </script>
     </div>
         
     <div id="top"></div>
     <div id="bottom"></div>
     <div id="left"></div>
     <div id="right"></div>
+
+    <script type="text/javascript" src="vendor/sha1.js"></script>
+    <script type="text/javascript" src="vendor/oauth.js"></script>
+    <script type="text/javascript" src="oauthTest.js"></script>
+    <script type="text/javascript">
+        var oauthSample = new OAuthSample();
+        oauthSample.init();
+    </script>
 </body>
-</html>
-<html>
-    <head>
-    </head>
-    <body>
-    </body>
 </html>

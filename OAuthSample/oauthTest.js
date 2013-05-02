@@ -1,13 +1,14 @@
+(function(global){
 
-(function(){
-    OAuthSample = {
+    var OAuthSample = function(){
+        this.auth = null;
+        this.tinCanVersion = "1.0.0";
+        this.DEBUG = false;
+    }
+    
+    OAuthSample.prototype = {
 
-        auth: null,
-        tinCanVersion: "1.0.0",
-
-        DEBUG: false,
-
-        init: function(msg) {
+        init: function() {
             var self = this,
                 parsedQueryString = {};
 
@@ -252,4 +253,7 @@
             return parsed;
         }
     }
-})();
+
+    global.OAuthSample = OAuthSample;
+
+})(this);
