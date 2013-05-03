@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tincan xmlns="http://projecttincan.com/tincan.xsd">
+	<activities>
+		<activity id="http://tincanapi.com/oauth-tester" type="http://adlnet.gov/expapi/activities/module">
+			<name>OAuth Tester Page</name>
+			<description lang="en-US">A simple page to test OAuth capability of a Tin Can endpoint.</description>
+			<launch lang="en-us">index.html</launch>
+		</activity>
+	</activities>
+</tincan>
