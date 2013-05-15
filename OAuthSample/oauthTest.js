@@ -19,6 +19,7 @@
             register("authorize", function(){ self.authorize(); });
             register("fetchToken", function(){ self.fetchToken(); });
             register("tryToken", function(){ self.tryToken(); });
+            register("tryNoUserToken", function(){ self.tryNoUserToken(); });
 
             this._userLog("OAuth sample initialized");
 
@@ -37,6 +38,7 @@
                 console.log(msg);
             }
         },
+
         
         authorize: function () {
             var message, accessor, parameterMap, xhr, oauthCallback, 
@@ -104,17 +106,46 @@
 
         tryToken: function() {
             var self = this,
-                endpoint = self._getFormVal("endpoint"),
-                headers = { "X-Experience-API-Version": self.tinCanVersion };
+                endpoint = self._getFormVal("endpoint");
 
             if (this.auth.oauth_verifier == undefined) {
                 this._error("Please authorize and fill in verify code first");
                 return;
             }
 
-            this._request("GET", endpoint + "statements?limit=1", headers, null, this.auth, function(xhr) {
+            this._request("GET", endpoint + "statements?limit=1", null, null, this.auth, function(xhr) {
                 if (xhr.status === 200) {
                     self._userLog("Successfully issued GET request on /statements resource with OAuth credentials!");
+                } else {
+                    self._error("OAuth signed statements request failed");
+                }
+            });
+        },
+
+        tryNoUserToken: function() {
+            var noUserAuth,
+                self = this,
+                endpoint = this._getFormVal("endpoint"),
+                consumerKey = this._getFormVal("consumerKey"),
+                consumerSecret = this._getFormVal("consumerSecret");
+            
+            if (endpoint == "" || consumerKey == "" || consumerSecret == "") {
+                self._error("Please fill in the endpoint, consumer key, and consumer secret");
+                return;
+            }
+
+            noUserAuth = {
+               type : "oAuth", 
+               consumerKey : consumerKey,
+               consumerSecret : consumerSecret,
+               oauth_token : "",
+               oauth_token_secret : ""
+            };
+
+            this._request("GET", endpoint + "statements?limit=1", null, null, noUserAuth, function(xhr) {
+                if (xhr.status === 200) {
+                    self._userLog("Successfully issued GET request on " +
+                        "/statements resource with (no user) OAuth credentials!");
                 } else {
                     self._error("OAuth signed statements request failed");
                 }
@@ -138,9 +169,7 @@
         },
         
         _oAuthSign: function (url, method, data, auth) {
-            var pairs, pair, parts, parameterMap, accessor, message, p, encodedParameter, auth;
-            
-            auth = this.auth;
+            var pairs, pair, parts, parameterMap, accessor, message, p, encodedParameter;
         
             if (auth.type !== "oAuth") {
                 // not using oAuth, nothing to do
@@ -215,6 +244,9 @@
                     xhr.setRequestHeader(headerName, headers[headerName]);
                 }
             }
+
+            //Set TCAPI version header
+            xhr.setRequestHeader("X-Experience-API-Version", this.tinCanVersion);
 
             //Setup callback
             xhr.onreadystatechange = function () {
