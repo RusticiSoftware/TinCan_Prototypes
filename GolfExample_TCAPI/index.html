@@ -134,9 +134,6 @@
             tincan.setState("location", currentPage, function () {});
         }
 
-        function doFinish(){
-        }
-
         function doPrevious(){
             if (currentPage > 0){
                 currentPage--;
@@ -149,84 +146,6 @@
                 currentPage++;
             }
             goToPage();
-        }
-
-        //called from the assessmenttemplate.html page to record the results of a test
-        //passes in score as a percentage
-        function GetRecordTestStatement(score, activityId){
-            // send score
-            var scaledScore = score / 100,
-                success = (scaledScore >= 0.8);
-
-            var stmt = {
-                verb: "http://adlnet.gov/expapi/verbs/completed",
-                object: {
-                    id: activityId
-                },
-                result: {
-                    score: {
-                        scaled: scaledScore,
-                        raw: score,
-                        min: 0,
-                        max: 100
-                    },
-                    success: success
-                },
-                context: GolfExample.getContext(GolfExample.CourseActivity.id)
-            };
-
-            return stmt;
-        }
-
-        //called from the assessmenttemplate.html page to record the results of a question
-        function GetQuestionAnswerStatement(id, questionText, questionChoices, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
-            if (typeof console !== 'undefined') {
-                console.log("GetQuestionAnswerStatement");
-            }
-
-            //send question info
-            var qObj = {
-                id: id,
-                definition: {
-                    type: "http://adlnet.gov/expapi/activities/cmi.interaction",
-                    description: {
-                        "en-US": questionText
-                    },
-                    interactionType: questionType,
-                    correctResponsesPattern: [
-                        String(correctAnswer)
-                    ]
-                }
-            };
-
-            if(questionChoices !== null && questionChoices.length > 0){
-                var choices = [];
-                for(var i = 0; i < questionChoices.length; i++){
-                    var choice = questionChoices[i];
-                    choices.push(
-                        {
-                            id: choice,
-                            description: {
-                                "en-US": choice
-                            }
-                        }
-                    );
-                }
-                if (typeof console !== 'undefined') {
-                    console.log(qObj);
-                }
-                qObj.definition.choices = choices;
-            }
-
-            return {
-                verb: "http://adlnet.gov/expapi/verbs/answered",
-                object: qObj,
-                result: {
-                    response: learnerResponse,
-                    success: wasCorrect
-                },
-                context: GolfExample.getContext(activityId)
-            }
         }
 
         function FormatChoiceResponse(value){
