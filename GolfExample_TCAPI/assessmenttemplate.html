@@ -84,6 +84,84 @@
                 obj.value = userText.replace(numbersRegEx, "");
             }
         }
+
+        // record the results of a test, passes in score as a percentage
+        function GetRecordTestStatement(score, activityId){
+            // send score
+            var scaledScore = score / 100,
+                success = (scaledScore >= 0.8);
+
+            var stmt = {
+                verb: "completed",
+                object: {
+                    id: activityId
+                },
+                result: {
+                    score: {
+                        scaled: scaledScore,
+                        raw: score,
+                        min: 0,
+                        max: 100
+                    },
+                    success: success
+                },
+                context: GolfExample.getContext(GolfExample.CourseActivity.id)
+            };
+
+            return stmt;
+        }
+
+        // record the results of a question
+        function GetQuestionAnswerStatement(id, questionText, questionChoices, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
+            if (typeof console !== 'undefined') {
+                console.log("GetQuestionAnswerStatement");
+            }
+
+            //send question info
+            var qObj = {
+                id: id,
+                definition: {
+                    type: "http://adlnet.gov/expapi/activities/cmi.interaction",
+                    description: {
+                        "en-US": questionText
+                    },
+                    interactionType: questionType,
+                    correctResponsesPattern: [
+                        String(correctAnswer)
+                    ]
+                }
+            };
+
+            if (questionChoices !== null && questionChoices.length > 0) {
+                var choices = [];
+                for (var i = 0; i < questionChoices.length; i++) {
+                    var choice = questionChoices[i];
+                    choices.push(
+                        {
+                            id: choice,
+                            description: {
+                                "en-US": choice
+                            }
+                        }
+                    );
+                }
+                if (typeof console !== 'undefined') {
+                    console.log(qObj);
+                }
+                qObj.definition.choices = choices;
+            }
+
+            return {
+                verb: "answered",
+                object: qObj,
+                result: {
+                    response: learnerResponse,
+                    success: wasCorrect
+                },
+                context: GolfExample.getContext(activityId)
+            }
+        }
+
         function SubmitAnswers(){
             var correctCount = 0;
             var totalQuestions = test.Questions.length;
@@ -143,20 +221,18 @@
                 wasCorrect = (correctAnswer == learnerResponse);
                 if (wasCorrect) {correctCount++;}
 
-                if (parent.GetQuestionAnswerStatement){
-                    answerStatements.unshift(
-                        parent.GetQuestionAnswerStatement(
-                            test.Questions[i].Id,
-                            test.Questions[i].Text,
-                            test.Questions[i].Answers,
-                            test.Questions[i].Type,
-                            learnerResponse,
-                            correctAnswer,
-                            wasCorrect,
-                            activityId
-                        )
-                    );
-                }
+                answerStatements.unshift(
+                    GetQuestionAnswerStatement(
+                        test.Questions[i].Id,
+                        test.Questions[i].Text,
+                        test.Questions[i].Answers,
+                        test.Questions[i].Type,
+                        learnerResponse,
+                        correctAnswer,
+                        wasCorrect,
+                        activityId
+                    )
+                );
 
                 resultsSummary += "<div class='questionResult'><h3>Question " + i + "</h3>";
                 if (wasCorrect) {
@@ -169,20 +245,18 @@
                 }
                 resultsSummary += "</div>";
             }
+
             var score = Math.round(correctCount * 100 / totalQuestions);
             resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
             document.getElementById("test").innerHTML = resultsSummary;
 
-            if (parent.GetRecordTestStatement){
-                answerStatements.push(parent.GetRecordTestStatement(score, activityId));
-                answerStatements.push(parent.GetRecordTestStatement(score, GolfExample.CourseActivity.id));
-            }
+            answerStatements.push(GetRecordTestStatement(score, activityId));
+            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id));
 
-            //send question answers
-            parent.tincan.sendStatements(answerStatements);
-
-            parent.doFinish();
+            // send question answers
+            tincan.sendStatements(answerStatements);
         }
+
         function RenderTest(test){
             document.write ("<div id='test'><form id='frmTest' action='#'>");
 
@@ -227,19 +301,6 @@
                     break;
                 }
                 document.write ("</div>");      //close out question div
-
-                //define the question in the assessment
-                /*var qObj = {
-                    "id":question.Id,
-                    "definition":{
-                        "type":"question",
-                        "description":question.Text,
-                        "interactionType":question.Type,
-                        "correctResponsesPattern",[String(question.CorrectAnswer)]
-                    }
-                };
-                testObj.definition.children.push(qObj);*/
-
             }
             document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
             document.write ("</form></div>");      //close out test div
