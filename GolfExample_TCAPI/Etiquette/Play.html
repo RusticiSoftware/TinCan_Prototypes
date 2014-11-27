@@ -21,7 +21,8 @@
                         },
                         description: {
                             "en-US": "An overview of golf etiquette as it pertains to game play."
-                        }
+                        }, 
+						type: "http://activitystrea.ms/schema/1.0/page"
                     }
                 }
             }
@@ -29,7 +30,12 @@
 
         tincan.sendStatement(
             {
-                verb: "experienced",
+                verb: {
+					id: "http://adlnet.gov/expapi/verbs/experienced",
+					display: {
+						"en-US" : "experienced"
+					}
+				},
                 context: GolfExample.getContext(
                     GolfExample.CourseActivity.id
                 )

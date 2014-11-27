@@ -23,6 +23,7 @@
                 type: "http://adlnet.gov/expapi/activities/assessment"
             }
         };
+		var assessmentStartTimestamp = new Date();
 
         var tincan = new TinCan (
             {
@@ -30,13 +31,22 @@
                 activity: testObj
             }
         );
-
+		
+		//Each go at the assessment is a new attempt at the assessment; there's no bookmarking within the assessment
         var stmt = {
-            verb: "attempted",
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/attempted",
+				display: {
+					"en-US" : "attempted"
+				}
+			},
             object: testObj,
             context: GolfExample.getContext(
                 GolfExample.CourseActivity.id
-            )
+            ),
+			result: {
+				duration: "PT0H0M0S"
+			}
         };
 
         tincan.sendStatement(stmt);
@@ -86,13 +96,28 @@
         }
 
         // record the results of a test, passes in score as a percentage
-        function GetRecordTestStatement(score, activityId){
+        function GetRecordTestStatement(score, activityId, duration){
             // send score
             var scaledScore = score / 100,
-                success = (scaledScore >= 0.8);
-
+                success = (scaledScore >= 0.8),
+				verb;
+			if (success){
+				verb = {
+					id: "http://adlnet.gov/expapi/verbs/passed",
+					display: {
+						"en-US" : "passed"
+					}
+				}
+			} else {
+				verb = {
+					id: "http://adlnet.gov/expapi/verbs/failed",
+					display: {
+						"en-US" : "failed"
+					}
+				}
+			}
             var stmt = {
-                verb: "completed",
+                verb: verb,
                 object: {
                     id: activityId
                 },
@@ -104,7 +129,8 @@
                         max: 100
                     },
                     success: success,
-                    completion: true
+                    completion: true,
+					duration: duration
                 },
                 context: GolfExample.getContext(GolfExample.CourseActivity.id)
             };
@@ -153,7 +179,12 @@
             }
 
             return {
-                verb: "answered",
+                verb: {
+					id: "http://adlnet.gov/expapi/verbs/answered",
+					display: {
+						"en-US" : "answered"
+					}
+				},
                 object: qObj,
                 result: {
                     response: learnerResponse,
@@ -250,12 +281,26 @@
             var score = Math.round(correctCount * 100 / totalQuestions);
             resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
             document.getElementById("test").innerHTML = resultsSummary;
-
-            answerStatements.push(GetRecordTestStatement(score, activityId));
-            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id));
+			
+			var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(
+				Math.abs((
+					new Date()) - 
+					assessmentStartTimestamp)),
+			attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
+            answerStatements.push(GetRecordTestStatement(score, activityId, assessmentAttemptDuration));
+            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, attemptDuration));
 
             // send question answers
             tincan.sendStatements(answerStatements);
+			
+			parent.attemptComplete = true;
+			var bookmarking = {
+				attemptComplete: true
+			}
+            tincan.setState("bookmarking-data", bookmarking, {
+				contentType: "application/json",
+				overwriteJSON: false
+			});
         }
 
         function RenderTest(test){
