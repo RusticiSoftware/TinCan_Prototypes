@@ -25,7 +25,7 @@
 		
 		.configInfo {diplay:none;}
 		.configInfo .info {font-size:.9em;}
-		.configInfo .settings {margin: 0 0 10px 15px;}
+		.configInfo .settings {margin-left:15px;}
 		.configInfo .settings span {font-weight:bold;}
 		.configInfo .settings .label {text-align:left;padding:0 10px;}
 		
@@ -46,8 +46,7 @@
 		font-size:16px;
 		font-weight:bold;
 		padding:6px 24px;
-		text-decoration:none;
-		margin: 0 5px 0 0;}
+		text-decoration:none;}
 		.cssButton:visited {
 		background-color:#39648f;
 		-moz-border-radius:3px;
@@ -73,7 +72,6 @@
         <script src="scripts/jquery-1.6.2.min.js"></script>
 		<script src="scripts/base64.js"></script>
 		<script src="config.js"></script>
-		<script src="GolfExample_TCAPI/scripts/TinCanJS/build/tincan.js"></script>
 
         <script type="text/javascript">
 
@@ -111,22 +109,6 @@
                 }
             };
         }
-		
-		/* Set up TinCanJS */
-		var tincan = new TinCan (
-			{
-				recordStores: [
-					{
-						endpoint: Config.endpoint,
-						username: Config.authUser,
-						password: Config.authPassword,
-						allowFail: false
-					}
-				]
-			}
-		);
-		
-		
 
 		$(document).ready(function(){
 			
@@ -135,22 +117,12 @@
             var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox[0];
             var PROTOTYPE_ENDPOINT = Config.endpoint;
             var PROTOTYPE_AUTH = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
-			var PROTOTYPE_REGISTRATION = Config.registration;
 
 			$('#tc_nameInput_golf').val(PROTOTYPE_DEFAULT_NAME);
 			$('#tc_emailInput_golf').val(PROTOTYPE_DEFAULT_MBOX.replace('mailto:',''));
 			$('#tc_nameInput_loc').val(PROTOTYPE_DEFAULT_NAME);
 			$('#tc_emailInput_loc').val(PROTOTYPE_DEFAULT_MBOX.replace('mailto:',''));
 			
-			$('.refreshRegistration').click(function(){
-				PROTOTYPE_REGISTRATION = TinCan.Utils.getUUID();
-				$('#defRegistration').text(PROTOTYPE_REGISTRATION);
-			});
-			
-			$('.resetRegistration').click(function(){
-				PROTOTYPE_REGISTRATION = Config.registration
-				$('#defRegistration').text(PROTOTYPE_REGISTRATION);
-			});
 			
 			$('#golfExampleLaunch').click(function(){
 				var em = $("#tc_emailInput_golf").val();
@@ -159,11 +131,10 @@
 				var actor = {'mbox' : [mbox], 'name' : [nm]};
 				
 				
-				$(this).attr('href',$(this).attr('data-baseref') 
+				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
 					+ "&auth=" + encodeURIComponent(PROTOTYPE_AUTH)
-					+ "&actor=" +encodeURIComponent(JSON.stringify(actor))
-					+ "&registration=" +encodeURIComponent(PROTOTYPE_REGISTRATION));
+					+ "&actor=" +encodeURIComponent(JSON.stringify(actor)));
 				return true;
 			});
 
@@ -173,11 +144,10 @@
                 var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
                 actor.mbox = [mbox];
 				
-				$(this).attr('href',$(this).attr('data-baseref') 
+				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
 					+ "&auth=" + encodeURIComponent(PROTOTYPE_AUTH)
-					+ "&actor=" +encodeURIComponent(JSON.stringify(actor))
-					+ "&registration=" +encodeURIComponent(PROTOTYPE_REGISTRATION));
+					+ "&actor=" +encodeURIComponent(JSON.stringify(actor)));
 				return true;
 			});
 			
@@ -188,11 +158,10 @@
 				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
 				var actor = {'mbox' : [mbox], 'name' : [nm]};
 				
-				$(this).attr('href',$(this).attr('data-baseref') 
+				$(this).attr('href',$(this).attr('baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
 					+ "&auth=" + encodeURIComponent(PROTOTYPE_AUTH)
-					+ "&actor=" +encodeURIComponent(JSON.stringify(actor))
-					+ "&registration=" +encodeURIComponent(PROTOTYPE_REGISTRATION));
+					+ "&actor=" +encodeURIComponent(JSON.stringify(actor)));
 				return true;
 			});
 			
@@ -202,7 +171,6 @@
 				$('#defAuth').text(PROTOTYPE_AUTH);
 				$('#defActorName').text(PROTOTYPE_DEFAULT_NAME);
 				$('#defActorMbox').text(PROTOTYPE_DEFAULT_MBOX);
-				$('#defRegistration').text(PROTOTYPE_REGISTRATION);
 			}
 			
 		});
@@ -242,14 +210,7 @@
 						<tr><td  class='label'>auth: <td/><td><span id="defAuth"></span></td></tr>
 						<tr><td class='label'>Default actor name: <td/><td><span id="defActorName"></span></td></tr>
 						<tr><td class='label'>Default actor mbox: <td/><td><span id="defActorMbox"></span></td></tr>
-						<tr><td class='label'>Default registration: <td/><td><span id="defRegistration"></span></td></tr>
 					</table>
-					<div class='info'>
-						To generate and use a new registration UUID, click <a href="#" class="refreshRegistration">New Attempt</a> below.
-						This will cause all of the prototypes to launch as a new attempt rather than using existign bookmarking data. Click
-						<a href="#" class="resetRegistration">Reset</a> to reset registration to the original configuration value. 
-					</div>
-					<a href="#" class="cssButton refreshRegistration">New Attempt</a><a href="#" class="cssButton resetRegistration">Reset</a>
 				</div>
 
 				<div class='prototypeDiv'>
@@ -297,7 +258,7 @@
 				&nbsp;&nbsp;&nbsp;
 				Email: <input type="text" id="tc_emailInput_golf" / > 
 				<br/>
-				<a class="cssButton" id="golfExampleLaunch" target="_blank" data-baseref="GolfExample_TCAPI/index.html?" href="GolfExample_TCAPI/index.html?" >Launch Golf Example</a>
+				<a class="cssButton" id="golfExampleLaunch" target="_blank" baseref="GolfExample_TCAPI/index.html?" href="GolfExample_TCAPI/index.html?" >Launch Golf Example</a>
 				</br>
 				</br>
 
@@ -321,7 +282,7 @@
 					<li>Reports the top 15 high scores achieved by all reporting players.(Uses LRS activity profile gets.)</li>
 				</ul>
 				<span class="warning">WARNING: Name and email will appear in the LRS viewer. Use default or made-up names & email if you don't want yours to appear.</span><br/><br/>
-				<a id="jsExampleLaunch" href="" target="_blank" data-baseref="JsTetris_TCAPI/tetris.html?" class="cssButton">Launch Js Tetris</a>
+				<a id="jsExampleLaunch" href="" target="_blank" baseref="JsTetris_TCAPI/tetris.html?" class="cssButton">Launch Js Tetris</a>
 				</br>
 				</br>
 				<hr/>
@@ -345,7 +306,7 @@
 				&nbsp;&nbsp;&nbsp;
 				Email: <input type="text" id="tc_emailInput_loc" / >
 				</br>
-				<a id="locatorExampleLaunch" target="_blank" data-baseref="Locator_TCAPI/index.html?" href="Locator_TCAPI/index.html?" class="cssButton">Launch Locator Example</a>
+				<a id="locatorExampleLaunch" target="_blank" baseref="Locator_TCAPI/index.html?" href="Locator_TCAPI/index.html?" class="cssButton">Launch Locator Example</a>
 				</br>
 				</br>
 				</div>
