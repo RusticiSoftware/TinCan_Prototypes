@@ -16,9 +16,12 @@ GolfExample.CourseActivity = {
 GolfExample.getContext = function(parentActivityId) {
     var ctx = {
         contextActivities: {
-            grouping: {
+            grouping: [{
                 id: GolfExample.CourseActivity.id
-            }
+            },
+			{
+                id: 'http://tincanapi.com/prototypes/'
+            }]
         }
     };
     if (parentActivityId !== undefined && parentActivityId !== null) {

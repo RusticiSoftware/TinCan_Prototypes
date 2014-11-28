@@ -126,10 +126,43 @@
 			}
 		);
 		
+		var PrototypesLauncher = {};
+		PrototypesLauncher.Activity = {
+			id: "http://tincanapi.com/prototypes/",
+			definition: {
+				type: "http://id.tincanapi.com/activitytype/lms",
+				name: {
+					"en-US": "Tin Can Prototypes Launcher"
+				},
+				description: {
+					"en-US": "A tool for launching the Tin Can prototypes. Simulates the role of an LMS in launching experiences."
+				}
+			}
+		};
 		
+		tincan.sendStatement({	
+			actor:{
+				name: Config.actor.name[0],
+				mbox: Config.actor.mbox[0]
+			},
+			verb: {
+				id: "http://adlnet.gov/expapi/verbs/experienced",
+				display: {
+					"en-US": "experienced"
+				}
+			},
+			object: PrototypesLauncher.Activity,
+			context: {
+				registration: Config.registration,
+				contextActivities: {
+					grouping: [
+						PrototypesLauncher.Activity
+					]
+				}
+			}
+		});
 
-		$(document).ready(function(){
-			
+		$(document).ready(function(){			
             var PROTOTYPE_SHOW_CONFIG_INFO = true;
             var PROTOTYPE_DEFAULT_NAME = Config.actor.name[0];
             var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox[0];
@@ -156,9 +189,10 @@
 				var em = $("#tc_emailInput_golf").val();
 				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
 				var nm = $("#tc_nameInput_golf").val();
-				var actor = {'mbox' : [mbox], 'name' : [nm]};
+				var actor = {'mbox' : mbox, 'name' : nm};
 				
-				
+				sendLaunchedStatement(actor, "http://tincanapi.com/GolfExample_TCAPI", PROTOTYPE_REGISTRATION);
+
 				$(this).attr('href',$(this).attr('data-baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
 					+ "&auth=" + encodeURIComponent(PROTOTYPE_AUTH)
@@ -171,7 +205,9 @@
 				var actor = Config.actor;
                 var em = actor.mbox[0];
                 var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
-                actor.mbox = [mbox];
+                actor.mbox = mbox;
+				
+				sendLaunchedStatement(actor, "http://tincanapi.com/JsTetris_TCAPI", PROTOTYPE_REGISTRATION);
 				
 				$(this).attr('href',$(this).attr('data-baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
@@ -186,7 +222,9 @@
 				var em = $("#tc_emailInput_loc").val();
 				var nm = $("#tc_nameInput_loc").val();
 				var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
-				var actor = {'mbox' : [mbox], 'name' : [nm]};
+				var actor = {'mbox' : mbox, 'name' : nm};
+				
+				sendLaunchedStatement(actor, "http://tincanapi.com/Course/NashvilleMuseumsTour", PROTOTYPE_REGISTRATION);
 				
 				$(this).attr('href',$(this).attr('data-baseref') 
 					+ "endpoint=" + encodeURIComponent(PROTOTYPE_ENDPOINT)
@@ -207,7 +245,28 @@
 			
 		});
 
-        
+        function sendLaunchedStatement(actor, activityId, registration){
+			tincan.sendStatement({	
+			actor: actor,
+			verb: {
+				id: "http://adlnet.gov/expapi/verbs/launched",
+				display: {
+					"en-US": "launched"
+				}
+			},
+			object: {
+				id: activityId
+			},
+			context: {
+				registration: registration,
+				contextActivities: {
+					grouping: [
+						PrototypesLauncher.Activity
+					]
+				}
+			}
+		});
+		}
         
         </script>
         
