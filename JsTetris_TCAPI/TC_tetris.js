@@ -23,10 +23,12 @@ $(document).ready(function () {
             var actor;
             if (!$(this).is(':checked')) {
                 TCActive = false;
+				tc_sendStatment_Terminate ();
                 $('#tc_actorprompt').hide();
             }
             else {
                 TCActive = true;
+				tc_sendStatment_Initialize ();
                 if (typeof tincan !== "undefined" && tincan.actor !== null) {
                     actor = tincan.actor;
                     actorName = actor.name;
@@ -52,6 +54,8 @@ $(document).ready(function () {
                 alert("Please enter a name and an email.");
                 return;
             }
+			
+			tc_sendStatment_Terminate ();
 
             actorName = $('#tc_nameInput').val();
             actorEmail = $('#tc_emailInput').val();
@@ -68,7 +72,9 @@ $(document).ready(function () {
 
             $('#tc_actorprompt').hide();
             $('#tc_actor').show();
-
+			
+			tc_sendStatment_Initialize ();
+			
             if (tetris.puzzle) {
                 tc_sendStatment_StartNewGame();
             }
@@ -85,36 +91,44 @@ $(document).ready(function () {
     $('#activateTinCan').click();
 });
 
-function tc_getContext () {
-    var extensions = {};
-    extensions[ROOT_ACTIVITY_ID + "/gameId"] = gameId;
-
-    return {
+function tc_getContext (extensions) {
+    var context = {
         contextActivities: {
-            grouping: {
+            grouping: [{
+                id: 'http://tincanapi.com/prototypes/'
+            },
+			{
                 id: ROOT_ACTIVITY_ID
-            }
-        },
-        extensions: extensions
+            }]
+        }
     };
+	if (typeof (extensions) !== undefined) {
+		context.extensions = extensions;
+	}
+    return context
 }
 
-function tc_sendStatementWithContext (stmt) {
-    stmt.context = tc_getContext();
+function tc_getContextExtensions() {
+	var extensions = {};
+    extensions[ROOT_ACTIVITY_ID + "/gameId"] = gameId;
+	return extensions;
+}
+
+function tc_sendStatementWithContext (stmt, extensions) {
+    stmt.context = tc_getContext(extensions);
 
     tincan.sendStatement(stmt, function () {});
 }
 
-function tc_sendStatment_StartNewGame () {
-    if (! TCActive) {
-        return;
-    }
-
-    gameId = TinCan.Utils.getUUID();
-
+function tc_sendStatment_Initialize () {
     tc_sendStatementWithContext(
         {
-            verb: "attempted",
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/initialized",
+				display: {
+					"en-US": "initialized"
+				}
+			},
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -131,6 +145,63 @@ function tc_sendStatment_StartNewGame () {
     );
 }
 
+function tc_sendStatment_Terminate () {
+    tc_sendStatementWithContext(
+        {
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/terminated",
+				display: {
+					"en-US": "terminated"
+				}
+			},
+            object: {
+                id: ROOT_ACTIVITY_ID,
+                definition: {
+                    type: "http://adlnet.gov/expapi/activities/media",
+                    name: {
+                        "en-US": "Js Tetris - Tin Can Prototype"
+                    },
+                    description: {
+                        "en-US": "A game of tetris."
+                    }
+                }
+            }
+        }
+    );
+}
+
+function tc_sendStatment_StartNewGame () {
+    if (! TCActive) {
+        return;
+    }
+
+    gameId = TinCan.Utils.getUUID();
+
+    tc_sendStatementWithContext(
+        {
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/attempted",
+				display: {
+					"en-US": "attempted"
+				}
+			},
+            object: {
+                id: ROOT_ACTIVITY_ID,
+                definition: {
+                    type: "http://adlnet.gov/expapi/activities/media",
+                    name: {
+                        "en-US": "Js Tetris - Tin Can Prototype"
+                    },
+                    description: {
+                        "en-US": "A game of tetris."
+                    }
+                }
+            }
+        },
+		tc_getContextExtensions()
+    );
+}
+
 function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
     var extensions = {};
 
@@ -144,7 +215,12 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
 
     tc_sendStatementWithContext(
         {
-            verb: "completed",
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/completed",
+				display: {
+					"en-US": "completed"
+				}
+			},
             object: {
                 id: ROOT_ACTIVITY_ID + "/level" + level,
                 definition: {
@@ -164,7 +240,8 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                     min: 0
                 }
             }
-        }
+        },
+		tc_getContextExtensions()
     );
 }
 
@@ -182,7 +259,12 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
 
     tc_sendStatementWithContext(
         {
-            verb: "completed",
+            verb: {
+				id: "http://adlnet.gov/expapi/verbs/completed",
+				display: {
+					"en-US": "completed"
+				}
+			},
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -202,7 +284,8 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
                 },
                 extensions: extensions
             }
-        }
+        },
+		tc_getContextExtensions()
     );
 
     // update high score
