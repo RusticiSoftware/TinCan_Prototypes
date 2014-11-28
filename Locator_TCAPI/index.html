@@ -56,7 +56,7 @@
                 activity: {
                     id: COURSE_ID,
                     definition: {
-                        type: "http://adlnet.gov/expapi/activities/course",
+                        type: "http://adlnet.gov/expapi/activities/performance",
                         name: {
                             "en-US": COURSE_NAME
                         },
@@ -118,11 +118,16 @@
                 var pmrk = Scavenger.currentPlacemark;
 
                 var stmt = {
-                    verb: "experienced",
+                    verb: {
+						id: "http://activitystrea.ms/schema/1.0/at",
+						display: {
+							"en-US": "was at"
+						}
+					},
                     object: {
                         id: pmrk.tc_id,
                         definition: {
-                            type: "http://adlnet.gov/expapi/activities/objective",
+                            type: "http://id.tincanapi.com/activitytype/place",
                             name: {
                                 "en-US": pmrk.name
                             },
@@ -140,8 +145,10 @@
                         extensions: {}
                     }
                 };
-                stmt.context.extensions[COURSE_ID + "/latitude"] = position.coords.latitude;
-                stmt.context.extensions[COURSE_ID + "/longitude"] = position.coords.longitude;
+				//Note: we could also use these as activity definition extensions if we know the location of the activity.
+				//In the context we're recording the location of the learner. 
+                stmt.context.extensions["http://id.tincanapi.com/extension/latitude"] = position.coords.latitude;
+                stmt.context.extensions["http://id.tincanapi.com/extension/longitude"] = position.coords.longitude;
 
                 tincan.sendStatement(stmt, function () {});
 
@@ -150,7 +157,7 @@
 
                 $('.loc[name="' + pmrk.name + '"]').addClass('visited');
 
-                CheckForAllVisited();
+                CheckForAllVisited(false);
 
                 if (Scavenger.useLocationCheat){
                     Scavenger.showLocation(position);
@@ -158,7 +165,7 @@
             }
         }
 
-        function CheckForAllVisited() {
+        function CheckForAllVisited(alreadyCompleted) {
             var pmrk,
                 // default to true and change to false if a placemark is not visited
                 allVisited = true,
@@ -170,11 +177,18 @@
                 }
             }
             if (allVisited) {
-                tincan.sendStatement(
-                    {
-                        verb: "completed"
-                    }
-                );
+				if (!alreadyCompleted){
+					tincan.sendStatement(
+						{
+							verb: {
+								id: "http://adlnet.gov/expapi/verbs/completed",
+								display: {
+									"en-US": "completed"
+								}
+							}
+						}
+					);
+				}
 
                 $(".exerciseComplete").show();
             }
@@ -199,8 +213,8 @@
                         sendActor: true,
                         params: {
                             verb: {
-                                id: "http://adlnet.gov/expapi/verbs/experienced"
-                            },
+								id: "http://activitystrea.ms/schema/1.0/at",
+							},
                             activity: new TinCan.Activity (
                                 {
                                     id: Placemarks[itm].tc_id
@@ -229,13 +243,21 @@
                 $("#locationListings").append(html);
             }
 
-            CheckForAllVisited();
+            CheckForAllVisited(true);
         }
 
         function SendCourseInit() {
             tincan.sendStatement(
                 {
-                    verb: "attempted"
+                    verb: {
+						id: "http://adlnet.gov/expapi/verbs/attempted",
+						display: {
+							"en-US": "attempted"
+						}
+					},
+					result :{
+						duration: "PT0S"
+					}
                 }
             );
         }
