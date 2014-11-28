@@ -1,5 +1,6 @@
 //TinCan.enableDebug();
 
+
 var ROOT_ACTIVITY_ID = "http://tincanapi.com/JsTetris_TCAPI",
     tincan = new TinCan (
         {
@@ -14,8 +15,8 @@ var ROOT_ACTIVITY_ID = "http://tincanapi.com/JsTetris_TCAPI",
     actorEmail = "",
     gameId = "",
     HighScoresActivityProfile = null,
-    HighScoresArray
-;
+    HighScoresArray;
+
 
 $(document).ready(function () {
     $('#activateTinCan').change(
@@ -73,11 +74,9 @@ $(document).ready(function () {
             $('#tc_actorprompt').hide();
             $('#tc_actor').show();
 			
-			tc_sendStatment_Initialize ();
+			tetris.reset();
 			
-            if (tetris.puzzle) {
-                tc_sendStatment_StartNewGame();
-            }
+			tc_sendStatment_Initialize ();
         }
     );
 
@@ -91,7 +90,7 @@ $(document).ready(function () {
     $('#activateTinCan').click();
 });
 
-function tc_getContext (extensions) {
+function tc_getContext (extensions, parent) {
     var context = {
         contextActivities: {
             grouping: [{
@@ -102,20 +101,24 @@ function tc_getContext (extensions) {
             }]
         }
     };
-	if (typeof (extensions) !== undefined) {
+	if (typeof (extensions) !== "undefined") {
 		context.extensions = extensions;
+	}
+	if (typeof (parent) !== "undefined") {
+		console.log(parent);
+		context.contextActivities.parent = [parent];
 	}
     return context
 }
 
 function tc_getContextExtensions() {
 	var extensions = {};
-    extensions[ROOT_ACTIVITY_ID + "/gameId"] = gameId;
+    extensions["http://id.tincanapi.com/extension/attemptId"] = gameId;
 	return extensions;
 }
 
-function tc_sendStatementWithContext (stmt, extensions) {
-    stmt.context = tc_getContext(extensions);
+function tc_sendStatementWithContext (stmt, extensions, parent) {
+    stmt.context = tc_getContext(extensions, parent);
 
     tincan.sendStatement(stmt, function () {});
 }
@@ -132,7 +135,7 @@ function tc_sendStatment_Initialize () {
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
-                    type: "http://adlnet.gov/expapi/activities/media",
+                    type: "http://activitystrea.ms/schema/1.0/game",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -157,7 +160,7 @@ function tc_sendStatment_Terminate () {
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
-                    type: "http://adlnet.gov/expapi/activities/media",
+                    type: "http://activitystrea.ms/schema/1.0/game",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -188,7 +191,7 @@ function tc_sendStatment_StartNewGame () {
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
-                    type: "http://adlnet.gov/expapi/activities/media",
+                    type: "http://activitystrea.ms/schema/1.0/game",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -196,7 +199,10 @@ function tc_sendStatment_StartNewGame () {
                         "en-US": "A game of tetris."
                     }
                 }
-            }
+            },
+			result: {
+				duration: "PT0S"
+			}
         },
 		tc_getContextExtensions()
     );
@@ -209,10 +215,11 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
         return;
     }
 
-    extensions[ROOT_ACTIVITY_ID + "/time"] = time;
-    extensions[ROOT_ACTIVITY_ID + "/apm"] = apm;
-    extensions[ROOT_ACTIVITY_ID + "/lines"] = lines;
+    extensions["http://id.tincanapi.com/extension/apm"] = apm;
+    extensions["http://id.tincanapi.com/extension/lines"] = lines;
 
+	console.log (time);
+	
     tc_sendStatementWithContext(
         {
             verb: {
@@ -224,7 +231,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
             object: {
                 id: ROOT_ACTIVITY_ID + "/level" + level,
                 definition: {
-                    type: "http://adlnet.gov/expapi/activities/media",
+                    type: "http://id.tincanapi.com/activitytype/game-level",
                     name: {
                         "en-US": "Js Tetris Level" + level
                     },
@@ -238,10 +245,12 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                 score: {
                     raw: score,
                     min: 0
-                }
+                }, 
+				duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000)
             }
         },
-		tc_getContextExtensions()
+		tc_getContextExtensions(),
+		{id: ROOT_ACTIVITY_ID}
     );
 }
 
@@ -252,10 +261,9 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
         return;
     }
 
-    extensions[ROOT_ACTIVITY_ID + "/level"] = level;
-    extensions[ROOT_ACTIVITY_ID + "/time"] = time;
-    extensions[ROOT_ACTIVITY_ID + "/apm"] = apm;
-    extensions[ROOT_ACTIVITY_ID + "/lines"] = lines;
+    extensions["http://id.tincanapi.com/extension/level"] = level;
+    extensions["http://id.tincanapi.com/extension/apm"] = apm;
+    extensions["http://id.tincanapi.com/extension/lines"] = lines;
 
     tc_sendStatementWithContext(
         {
@@ -268,7 +276,7 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
-                    type: "http://adlnet.gov/expapi/activities/media",
+                    type: "http://activitystrea.ms/schema/1.0/game",
                     name: {
                         "en-US": "Js Tetris - Tin Can Prototype"
                     },
@@ -282,6 +290,7 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
                     raw: score,
                     min: 0
                 },
+				duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000),
                 extensions: extensions
             }
         },
