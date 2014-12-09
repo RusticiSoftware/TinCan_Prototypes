@@ -24,12 +24,12 @@ $(document).ready(function () {
             var actor;
             if (!$(this).is(':checked')) {
                 TCActive = false;
-				tc_sendStatment_Terminate ();
+                tc_sendStatment_Terminate ();
                 $('#tc_actorprompt').hide();
             }
             else {
                 TCActive = true;
-				tc_sendStatment_Initialize ();
+                tc_sendStatment_Initialize ();
                 if (typeof tincan !== "undefined" && tincan.actor !== null) {
                     actor = tincan.actor;
                     actorName = actor.name;
@@ -55,8 +55,8 @@ $(document).ready(function () {
                 alert("Please enter a name and an email.");
                 return;
             }
-			
-			tc_sendStatment_Terminate ();
+            
+            tc_sendStatment_Terminate ();
 
             actorName = $('#tc_nameInput').val();
             actorEmail = $('#tc_emailInput').val();
@@ -73,10 +73,10 @@ $(document).ready(function () {
 
             $('#tc_actorprompt').hide();
             $('#tc_actor').show();
-			
-			tetris.reset();
-			
-			tc_sendStatment_Initialize ();
+            
+            tetris.reset();
+            
+            tc_sendStatment_Initialize ();
         }
     );
 
@@ -96,25 +96,25 @@ function tc_getContext (extensions, parent) {
             grouping: [{
                 id: 'http://tincanapi.com/prototypes/'
             },
-			{
+            {
                 id: ROOT_ACTIVITY_ID
             }]
         }
     };
-	if (typeof (extensions) !== "undefined") {
-		context.extensions = extensions;
-	}
-	if (typeof (parent) !== "undefined") {
-		console.log(parent);
-		context.contextActivities.parent = [parent];
-	}
+    if (typeof (extensions) !== "undefined") {
+        context.extensions = extensions;
+    }
+    if (typeof (parent) !== "undefined") {
+        console.log(parent);
+        context.contextActivities.parent = [parent];
+    }
     return context
 }
 
 function tc_getContextExtensions() {
-	var extensions = {};
+    var extensions = {};
     extensions["http://id.tincanapi.com/extension/attemptId"] = gameId;
-	return extensions;
+    return extensions;
 }
 
 function tc_sendStatementWithContext (stmt, extensions, parent) {
@@ -127,11 +127,11 @@ function tc_sendStatment_Initialize () {
     tc_sendStatementWithContext(
         {
             verb: {
-				id: "http://adlnet.gov/expapi/verbs/initialized",
-				display: {
-					"en-US": "initialized"
-				}
-			},
+                id: "http://adlnet.gov/expapi/verbs/initialized",
+                display: {
+                    "en-US": "initialized"
+                }
+            },
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -152,11 +152,11 @@ function tc_sendStatment_Terminate () {
     tc_sendStatementWithContext(
         {
             verb: {
-				id: "http://adlnet.gov/expapi/verbs/terminated",
-				display: {
-					"en-US": "terminated"
-				}
-			},
+                id: "http://adlnet.gov/expapi/verbs/terminated",
+                display: {
+                    "en-US": "terminated"
+                }
+            },
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -183,11 +183,11 @@ function tc_sendStatment_StartNewGame () {
     tc_sendStatementWithContext(
         {
             verb: {
-				id: "http://adlnet.gov/expapi/verbs/attempted",
-				display: {
-					"en-US": "attempted"
-				}
-			},
+                id: "http://adlnet.gov/expapi/verbs/attempted",
+                display: {
+                    "en-US": "attempted"
+                }
+            },
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -200,11 +200,11 @@ function tc_sendStatment_StartNewGame () {
                     }
                 }
             },
-			result: {
-				duration: "PT0S"
-			}
+            result: {
+                duration: "PT0S"
+            }
         },
-		tc_getContextExtensions()
+        tc_getContextExtensions()
     );
 }
 
@@ -218,16 +218,16 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
     extensions["http://id.tincanapi.com/extension/apm"] = apm;
     extensions["http://id.tincanapi.com/extension/lines"] = lines;
 
-	console.log (time);
-	
+    console.log (time);
+    
     tc_sendStatementWithContext(
         {
             verb: {
-				id: "http://adlnet.gov/expapi/verbs/completed",
-				display: {
-					"en-US": "completed"
-				}
-			},
+                id: "http://adlnet.gov/expapi/verbs/completed",
+                display: {
+                    "en-US": "completed"
+                }
+            },
             object: {
                 id: ROOT_ACTIVITY_ID + "/level" + level,
                 definition: {
@@ -246,11 +246,11 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                     raw: score,
                     min: 0
                 }, 
-				duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000)
+                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000)
             }
         },
-		tc_getContextExtensions(),
-		{id: ROOT_ACTIVITY_ID}
+        tc_getContextExtensions(),
+        {id: ROOT_ACTIVITY_ID}
     );
 }
 
@@ -268,11 +268,11 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
     tc_sendStatementWithContext(
         {
             verb: {
-				id: "http://adlnet.gov/expapi/verbs/completed",
-				display: {
-					"en-US": "completed"
-				}
-			},
+                id: "http://adlnet.gov/expapi/verbs/completed",
+                display: {
+                    "en-US": "completed"
+                }
+            },
             object: {
                 id: ROOT_ACTIVITY_ID,
                 definition: {
@@ -290,11 +290,11 @@ function tc_sendStatment_EndGame (level, time, apm, lines, score) {
                     raw: score,
                     min: 0
                 },
-				duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000),
+                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000),
                 extensions: extensions
             }
         },
-		tc_getContextExtensions()
+        tc_getContextExtensions()
     );
 
     // update high score
