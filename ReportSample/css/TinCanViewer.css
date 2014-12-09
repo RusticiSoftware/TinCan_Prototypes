@@ -30,8 +30,8 @@ tr.statement {cursor:pointer;}
 #golfCourseData td {padding:3px 0;}
 #golfCourseData td.name {}
 #golfCourseData td.completion {text-align:right;}
-#golfCourseData td.completion.complete {color:green;}
-#golfCourseData td.completion.incomplete {color:red;}
+#golfCourseData td.completion.complete, #golfCourseData td.completion.passed {color:green;}
+#golfCourseData td.completion.incomplete, #golfCourseData td.completion.failed {color:red;}
 #golfCourseData td.score {text-align:right;}
 
 table#golfQuestions {}

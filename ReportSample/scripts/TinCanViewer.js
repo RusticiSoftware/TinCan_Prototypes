@@ -458,7 +458,7 @@ function RenderGolfData (err, result) {
 
     html = "<table><tr class='labels'>";
     html += "<td class='name'>Learner</td>";
-    html += "<td class='completion'>Completion</td>";
+    html += "<td class='completion'>Status</td>";
     html += "<td class='score'>Score</td>";
     html += "</tr>";
 
@@ -480,6 +480,17 @@ function RenderGolfData (err, result) {
         if (statements[i].verb.id === "http://adlnet.gov/expapi/verbs/completed") {
             learnerObjs[mbox].complete = 'complete';
         }
+        if (statements[i].verb.id === "http://adlnet.gov/expapi/verbs/passed") {
+            learnerObjs[mbox].complete = 'passed';
+            learnerObjs[mbox].score = (statements[i].result.score.scaled * 100).toString() + "%";
+        }
+        if (statements[i].verb.id === "http://adlnet.gov/expapi/verbs/failed") {
+            learnerObjs[mbox].complete = 'failed';
+            learnerObjs[mbox].score = (statements[i].result.score.scaled * 100).toString() + "%";
+        }
+
+
+
     }
     for (j in learners){
         l = learnerObjs[learners[j]];
@@ -648,8 +659,7 @@ function RenderLocationData (err, result) {
         if (typeof learnerObjs[mbox].name === "undefined" || learnerObjs[mbox].name === mbox) {
             learnerObjs[mbox].name = (statements[i].actor.name !== null) ? statements[i].actor.name : mbox;
         }
-
-        if (statements[i].verb === "http://adlnet.gov/expapi/verbs/completed") {
+        if (statements[i].verb.id === "http://adlnet.gov/expapi/verbs/completed") {
             learnerObjs[mbox].complete = 'complete';
         }
     }
@@ -669,7 +679,7 @@ function RenderLocationData (err, result) {
 function RequestLocations () {
     var getStatementsParams = {
             verb: {
-                id: "http://adlnet.gov/expapi/verbs/experienced"
+                id: "http://activitystrea.ms/schema/1.0/at"
             }
         },
         tourActivity = new TinCan.Activity (
