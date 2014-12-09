@@ -142,8 +142,8 @@
         
         tincan.sendStatement({  
             actor:{
-                name: Config.actor.name[0],
-                mbox: Config.actor.mbox[0]
+                name: Config.actor.name,
+                mbox: Config.actor.mbox
             },
             verb: {
                 id: "http://adlnet.gov/expapi/verbs/experienced",
@@ -164,8 +164,8 @@
 
         $(document).ready(function(){           
             var PROTOTYPE_SHOW_CONFIG_INFO = true;
-            var PROTOTYPE_DEFAULT_NAME = Config.actor.name[0];
-            var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox[0];
+            var PROTOTYPE_DEFAULT_NAME = Config.actor.name;
+            var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox;
             var PROTOTYPE_ENDPOINT = Config.endpoint;
             var PROTOTYPE_AUTH = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
             var PROTOTYPE_REGISTRATION = Config.registration;
@@ -203,7 +203,7 @@
 
             $('#jsExampleLaunch').click(function(){
                 var actor = Config.actor;
-                var em = actor.mbox[0];
+                var em = actor.mbox;
                 var mbox = (em.indexOf('mailto:') == 0) ? em : 'mailto:' + em;
                 actor.mbox = mbox;
                 
