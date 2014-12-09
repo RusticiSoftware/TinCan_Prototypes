@@ -119,11 +119,11 @@
 
                 var stmt = {
                     verb: {
-						id: "http://activitystrea.ms/schema/1.0/at",
-						display: {
-							"en-US": "was at"
-						}
-					},
+                        id: "http://activitystrea.ms/schema/1.0/at",
+                        display: {
+                            "en-US": "was at"
+                        }
+                    },
                     object: {
                         id: pmrk.tc_id,
                         definition: {
@@ -145,8 +145,8 @@
                         extensions: {}
                     }
                 };
-				//Note: we could also use these as activity definition extensions if we know the location of the activity.
-				//In the context we're recording the location of the learner. 
+                //Note: we could also use these as activity definition extensions if we know the location of the activity.
+                //In the context we're recording the location of the learner. 
                 stmt.context.extensions["http://id.tincanapi.com/extension/latitude"] = position.coords.latitude;
                 stmt.context.extensions["http://id.tincanapi.com/extension/longitude"] = position.coords.longitude;
 
@@ -177,18 +177,18 @@
                 }
             }
             if (allVisited) {
-				if (!alreadyCompleted){
-					tincan.sendStatement(
-						{
-							verb: {
-								id: "http://adlnet.gov/expapi/verbs/completed",
-								display: {
-									"en-US": "completed"
-								}
-							}
-						}
-					);
-				}
+                if (!alreadyCompleted){
+                    tincan.sendStatement(
+                        {
+                            verb: {
+                                id: "http://adlnet.gov/expapi/verbs/completed",
+                                display: {
+                                    "en-US": "completed"
+                                }
+                            }
+                        }
+                    );
+                }
 
                 $(".exerciseComplete").show();
             }
@@ -213,8 +213,8 @@
                         sendActor: true,
                         params: {
                             verb: {
-								id: "http://activitystrea.ms/schema/1.0/at",
-							},
+                                id: "http://activitystrea.ms/schema/1.0/at",
+                            },
                             activity: new TinCan.Activity (
                                 {
                                     id: Placemarks[itm].tc_id
@@ -250,14 +250,14 @@
             tincan.sendStatement(
                 {
                     verb: {
-						id: "http://adlnet.gov/expapi/verbs/attempted",
-						display: {
-							"en-US": "attempted"
-						}
-					},
-					result :{
-						duration: "PT0S"
-					}
+                        id: "http://adlnet.gov/expapi/verbs/attempted",
+                        display: {
+                            "en-US": "attempted"
+                        }
+                    },
+                    result :{
+                        duration: "PT0S"
+                    }
                 }
             );
         }
