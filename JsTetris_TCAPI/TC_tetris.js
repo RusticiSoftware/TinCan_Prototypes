@@ -95,7 +95,7 @@ function tc_getContext (extensions, parent) {
         contextActivities: {
             grouping: [
                 {
-                    id: 'http://id.tincanapi.com/activity/tincan-prototypes/'
+                    id: "http://id.tincanapi.com/activity/tincan-prototypes"
                 },
                 {
                     id: ROOT_ACTIVITY_ID
@@ -103,9 +103,9 @@ function tc_getContext (extensions, parent) {
             ],
             category: [
                  {
-                    id: 'http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1',
+                    id: "http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1",
                     definition: {
-                        type: 'http://id.tincanapi.com/activitytype/recipe'
+                        type: "http://id.tincanapi.com/activitytype/recipe"
                     }
                 },
                 {
