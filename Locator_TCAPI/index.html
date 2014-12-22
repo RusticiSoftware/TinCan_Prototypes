@@ -140,7 +140,22 @@
                         contextActivities: {
                             grouping: {
                                 id: COURSE_ID
-                            }
+                            },
+                            category: [
+                                 {
+                                    id: 'http://id.tincanapi.com/recipe/tincan-prototypes/launcher/1',
+                                    definition: {
+                                        type: 'http://id.tincanapi.com/activitytype/recipe'
+                                    }
+                                },
+                                {
+                                    //locator is used rather than nashville-museums-tour as this category of prototype can be shared with other locator examples
+                                    id: 'http://id.tincanapi.com/activity/tincan-prototypes/locator',
+                                    definition: {
+                                        type: 'http://adlnet.gov/expapi/activities/performance'
+                                    }
+                                }
+                            ]
                         },
                         extensions: {}
                     }

@@ -1,7 +1,7 @@
 //TinCan.enableDebug();
 
 
-var ROOT_ACTIVITY_ID = "http://tincanapi.com/JsTetris_TCAPI",
+var ROOT_ACTIVITY_ID = "http://id.tincanapi.com/activity/tincan-prototypes/tetris",
     tincan = new TinCan (
         {
             url: window.location.href,
@@ -93,12 +93,25 @@ $(document).ready(function () {
 function tc_getContext (extensions, parent) {
     var context = {
         contextActivities: {
-            grouping: [{
-                id: 'http://tincanapi.com/prototypes/'
-            },
-            {
-                id: ROOT_ACTIVITY_ID
-            }]
+            grouping: [
+                {
+                    id: 'http://id.tincanapi.com/activity/tincan-prototypes/'
+                },
+                {
+                    id: ROOT_ACTIVITY_ID
+                }
+            ],
+            category: [
+                 {
+                    id: 'http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1',
+                    definition: {
+                        type: 'http://id.tincanapi.com/activitytype/recipe'
+                    }
+                },
+                {
+                    id: ROOT_ACTIVITY_ID
+                }
+            ]
         }
     };
     if (typeof (extensions) !== "undefined") {
@@ -229,7 +242,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                 }
             },
             object: {
-                id: ROOT_ACTIVITY_ID + "/level" + level,
+                id: ROOT_ACTIVITY_ID + "/levels/" + level,
                 definition: {
                     type: "http://id.tincanapi.com/activitytype/game-level",
                     name: {
