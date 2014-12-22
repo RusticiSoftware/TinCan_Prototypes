@@ -6,19 +6,19 @@
 
 ##Activities
 
-* http://id.tincanapi.com/activity/tincan-prototypes/launcher
+* http://id.tincanapi.com/activity/tincan-prototypes/launcher
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example
 * http://id.tincanapi.com/activity/tincan-prototypes/tetris
 * http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour
 
 ##Activity Types
 
-* http://id.tincanapi.com/activitytype/lms
+* http://id.tincanapi.com/activitytype/lms
 * http://id.tincanapi.com/activitytype/recipe
 
 ##Verbs
 
-* http://adlnet.gov/expapi/verbs/experienced
+* http://adlnet.gov/expapi/verbs/experienced
 * http://adlnet.gov/expapi/verbs/launched
 
 ##Extensions
@@ -74,7 +74,7 @@ None.
 
 ##Verbs
 
-* http://adlnet.gov/expapi/verbs/initialized
+* http://adlnet.gov/expapi/verbs/initialized
 * http://adlnet.gov/expapi/verbs/attempted
 * http://adlnet.gov/expapi/verbs/resumed
 * http://adlnet.gov/expapi/verbs/suspended
@@ -107,7 +107,7 @@ Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/t
 
 ##Verbs
 
-* http://adlnet.gov/expapi/verbs/initialized
+* http://adlnet.gov/expapi/verbs/initialized
 * http://adlnet.gov/expapi/verbs/terminated
 * http://adlnet.gov/expapi/verbs/attempted
 * http://adlnet.gov/expapi/verbs/completed
@@ -136,12 +136,12 @@ Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/t
 
 ##Activity Types
 
-* http://id.tincanapi.com/activitytype/place
+* http://id.tincanapi.com/activitytype/place
 * http://adlnet.gov/expapi/activities/performance
 
 ##Verbs
 
-* http://activitystrea.ms/schema/1.0/at
+* http://activitystrea.ms/schema/1.0/at
 * http://adlnet.gov/expapi/verbs/completed
 * http://adlnet.gov/expapi/verbs/attempted
 
@@ -149,6 +149,3 @@ Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/t
 
 * http://id.tincanapi.com/extension/latitude
 * http://id.tincanapi.com/extension/longitude
-
-
-
