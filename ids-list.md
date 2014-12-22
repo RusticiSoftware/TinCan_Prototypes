@@ -12,7 +12,7 @@ All statements include the Recipe ID in the 'category' context activity list.
 ##Activities
 Statements are grouped in the context of ```http://id.tincanapi.com/activity/tincan-prototypes```. They are 
 categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototypes/golf/1``` and 
-```http://id.tincanapi.com/activity/tincan-prototypes/launcher```.
+```http://id.tincanapi.com/activity/tincan-prototypes/launcher``` .
 
 * http://id.tincanapi.com/activity/tincan-prototypes
 * http://id.tincanapi.com/activity/tincan-prototypes/launcher
