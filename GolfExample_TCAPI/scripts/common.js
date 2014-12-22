@@ -1,7 +1,7 @@
 GolfExample = {};
 
 GolfExample.CourseActivity = {
-    id: "http://tincanapi.com/GolfExample_TCAPI",
+    id: "http://id.tincanapi.com/activity/tincan-prototypes/golf-example",
     definition: {
         type: "http://adlnet.gov/expapi/activities/course",
         name: {
@@ -20,8 +20,23 @@ GolfExample.getContext = function(parentActivityId) {
                 id: GolfExample.CourseActivity.id
             },
 			{
-                id: 'http://tincanapi.com/prototypes/'
-            }]
+                id: 'http://id.tincanapi.com/activity/tincan-prototypes/'
+            }],
+            category: [
+                 {
+                    id: 'http://id.tincanapi.com/recipe/tincan-prototypes/golf/1',
+                    definition: {
+                        type: 'http://id.tincanapi.com/activitytype/recipe'
+                    }
+                },
+                {
+                        id: 'http://id.tincanapi.com/activity/tincan-prototypes/elearning',
+                        definition: {
+                        type: 'http://adlnet.gov/expapi/activities/course'
+                    }
+                }
+
+            ]
         }
     };
     if (parentActivityId !== undefined && parentActivityId !== null) {

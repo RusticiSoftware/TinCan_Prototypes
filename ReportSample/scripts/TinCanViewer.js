@@ -42,19 +42,19 @@ $(document).ready(function(){
         },
         tetrisActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/JsTetris_TCAPI"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/tetris"
             }
         ),
         getGolfStatements = {},
         golfActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/GolfExample_TCAPI"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/golf-example"
             }
         ),
         getTourStatements = {},
         tourActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour"
             }
         );
 
@@ -134,7 +134,7 @@ $(document).ready(function(){
             "highscores",
             {
                 activity: {
-                    id: "http://tincanapi.com/JsTetris_TCAPI"
+                    id: "ttp://id.tincanapi.com/activity/tincan-prototypes/tetris"
                 },
                 callback: RenderHighScores
             }
@@ -445,7 +445,7 @@ function RenderGolfData (err, result) {
         },
         assessmentActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/GolfExample_TCAPI/GolfAssessment.html"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment"
             }
         );
 
@@ -546,7 +546,7 @@ function RequestGolfQuestions () {
         },
         assessmentActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/GolfExample_TCAPI"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/golf-example"
             }
         );
 
@@ -684,7 +684,7 @@ function RequestLocations () {
         },
         tourActivity = new TinCan.Activity (
             {
-                id: "http://tincanapi.com/Course/NashvilleMuseumsTour"
+                id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour"
             }
         );
 
