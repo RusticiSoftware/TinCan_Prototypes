@@ -1,0 +1,568 @@
+http://id.tincanapi.com/activity/tincan-prototypes/launcher
+{
+    "type": "http://id.tincanapi.com/activitytype/lms",
+    "name": {
+        "en-US": "Tin Can Prototypes Launcher"
+    },
+    "description": {
+        "en-US": "A tool for launching the Tin Can prototypes. Simulates the role of an LMS in launching experiences."
+    }
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/elearning
+{
+    "type": "http://adlnet.gov/expapi/activities/course",
+    "name": {
+        "en-US": "E-learning course"
+    },
+    "description": {
+        "en-US": "An e-learning course built using the golf prototype framework."
+    }
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example
+{
+    "type": "http://adlnet.gov/expapi/activities/course",
+    "name": {
+        "en-US": "Golf Example - Tin Can Course"
+    },
+    "description": {
+        "en-US": "An overview of how to play the great game of golf."
+    }
+}
+
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment
+{
+    "name": {
+        "en-US": "Golf Example Assessment"
+    },
+    "description": {
+        "en-US": "An Assessment for the Golf Example course."
+    },
+    "type": "http://adlnet.gov/expapi/activities/assessment"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Playing/Playing
+{
+    "name": {
+        "en-US": "Playing Golf"
+    },
+    "description": {
+        "en-US": "An overview of the game of golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Playing/Scoring
+{
+    "name": {
+        "en-US": "Scoring"
+    },
+    "description": {
+        "en-US": "An overview of how to score a round of golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Playing/OtherScoring
+{
+    "name": {
+        "en-US": "Other Scoring Systems"
+    },
+    "description": {
+        "en-US": "An overview of some alternative methods of scoring a round of golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Playing/RulesOfGolf
+{
+    "name": {
+        "en-US": "Rules of Golf"
+    },
+    "description": {
+        "en-US": "An overview of standardized procedures in which the game of golf should be played."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Etiquette/Course
+{
+    "name": {
+        "en-US": "Etiquette - Course"
+    },
+    "description": {
+        "en-US": "An overview of golf etiquette as it pertains to the course."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Etiquette/Distracting
+{
+    "name": {
+        "en-US": "Etiquette - Distracting"
+    },
+    "description": {
+        "en-US": "An overview of golf etiquette as it pertains to game play distractions."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Etiquette/Play
+{
+    "name": {
+        "en-US": "Etiquette - Playing"
+    },
+    "description": {
+        "en-US": "An overview of golf etiquette as it pertains to game play."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Handicapping/Overview
+{
+    "name": {
+        "en-US": "Handicapping"
+    },
+    "description": {
+        "en-US": "An overview of handicapping in golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Handicapping/CalculatingHandicap
+{
+    "name": {
+        "en-US": "Handicap Calculating"
+    },
+    "description": {
+        "en-US": "An overview of how to calculate a handicap in golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Handicapping/CalculatingScore
+{
+    "name": {
+        "en-US": "Calculating a Score"
+    },
+    "description": {
+        "en-US": "An overview of how to calculate a score with an applied handicap in golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Handicapping/Example
+{
+    "name": {
+        "en-US": "Handicapping Example"
+    },
+    "description": {
+        "en-US": "An example of how to calculate a score with an applied handicap for a round of golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/HavingFun/HowToHaveFun
+{
+    "name": {
+        "en-US": "How to Have Fun"
+    },
+    "description": {
+        "en-US": "An overview of how to have fun playing golf."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/HavingFun/MakeFriends
+{
+    "name": {
+        "en-US": "How to Make Friends on the Golf Course"
+    },
+    "description": {
+        "en-US": "An overview of how to make friends on the golf course. Friends make golf better."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/HavingFun/HowToBeStylish
+{
+    "name": {
+        "en-US": "How to be Stylish"
+    },
+    "description": {
+        "en-US": "Some tips for how to be stylish on the golf course. Directed primarily at women."
+    },
+    "type": "http://activitystrea.ms/schema/1.0/page"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_1
+{
+    "description": {
+        "en-US": "The rules of golf are maintained by:"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "choice",
+    "correctResponsesPattern": [
+        "USGA and Royal and Ancient"
+    ],
+    "choices": [
+        {
+            "id": "The UN",
+            "description": {
+                "en-US": "The UN"
+            }
+        },
+        {
+            "id": "USGA and Royal and Ancient",
+            "description": {
+                "en-US": "USGA and Royal and Ancient"
+            }
+        },
+        {
+            "id": "The PGA",
+            "description": {
+                "en-US": "The PGA"
+            }
+        },
+        {
+            "id": "Each course has it's own rules",
+            "description": {
+                "en-US": "Each course has it's own rules"
+            }
+        }
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_2
+{
+    "description": {
+        "en-US": "A score of two under par on a given hole is known as a(n):"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "choice",
+    "correctResponsesPattern": [
+        "eagle"
+    ],
+    "choices": [
+        {
+            "id": "opportunity for improvement",
+            "description": {
+                "en-US": "opportunity for improvement"
+            }
+        },
+        {
+            "id": "birdie",
+            "description": {
+                "en-US": "birdie"
+            }
+        },
+        {
+            "id": "double bogie",
+            "description": {
+                "en-US": "double bogie"
+            }
+        },
+        {
+            "id": "eagle",
+            "description": {
+                "en-US": "eagle"
+            }
+        }
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_3
+{
+    "description": {
+        "en-US": "A typical golf course has ____ holes"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "numeric",
+    "correctResponsesPattern": [
+        "18"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_4
+{
+    "description": {
+        "en-US": "In stableford scoring, the highest score wins."
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "true-false",
+    "correctResponsesPattern": [
+        "true"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_5
+{
+    "description": {
+        "en-US": "Par for a 175 yard hole is typically:"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "numeric",
+    "correctResponsesPattern": [
+        "3"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_1
+{
+    "description": {
+        "en-US": "When another player is attempting a shot, it is best to stand:"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "choice",
+    "correctResponsesPattern": [
+        "Out of the player's line of sight"
+    ],
+    "choices": [
+        {
+            "id": "On top of his ball",
+            "description": {
+                "en-US": "On top of his ball"
+            }
+        },
+        {
+            "id": "Directly in his line of fire",
+            "description": {
+                "en-US": "Directly in his line of fire"
+            }
+        },
+        {
+            "id": "Out of the player's line of sight",
+            "description": {
+                "en-US": "Out of the player's line of sight"
+            }
+        }
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_2
+{
+    "description": {
+        "en-US": "Generally sand trap rakes should be left outside of the hazard"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "true-false",
+    "correctResponsesPattern": [
+        "true"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_3
+{
+    "description": {
+        "en-US": "The player with the best score on previous hole tees off:"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "choice",
+    "correctResponsesPattern": [
+        "First"
+    ],
+    "choices": [
+        {
+            "id": "First",
+            "description": {
+                "en-US": "First"
+            }
+        },
+        {
+            "id": "Last",
+            "description": {
+                "en-US": "Last"
+            }
+        },
+        {
+            "id": "With a putter",
+            "description": {
+                "en-US": "With a putter"
+            }
+        }
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.handicap_1
+{
+    "description": {
+        "en-US": "Which formula is used to calculate the 'course handicap'?"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "choice",
+    "correctResponsesPattern": [
+        "Course Handicap = Handicap index * Slope Rating / 113"
+    ],
+    "choices": [
+        {
+            "id": "Course Handicap = Handicap index + number of holes * number of lost balls in last round",
+            "description": {
+                "en-US": "Course Handicap = Handicap index + number of holes * number of lost balls in last round"
+            }
+        },
+        {
+            "id": "Course Handicap = Number of years experience / annual equipment spending",
+            "description": {
+                "en-US": "Course Handicap = Number of years experience / annual equipment spending"
+            }
+        },
+        {
+            "id": "Course Handicap = Handicap index * Slope Rating / 113",
+            "description": {
+                "en-US": "Course Handicap = Handicap index * Slope Rating / 113"
+            }
+        }
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.handicap_2
+{
+    "description": {
+        "en-US": "Golfer A has a course handicap of 6. Golfer B has a course handicap of 10. Golfer A shoots an 81. Golfer B shoots an 84. Golfer B wins the match be how many strokes?"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "numeric",
+    "correctResponsesPattern": [
+        "1"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.handicap_3
+{
+        "en-US": "A 'scratch golfer' has a handicap of ___"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "numeric",
+    "correctResponsesPattern": [
+        "0"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.handicap_4
+{
+    "description": {
+        "en-US": "Golfer A has a course handicap of 3. Golfer B has a course handicap of 28. On the 6th handicap hole, how many strokes will Golfer A have to give Golfer B in match play?"
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "numeric",
+    "correctResponsesPattern": [
+        "2"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_1
+{
+    "description": {
+        "en-US": "To make friends on the golf course, you should play really slowly."
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "true-false",
+    "correctResponsesPattern": [
+        "false"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_2
+{
+    "description": {
+        "en-US": "Knickers indicate a refined sense of style."
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "true-false",
+    "correctResponsesPattern": [
+        "false"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_3
+{
+    "description": {
+        "en-US": "You should take your score very seriously if you want to have a lot of fun on the course."
+    },
+    "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+    "interactionType": "true-false",
+    "correctResponsesPattern": [
+        "false"
+    ]
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/tetris
+{
+    "type": "http://activitystrea.ms/schema/1.0/game",
+    "name": {
+        "en-US": "Js Tetris - Tin Can Prototype"
+    },
+    "description": {
+        "en-US": "A game of tetris."
+    }
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour
+{
+    "type": "http://adlnet.gov/expapi/activities/performance",
+    "name": {
+        "en-US": "Nashville Museums Tour"
+    },
+    "description": {
+        "en-US": "An exploration of museums in the greater Nashville TN area."
+    }
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/parthenon
+{
+    "type": "http://id.tincanapi.com/activitytype/place",
+    "name": {
+        "en-US": "Parthenon"
+    },
+    "description": {
+        "en-US": "The Parthenon in Nashville, Tennessee is a full-scale replica of the original Parthenon in Athens. It was built in 1897 as part of the Tennessee Centennial Exposition. The Parthenon serves as the city of Nashville's art museum."
+    }
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/country-music-hall-of-fame
+{
+    "name": {
+        "en-US": "Country Music Hall of Fame and Museum"
+    },
+    "description": {
+        "en-US": "The mission of the Country Music Hall of Fame and Museum is to identify and preserve the evolving history and traditions of country music and to educate its audiences. Functioning as a local history museum and as an international arts organization, the Country Music Hall of Fame and Museum serves visiting and non-visiting audiences including fans, students, scholars, members of the music industry."
+    },
+    "type": "http://id.tincanapi.com/activitytype/place"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/the-frist
+{
+    "name": {
+        "en-US": "Frist Center For The Visual Arts"
+    },
+    "description": {
+        "en-US": "The Frist Center opened in April 2001, and since that time has hosted a spectacular array of art from the region, the country, and around the world."
+    },
+    "type": "http://id.tincanapi.com/activitytype/place"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/adventure-science-center
+{
+    "name": {
+        "en-US": "Adventure Science Center"
+    },
+    "description": {
+        "en-US": "Igniting curiosity and inspiring the discovery of science for all ages."
+    },
+    "type": "http://id.tincanapi.com/activitytype/place"
+}
+
+http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/cheekwood
+{
+    "name": {
+        "en-US": "Cheekwood-Botanical Garden & Museum of Art"
+    },
+    "description": {
+        "en-US": "Cheekwood is a 55-acre botanical garden and art museum located on the historic Cheek estate. Cheekwood exists to celebrate and preserve its landscape, buildings, art and botanical collections and, through these unique means, provide an inspiring place for visitors to explore their connections with art, nature and the environment."
+    },
+    "type": "http://id.tincanapi.com/activitytype/place"
+}
+

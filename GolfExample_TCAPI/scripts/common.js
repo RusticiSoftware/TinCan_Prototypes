@@ -13,29 +13,37 @@ GolfExample.CourseActivity = {
     }
 };
 
-GolfExample.getContext = function(parentActivityId) {
+GolfExample.getContext = function(parentActivityId, isAssessment) {
+    isAssessment = typeof isAssessment !== 'undefined' ? isAssessment : false;
     var ctx = {
         contextActivities: {
-            grouping: [{
-                id: GolfExample.CourseActivity.id
-            },
-			{
-                id: 'http://id.tincanapi.com/activity/tincan-prototypes/'
-            }],
+            grouping: [
+                {
+                    id: GolfExample.CourseActivity.id
+                },
+    			{
+                    id: "http://id.tincanapi.com/activity/tincan-prototypes"
+                }
+            ],
             category: [
                  {
-                    id: 'http://id.tincanapi.com/recipe/tincan-prototypes/golf/1',
+                    id: "http://id.tincanapi.com/recipe/tincan-prototypes/golf/1",
                     definition: {
-                        type: 'http://id.tincanapi.com/activitytype/recipe'
+                        type: "http://id.tincanapi.com/activitytype/recipe"
                     }
                 },
                 {
-                        id: 'http://id.tincanapi.com/activity/tincan-prototypes/elearning',
-                        definition: {
-                        type: 'http://adlnet.gov/expapi/activities/course'
+                    id: "http://id.tincanapi.com/activity/tincan-prototypes/elearning",
+                    definition: {
+                        type: "http://adlnet.gov/expapi/activities/course",
+                        name: {
+                            "en-US": "E-learning course"
+                        },
+                        description: {
+                            "en-US": "An e-learning course built using the golf prototype framework."
+                        }
                     }
                 }
-
             ]
         }
     };
@@ -43,6 +51,11 @@ GolfExample.getContext = function(parentActivityId) {
         ctx.contextActivities.parent = {
             id: parentActivityId
         };
+    }
+    if (isAssessment){
+        ctx.contextActivities.grouping.push({
+            id: GolfExample.CourseActivity.id + "/GolfAssessment"
+        });
     }
     return ctx;
 };

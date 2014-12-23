@@ -41,9 +41,7 @@
                 }
             },
             object: testObj,
-            context: GolfExample.getContext(
-                GolfExample.CourseActivity.id
-            ),
+            context: GolfExample.getContext(GolfExample.CourseActivity.id, true),
             result: {
                 duration: "PT0H0M0S"
             }
@@ -96,7 +94,7 @@
         }
 
         // record the results of a test, passes in score as a percentage
-        function GetRecordTestStatement(score, activityId, duration){
+        function GetRecordTestStatement(score, activityId, duration, isAssessment){
             // send score
             var scaledScore = score / 100,
                 success = (scaledScore >= 0.8),
@@ -132,7 +130,7 @@
                     completion: true,
                     duration: duration
                 },
-                context: GolfExample.getContext(GolfExample.CourseActivity.id)
+                context: GolfExample.getContext(GolfExample.CourseActivity.id, isAssessment)
             };
 
             return stmt;
@@ -190,7 +188,7 @@
                     response: learnerResponse,
                     success: wasCorrect
                 },
-                context: GolfExample.getContext(activityId)
+                context: GolfExample.getContext(activityId, true)
             }
         }
 
@@ -287,8 +285,8 @@
                     new Date()) - 
                     assessmentStartTimestamp)),
             attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
-            answerStatements.push(GetRecordTestStatement(score, activityId, assessmentAttemptDuration));
-            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, attemptDuration));
+            answerStatements.push(GetRecordTestStatement(score, activityId, assessmentAttemptDuration, true));
+            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, attemptDuration, false));
 
             // send question answers
             tincan.sendStatements(answerStatements);
