@@ -1,8 +1,8 @@
-# Launcher
+# Launcher Prototype
 
-The launcher prototype simulates the role of an LMS in launching activties. It
+The launcher prototype simulates the role of an LMS in launching activities. It
 issues an 'experienced' statement when the learner accesses the page and a
-'launched' statement for each activity when launched. 
+'launched' statement for each activity when launched.
 
 ##Recipe
 All statements include the Recipe ID in the 'category' context activity list.
@@ -35,7 +35,7 @@ The launcher itself is experienced. It launches the other content.
 ##Extensions
 None.
 
-# Golf
+# Golf Prototype
 The Golf prototype is an example of a classic slide-slide-quiz e-learning course. This
 recipe is based on emerging best practice for this type of course. 
 
@@ -67,6 +67,11 @@ Activity ids indicate the position of each element within the course structure.
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Etiquette/Distracting
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/Etiquette/Play
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment
+* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_1
+* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_2
+* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_3
+* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_4
+* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_5
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_1
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_2
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.etiquette_3
@@ -77,10 +82,7 @@ Activity ids indicate the position of each element within the course structure.
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_1
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_2
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_3
-* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_1
-* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_2
-* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_3
-* http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.playing_4
+
 
 ##Activity Types
 The course contains pages and an assessment which contains cmi interactions.
@@ -108,9 +110,9 @@ Pages are experienced and cmi intereactions are answered.
 ##Extensions
 None.
 
-# Tetris
+# Tetris Prototype
 The Tetris prototype is an example of a game. Concepts from this recipe may be reflected in serious learning games, but
-this recipe as a whole (the 'lines' extension in particular) is only suitable for Tetris style games.  
+this recipe as a whole (the 'lines' extension in particular) is only suitable for Tetris style games.
 
 ##Recipe
 All statements include the Recipe ID in the 'category' context activity list.
@@ -155,7 +157,7 @@ by the player.
 * http://id.tincanapi.com/extension/apm
 * http://id.tincanapi.com/extension/lines
 
-# Locator
+# Locator Prototype
 The locator prototype is an example of a learning activity that takes advantage on native features of a mobile device,
 in this case the GPS. This recipe may be applicable to any location based activity. 
 
