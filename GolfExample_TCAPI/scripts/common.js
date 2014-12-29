@@ -35,7 +35,7 @@ GolfExample.getContext = function(parentActivityId, isAssessment) {
                 {
                     id: "http://id.tincanapi.com/activity/tincan-prototypes/elearning",
                     definition: {
-                        type: "http://adlnet.gov/expapi/activities/course",
+                        type: "http://id.tincanapi.com/activitytype/source",
                         name: {
                             "en-US": "E-learning course"
                         },
