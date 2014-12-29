@@ -109,7 +109,10 @@ function tc_getContext (extensions, parent) {
                     }
                 },
                 {
-                    id: ROOT_ACTIVITY_ID
+                    id: "http://id.tincanapi.com/activity/tincan-prototypes/tetris-template",
+                    definition: {
+                        type: "http://id.tincanapi.com/activitytype/source"
+                    }
                 }
             ]
         }

@@ -16,6 +16,7 @@ categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototype
 
 * http://id.tincanapi.com/activity/tincan-prototypes
 * http://id.tincanapi.com/activity/tincan-prototypes/launcher
+* http://id.tincanapi.com/activity/tincan-prototypes/launcher-template
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example
 * http://id.tincanapi.com/activity/tincan-prototypes/tetris
 * http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour
@@ -24,6 +25,7 @@ categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototype
 The launcher plays the role of an LMS in launching the content. 
 
 * http://id.tincanapi.com/activitytype/recipe
+* http://id.tincanapi.com/activitytype/source
 * http://id.tincanapi.com/activitytype/lms
 
 ##Verbs
@@ -88,6 +90,7 @@ Activity ids indicate the position of each element within the course structure.
 The course contains pages and an assessment which contains cmi interactions.
 
 * http://id.tincanapi.com/activitytype/recipe
+* http://id.tincanapi.com/activitytype/source
 * http://adlnet.gov/expapi/activities/course
 * http://activitystrea.ms/schema/1.0/page
 * http://adlnet.gov/expapi/activities/assessment
@@ -122,9 +125,10 @@ All statements include the Recipe ID in the 'category' context activity list.
 ##Activities
 Statements are grouped in the context of ```http://id.tincanapi.com/activity/tincan-prototypes``` and ```http://id.tincanapi.com/activity/tincan-prototypes/tetris```. They are categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1``` and ```http://id.tincanapi.com/activity/tincan-prototypes/tetris```.
 
-The game as a whole has an activity id. 
+The game as a whole has an activity id, and there's a category activity id for games based on this prototype. 
 
 * http://id.tincanapi.com/activity/tincan-prototypes/tetris
+* http://id.tincanapi.com/activity/tincan-prototypes/tetris-template
 
 Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/tincan-prototypes/tetris/levels/n``` where ```n``` is the level number. 
 
@@ -132,6 +136,7 @@ Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/t
 The game has game levels. 
 
 * http://id.tincanapi.com/activitytype/recipe
+* http://id.tincanapi.com/activitytype/source
 * http://activitystrea.ms/schema/1.0/game
 * http://id.tincanapi.com/activitytype/game-level
 
@@ -182,6 +187,8 @@ The activity contains a number of places.
 ##Activity Types
 The activity is a 'performance' type as the learner must perform a series of tasks, i.e. visiting places. 
 
+* http://id.tincanapi.com/activitytype/recipe
+* http://id.tincanapi.com/activitytype/source
 * http://id.tincanapi.com/activitytype/place
 * http://adlnet.gov/expapi/activities/performance
 
