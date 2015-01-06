@@ -247,7 +247,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
             object: {
                 id: ROOT_ACTIVITY_ID + "/levels/" + level,
                 definition: {
-                    type: "http://id.tincanapi.com/activitytype/game-level",
+                    type: "http://curatr3.com/define/type/level",
                     name: {
                         "en-US": "Js Tetris Level" + level
                     },
