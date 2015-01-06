@@ -138,7 +138,7 @@ The game has game levels.
 * http://id.tincanapi.com/activitytype/recipe
 * http://id.tincanapi.com/activitytype/source
 * http://activitystrea.ms/schema/1.0/game
-* http://id.tincanapi.com/activitytype/game-level
+* http://curatr3.com/define/type/level
 
 ##Verbs
 The session is initialized and terminated when the gamer enters the page and when they turn tracking off and on. 
