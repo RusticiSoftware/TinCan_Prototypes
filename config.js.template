@@ -1,10 +1,10 @@
 //globals: equal, responseText, statement, ok, deepEqual, QUnit, module, asyncTest, Util, start, golfStatements, console
 /*jslint bitwise: true, browser: true, plusplus: true, maxerr: 50, indent: 4 */
 function Config() {
-	"use strict";
+    "use strict";
 }
 Config.endpoint = "<TCAPI end point (ending with slash)>";
 Config.authUser = "<account id>";
 Config.authPassword = "<password>";
-Config.actor = { "mbox":["<learner email>"], "name":["<Learner Name>"] };
+Config.actor = { "mbox":"<learner email>", "name":"<Learner Name>" };
 Config.registration = "<registration-uuid>";

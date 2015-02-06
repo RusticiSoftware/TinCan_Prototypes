@@ -7,10 +7,10 @@
         @import url( css/style.css );
     </style>
 
-    <script src="scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
-    <script src="scripts/common.js" type="text/javascript"></script>
+    <script src="scripts/TinCanJS/build/tincan-min.js"></script>
+    <script src="scripts/common.js"></script>
     <script type="text/javascript">
-        var activityId = GolfExample.CourseActivity.id + "/GolfAssessment.html";
+        var activityId = GolfExample.CourseActivity.id + "/GolfAssessment";
         var testObj = {
             id: activityId,
             definition: {
@@ -23,6 +23,7 @@
                 type: "http://adlnet.gov/expapi/activities/assessment"
             }
         };
+        var assessmentStartTimestamp = new Date();
 
         var tincan = new TinCan (
             {
@@ -31,12 +32,19 @@
             }
         );
 
+        //Each go at the assessment is a new attempt at the assessment; there's no bookmarking within the assessment
         var stmt = {
-            verb: "attempted",
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/attempted",
+                display: {
+                    "en-US" : "attempted"
+                }
+            },
             object: testObj,
-            context: GolfExample.getContext(
-                GolfExample.CourseActivity.id
-            )
+            context: GolfExample.getContext(GolfExample.CourseActivity.id, true),
+            result: {
+                duration: "PT0H0M0S"
+            }
         };
 
         tincan.sendStatement(stmt);
@@ -63,19 +71,6 @@
 
         var test = new Test([]);
 
-        var queryString = new String(document.location.search);
-        if (queryString.length > 0) {
-            queryString = queryString.substring(1);
-
-            var includeFiles = queryString.split("&");
-            for (var i = 0; i < includeFiles.length; i++){
-                if (includeFiles[i].indexOf("questions=") >= 0) {
-                    var questionsFile = includeFiles[i].replace("questions=", "");
-                    document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
-                }
-            }
-        }
-
         function CheckNumeric(obj){
             var userText = new String(obj.value);
             var numbersRegEx = /[^0-9]/g;
@@ -86,13 +81,28 @@
         }
 
         // record the results of a test, passes in score as a percentage
-        function GetRecordTestStatement(score, activityId){
+        function GetRecordTestStatement(score, activityId, parentActivityId, duration, isAssessment){
             // send score
             var scaledScore = score / 100,
-                success = (scaledScore >= 0.8);
-
+                success = (scaledScore >= 0.8),
+                verb;
+            if (success){
+                verb = {
+                    id: "http://adlnet.gov/expapi/verbs/passed",
+                    display: {
+                        "en-US" : "passed"
+                    }
+                }
+            } else {
+                verb = {
+                    id: "http://adlnet.gov/expapi/verbs/failed",
+                    display: {
+                        "en-US" : "failed"
+                    }
+                }
+            }
             var stmt = {
-                verb: "completed",
+                verb: verb,
                 object: {
                     id: activityId
                 },
@@ -104,9 +114,10 @@
                         max: 100
                     },
                     success: success,
-                    completion: true
+                    completion: true,
+                    duration: duration
                 },
-                context: GolfExample.getContext(GolfExample.CourseActivity.id)
+                context: GolfExample.getContext(parentActivityId, isAssessment)
             };
 
             return stmt;
@@ -118,6 +129,8 @@
                 console.log("GetQuestionAnswerStatement");
             }
 
+            strCorrectAnswer = String(correctAnswer);
+
             //send question info
             var qObj = {
                 id: id,
@@ -128,10 +141,15 @@
                     },
                     interactionType: questionType,
                     correctResponsesPattern: [
-                        String(correctAnswer)
+                        strCorrectAnswer
                     ]
                 }
             };
+
+            //format numeric response pattern. 
+            if (qObj.definition.interactionType == "numeric"){
+                qObj.definition.correctResponsesPattern[0] = strCorrectAnswer + ":" + strCorrectAnswer;
+            }
 
             if (questionChoices !== null && questionChoices.length > 0) {
                 var choices = [];
@@ -139,7 +157,7 @@
                     var choice = questionChoices[i];
                     choices.push(
                         {
-                            id: choice,
+                            id: choice.replace(/\s+/g, '-'),
                             description: {
                                 "en-US": choice
                             }
@@ -150,16 +168,25 @@
                     console.log(qObj);
                 }
                 qObj.definition.choices = choices;
+                qObj.definition.correctResponsesPattern = [
+                    correctAnswer.replace(/\s+/g, '-')
+                ];
+                learnerResponse = learnerResponse.replace(/\s+/g, '-');
             }
 
             return {
-                verb: "answered",
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/answered",
+                    display: {
+                        "en-US" : "answered"
+                    }
+                },
                 object: qObj,
                 result: {
                     response: learnerResponse,
                     success: wasCorrect
                 },
-                context: GolfExample.getContext(activityId)
+                context: GolfExample.getContext(activityId, true)
             }
         }
 
@@ -250,12 +277,26 @@
             var score = Math.round(correctCount * 100 / totalQuestions);
             resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
             document.getElementById("test").innerHTML = resultsSummary;
-
-            answerStatements.push(GetRecordTestStatement(score, activityId));
-            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id));
+            
+            var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(
+                Math.abs((
+                    new Date()) - 
+                    assessmentStartTimestamp)),
+            attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
+            answerStatements.push(GetRecordTestStatement(score, activityId, GolfExample.CourseActivity.id, assessmentAttemptDuration, true));
+            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, null, attemptDuration, false));
 
             // send question answers
             tincan.sendStatements(answerStatements);
+            
+            parent.attemptComplete = true;
+            var bookmarking = {
+                attemptComplete: true
+            }
+            tincan.setState("bookmarking-data", bookmarking, {
+                contentType: "application/json",
+                overwriteJSON: false
+            });
         }
 
         function RenderTest(test){
@@ -307,6 +348,10 @@
             document.write ("</form></div>");      //close out test div
         }
     </script>
+    <script src="Etiquette/questions.js"></script>
+    <script src="Handicapping/questions.js"></script>
+    <script src="HavingFun/questions.js"></script>
+    <script src="Playing/questions.js"></script>
     <script src="scripts/contentfunctions.js" type="text/javascript"></script>
 </head>
 

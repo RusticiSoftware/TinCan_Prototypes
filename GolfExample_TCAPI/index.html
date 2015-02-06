@@ -27,10 +27,12 @@
                 "HavingFun/HowToHaveFun.html",
                 "HavingFun/MakeFriends.html",
                 "HavingFun/HowToBeStylish.html",
-                "assessmenttemplate.html?questions=Playing&questions=Etiquette&questions=Handicapping&questions=HavingFun"
+                "assessmenttemplate.html"
             ],
             currentPage = 0,
-            startTimeStamp = null,
+            startTimeStamp = new Date(),
+            startAttemptDuration = 0,
+            attemptComplete = false,
             processedUnload = false,
             reachedEnd = false,
             maxPageReached = 0,
@@ -40,14 +42,6 @@
                     activity: GolfExample.CourseActivity
                 }
             );
-
-        tincan.sendStatement(
-            {
-                verb: "attempted",
-                context: GolfExample.getContext()
-            }
-        );
-
         //
         // functions for sizing the iFrame
         //
@@ -89,19 +83,71 @@
         function doStart(){
             //get the iFrame sized correctly and set up
             SetupIFrame();
+            
+            var statements = [];
+            statements.push({
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/initialized",
+                    display: {
+                        "en-US" : "initialized"
+                    }
+                },
+                context: GolfExample.getContext(),
+                result: {
+                    duration: "PT0H0M0S"
+                }
+            });
+            var attemptedStatement = {
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/attempted",
+                    display: {
+                        "en-US" : "attempted"
+                    }
+                },
+                context: GolfExample.getContext(),
+                result: {
+                    duration: "PT0H0M0S"
+                }
+            };
 
             //get activity_id bookmark if it exists
-            var stateResult = tincan.getState("location");
+            var stateResult = tincan.getState("bookmarking-data");
             if (stateResult.err === null && stateResult.state !== null && stateResult.state.contents !== "") {
-                if (confirm("Would you like to resume from where you previously left off? ")) {
-                    currentPage = parseInt(stateResult.state.contents, 10);
+                if (confirm("Would you like to resume from where you previously left off? Click cancel to start a afresh.")) {
+                    currentPage = parseInt(stateResult.state.contents.location, 10);
+                    startAttemptDuration = stateResult.state.contents.attemptDuration;
+                    attemptComplete = stateResult.state.contents.attemptComplete;
+                    if (!attemptComplete) {
+                        var resumedStatement = {
+                            verb: {
+                                id: "http://adlnet.gov/expapi/verbs/resumed",
+                                display: {
+                                    "en-US": "resumed"
+                                }
+                            },
+                            context: GolfExample.getContext(),
+                            result: {
+                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(startAttemptDuration)
+                            }
+                        }
+                        statements.push(resumedStatement);
+                    }
+                }
+                else {
+                    currentPage = 0;
+                    startAttemptDuration = 0;
+                    attemptComplete = false;
+                    //start new attempt
+                    statements.push(attemptedStatement);
+                    saveBookmarking();
                 }
             }
             else {
                 // if there isn't a stored bookmark, start the user at the first page
                 currentPage = 0;
+                statements.push(attemptedStatement);
             }
-
+            tincan.sendStatements(statements);
             goToPage();
         }
 
@@ -130,8 +176,7 @@
                 prevButton.disabled = false;
             }
 
-            // save the current location as the bookmark
-            tincan.setState("location", currentPage, function () {});
+            saveBookmarking();
         }
 
         function doPrevious(){
@@ -147,6 +192,45 @@
             }
             goToPage();
         }
+        
+        function doExit(){
+            document.getElementById("exitButton").setAttribute("value","Saving...");
+            saveBookmarking(function(){
+                document.getElementById("exitButton").setAttribute("value","Save & Exit");
+                if (confirm("Are you sure you want to Exit?")) {
+                    var statements = [];
+                    if (!attemptComplete){
+                        statements.push({
+                            verb: {
+                                id: "http://adlnet.gov/expapi/verbs/suspended",
+                                display: {
+                                    "en-US": "suspended"
+                                }
+                            },
+                            context: GolfExample.getContext(),
+                            result: {
+                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(getAttemptDuration())
+                            }
+                        });
+                    }
+                    statements.push({
+                        verb: {
+                            id: "http://adlnet.gov/expapi/verbs/terminated",
+                            display: {
+                                "en-US": "terminated"
+                            }
+                        },
+                        context: GolfExample.getContext(),
+                        result: {
+                            duration: TinCan.Utils.convertMillisecondsToISO8601Duration(getSessionDuration())
+                        }
+                    });
+                    tincan.sendStatements(statements, function (){
+                        close();
+                    });
+                }
+            });  
+        }
 
         function FormatChoiceResponse(value){
             var newValue = new String(value);
@@ -155,6 +239,26 @@
             newValue = newValue.replace(/\W/g, "_");
 
             return newValue;
+        }
+        
+        function saveBookmarking(callback){
+            var bookmarking = {
+                location: currentPage,
+                attemptDuration: getAttemptDuration(),
+                attemptComplete: attemptComplete
+            }
+            tincan.setState("bookmarking-data", bookmarking, {
+                contentType: "application/json",
+                callback: callback
+            });
+        }
+        
+        function getAttemptDuration(){
+            return startAttemptDuration + getSessionDuration();
+        }
+        
+        function getSessionDuration(){
+            return Math.abs ((new Date()) - startTimeStamp);
         }
     </script>
 </head>
@@ -168,6 +272,7 @@
 <div id="navDiv">
     <input type="button" value="<- Previous" id="butPrevious" onclick="doPrevious();"/>
     <input type="button" value="Next ->" id="butNext" onclick="doNext();"/>
+    <input id="exitButton" type="button" value="Save & Exit" id="butNext" onclick="doExit();"/>
 </div>
 
 <script type="text/javascript">

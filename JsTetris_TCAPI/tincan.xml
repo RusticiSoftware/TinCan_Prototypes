@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <tincan xmlns="http://projecttincan.com/tincan.xsd">
-	<activities>
-		<activity id="http://tincanapi.com/JsTetris_TCAPI" type="http://adlnet.gov/expapi/activities/course">
-			<name>Tin Can Tetris Example</name>
-			<description lang="en-US">A game of Tetris</description>
-			<launch lang="en-us">tetris.html</launch>
-		</activity>
-	</activities>
+    <activities>
+        <activity id="http://id.tincanapi.com/activity/tincan-prototypes/tetris" type="http://activitystrea.ms/schema/1.0/game">
+            <name>Tin Can Tetris Example</name>
+            <description lang="en-US">A game of Tetris</description>
+            <launch lang="en-us">tetris.html</launch>
+        </activity>
+    </activities>
 </tincan>
