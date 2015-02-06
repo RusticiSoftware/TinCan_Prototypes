@@ -6,9 +6,9 @@ var COURSE_ID = "http://tincanapi.com/Course/NashvilleMuseumsTour";
 var COURSE_DESC = "An exploration of museums in the greater Nashville TN area.";
 
 var config = {
-	CurrentLocationTitle : "My Current Location",
-	CurrentLocationIcon : "http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
-	Placemarks : [
+    CurrentLocationTitle : "My Current Location",
+    CurrentLocationIcon : "http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+    Placemarks : [
         {
             name : "Parthenon",
             icon : "img/notvisited.png",
@@ -64,7 +64,7 @@ var config = {
             visitrange: .25,
             tc_id: "http://tincanapi.com/Course/NashvilleMuseums/Cheekwood"
         }
-	]
+    ]
 };
 
 Scavenger.config = config;
