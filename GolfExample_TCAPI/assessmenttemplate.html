@@ -7,8 +7,8 @@
         @import url( css/style.css );
     </style>
 
-    <script src="scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
-    <script src="scripts/common.js" type="text/javascript"></script>
+    <script src="scripts/TinCanJS/build/tincan-min.js"></script>
+    <script src="scripts/common.js"></script>
     <script type="text/javascript">
         var activityId = GolfExample.CourseActivity.id + "/GolfAssessment";
         var testObj = {
@@ -31,7 +31,7 @@
                 activity: testObj
             }
         );
-        
+
         //Each go at the assessment is a new attempt at the assessment; there's no bookmarking within the assessment
         var stmt = {
             verb: {
@@ -70,19 +70,6 @@
         }
 
         var test = new Test([]);
-
-        var queryString = new String(document.location.search);
-        if (queryString.length > 0) {
-            queryString = queryString.substring(1);
-
-            var includeFiles = queryString.split("&");
-            for (var i = 0; i < includeFiles.length; i++){
-                if (includeFiles[i].indexOf("questions=") >= 0) {
-                    var questionsFile = includeFiles[i].replace("questions=", "");
-                    document.write('<script src="', questionsFile, '/questions.js" type="text/JavaScript"><\/script>');
-                }
-            }
-        }
 
         function CheckNumeric(obj){
             var userText = new String(obj.value);
@@ -142,6 +129,8 @@
                 console.log("GetQuestionAnswerStatement");
             }
 
+            strCorrectAnswer = String(correctAnswer);
+
             //send question info
             var qObj = {
                 id: id,
@@ -152,10 +141,15 @@
                     },
                     interactionType: questionType,
                     correctResponsesPattern: [
-                        String(correctAnswer)
+                        strCorrectAnswer
                     ]
                 }
             };
+
+            //format numeric response pattern. 
+            if (qObj.definition.interactionType == "numeric"){
+                qObj.definition.correctResponsesPattern[0] = strCorrectAnswer + ":" + strCorrectAnswer;
+            }
 
             if (questionChoices !== null && questionChoices.length > 0) {
                 var choices = [];
@@ -354,6 +348,10 @@
             document.write ("</form></div>");      //close out test div
         }
     </script>
+    <script src="Etiquette/questions.js"></script>
+    <script src="Handicapping/questions.js"></script>
+    <script src="HavingFun/questions.js"></script>
+    <script src="Playing/questions.js"></script>
     <script src="scripts/contentfunctions.js" type="text/javascript"></script>
 </head>
 
