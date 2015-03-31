@@ -187,7 +187,8 @@
                         registration: Config.registration,
                         contextActivities: PrototypesLauncher.context.contextActivities
                     }
-                }
+                }, 
+                function (err, xhr) {}
             );
 
             $(document).ready(function () {
@@ -292,7 +293,8 @@
                             registration: registration,
                             contextActivities: PrototypesLauncher.context.contextActivities
                         }
-                    }
+                    }, 
+                    function (err, xhr) {}
                 );
             }
         </script>
