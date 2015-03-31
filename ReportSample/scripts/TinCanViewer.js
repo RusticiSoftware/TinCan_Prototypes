@@ -134,7 +134,7 @@ $(document).ready(function(){
             "highscores",
             {
                 activity: {
-                    id: "ttp://id.tincanapi.com/activity/tincan-prototypes/tetris"
+                    id: "http://id.tincanapi.com/activity/tincan-prototypes/tetris"
                 },
                 callback: RenderHighScores
             }
@@ -488,9 +488,6 @@ function RenderGolfData (err, result) {
             learnerObjs[mbox].complete = 'failed';
             learnerObjs[mbox].score = (statements[i].result.score.scaled * 100).toString() + "%";
         }
-
-
-
     }
     for (j in learners){
         l = learnerObjs[learners[j]];

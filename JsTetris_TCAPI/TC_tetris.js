@@ -1,6 +1,5 @@
 //TinCan.enableDebug();
 
-
 var ROOT_ACTIVITY_ID = "http://id.tincanapi.com/activity/tincan-prototypes/tetris",
     tincan = new TinCan (
         {
@@ -17,19 +16,18 @@ var ROOT_ACTIVITY_ID = "http://id.tincanapi.com/activity/tincan-prototypes/tetri
     HighScoresActivityProfile = null,
     HighScoresArray;
 
-
 $(document).ready(function () {
     $('#activateTinCan').change(
         function () {
             var actor;
             if (!$(this).is(':checked')) {
                 TCActive = false;
-                tc_sendStatment_Terminate ();
+                tc_sendStatement_Terminate();
                 $('#tc_actorprompt').hide();
             }
             else {
                 TCActive = true;
-                tc_sendStatment_Initialize ();
+                tc_sendStatement_Initialize();
                 if (typeof tincan !== "undefined" && tincan.actor !== null) {
                     actor = tincan.actor;
                     actorName = actor.name;
@@ -40,7 +38,8 @@ $(document).ready(function () {
 
                 if (actorName === "" || actorEmail === "") {
                     $('#tc_actorprompt').show();
-                } else {
+                }
+                else {
                     $('#tc_actor').show();
                 }
             }
@@ -55,8 +54,8 @@ $(document).ready(function () {
                 alert("Please enter a name and an email.");
                 return;
             }
-            
-            tc_sendStatment_Terminate ();
+
+            tc_sendStatement_Terminate();
 
             actorName = $('#tc_nameInput').val();
             actorEmail = $('#tc_emailInput').val();
@@ -73,10 +72,10 @@ $(document).ready(function () {
 
             $('#tc_actorprompt').hide();
             $('#tc_actor').show();
-            
+
             tetris.reset();
-            
-            tc_sendStatment_Initialize ();
+
+            tc_sendStatement_Initialize();
         }
     );
 
@@ -127,10 +126,10 @@ function tc_getContext (extensions, parent) {
     return context
 }
 
-function tc_getContextExtensions() {
-    var extensions = {};
-    extensions["http://id.tincanapi.com/extension/attemptId"] = gameId;
-    return extensions;
+function tc_getContextExtensions () {
+    return {
+        "http://id.tincanapi.com/extension/attemptId": gameId
+    };
 }
 
 function tc_sendStatementWithContext (stmt, extensions, parent) {
@@ -139,7 +138,7 @@ function tc_sendStatementWithContext (stmt, extensions, parent) {
     tincan.sendStatement(stmt, function () {});
 }
 
-function tc_sendStatment_Initialize () {
+function tc_sendStatement_Initialize () {
     tc_sendStatementWithContext(
         {
             verb: {
@@ -164,7 +163,7 @@ function tc_sendStatment_Initialize () {
     );
 }
 
-function tc_sendStatment_Terminate () {
+function tc_sendStatement_Terminate () {
     tc_sendStatementWithContext(
         {
             verb: {
@@ -189,7 +188,7 @@ function tc_sendStatment_Terminate () {
     );
 }
 
-function tc_sendStatment_StartNewGame () {
+function tc_sendStatement_StartNewGame () {
     if (! TCActive) {
         return;
     }
@@ -224,7 +223,7 @@ function tc_sendStatment_StartNewGame () {
     );
 }
 
-function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
+function tc_sendStatement_FinishLevel (level, time, apm, lines, score) {
     var extensions = {};
 
     if (! TCActive) {
@@ -234,8 +233,6 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
     extensions["http://id.tincanapi.com/extension/apm"] = apm;
     extensions["http://id.tincanapi.com/extension/lines"] = lines;
 
-    console.log (time);
-    
     tc_sendStatementWithContext(
         {
             verb: {
@@ -261,7 +258,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
                 score: {
                     raw: score,
                     min: 0
-                }, 
+                },
                 duration: TinCan.Utils.convertMillisecondsToISO8601Duration(time*1000)
             }
         },
@@ -270,7 +267,7 @@ function tc_sendStatment_FinishLevel (level, time, apm, lines, score) {
     );
 }
 
-function tc_sendStatment_EndGame (level, time, apm, lines, score) {
+function tc_sendStatement_EndGame (level, time, apm, lines, score) {
     var extensions = {};
 
     if (! TCActive) {

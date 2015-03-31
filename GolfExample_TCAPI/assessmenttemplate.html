@@ -43,7 +43,7 @@
             object: testObj,
             context: GolfExample.getContext(GolfExample.CourseActivity.id, true),
             result: {
-                duration: "PT0H0M0S"
+                duration: "PT0S"
             }
         };
 
@@ -146,9 +146,9 @@
                 }
             };
 
-            //format numeric response pattern. 
+            //format numeric response pattern.
             if (qObj.definition.interactionType == "numeric"){
-                qObj.definition.correctResponsesPattern[0] = strCorrectAnswer + ":" + strCorrectAnswer;
+                qObj.definition.correctResponsesPattern[0] = strCorrectAnswer + "[:]" + strCorrectAnswer;
             }
 
             if (questionChoices !== null && questionChoices.length > 0) {
@@ -277,26 +277,26 @@
             var score = Math.round(correctCount * 100 / totalQuestions);
             resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
             document.getElementById("test").innerHTML = resultsSummary;
-            
-            var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(
-                Math.abs((
-                    new Date()) - 
-                    assessmentStartTimestamp)),
-            attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
+
+            var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration( Math.abs((new Date()) - assessmentStartTimestamp) ),
+                attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
             answerStatements.push(GetRecordTestStatement(score, activityId, GolfExample.CourseActivity.id, assessmentAttemptDuration, true));
             answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, null, attemptDuration, false));
 
             // send question answers
             tincan.sendStatements(answerStatements);
-            
+
             parent.attemptComplete = true;
-            var bookmarking = {
-                attemptComplete: true
-            }
-            tincan.setState("bookmarking-data", bookmarking, {
-                contentType: "application/json",
-                overwriteJSON: false
-            });
+            tincan.setState(
+                "bookmarking-data",
+                {
+                    attemptComplete: true
+                },
+                {
+                    contentType: "application/json",
+                    overwriteJSON: false
+                }
+            );
         }
 
         function RenderTest(test){
