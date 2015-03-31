@@ -29,10 +29,6 @@
                 "HavingFun/HowToBeStylish.html",
                 "assessmenttemplate.html"
             ],
-            currentPage = 0,
-            startTimeStamp = new Date(),
-            startAttemptDuration = 0,
-            attemptComplete = false,
             processedUnload = false,
             reachedEnd = false,
             maxPageReached = 0,
@@ -42,6 +38,77 @@
                     activity: GolfExample.CourseActivity
                 }
             );
+
+        var bookmarkingTracker = function(){
+            this.currentPage = 0;
+            this.startTimeStamp = new Date();
+            this.startAttemptDuration = 0;
+            this.attemptComplete = false;
+        };
+
+        bookmarkingTracker.prototype = {
+            initFromBookmark: function(bookmark){
+                this.setPage(parseInt(bookmark.location, 10));
+                this.setStartDuration(bookmark.attemptDuration);
+                this.getCompletion(bookmark.attemptComplete);
+            },
+            reset: function(){
+                this.setPage(0);
+                this.setStartDuration(0);
+                this.setCompletion(false);
+            },
+            save: function (callback){
+                var bookmarking = {
+                    location: this.currentPage,
+                    attemptDuration: this.getAttemptDuration(),
+                    attemptComplete: this.attemptComplete
+                };
+                tincan.setState("bookmarking-data", bookmarking, {
+                    contentType: "application/json",
+                    callback: callback
+                });
+            },
+            get: function(){
+                var stateResult = tincan.getState("bookmarking-data");
+                if (stateResult.err === null && stateResult.state !== null && stateResult.state.contents !== "") {
+                    return stateResult.state.contents;
+                } else {
+                    return null;
+                }
+            },
+            setStartDuration: function(duration){
+                this.startAttemptDuration = duration;
+            },
+            setPage: function(page){
+                this.currentPage = page;
+                return true;
+            },
+            getPage: function(){
+                return this.currentPage;
+            },
+            incrementPage: function (){
+                this.currentPage++;
+            },
+            decrementPage: function (){
+                this.currentPage--;
+            },
+            setCompletion: function(completion){
+                this.attemptComplete = completion;
+                return true;
+            },
+            getCompletion: function(completion){
+                return this.attemptComplete;
+            },
+            getAttemptDuration: function (){
+                return this.startAttemptDuration + this.getSessionDuration();
+            },
+            getSessionDuration: function (){
+                return Math.abs ((new Date()) - this.startTimeStamp);
+            }
+        };
+
+        var bookmarkingData = new bookmarkingTracker();
+
         //
         // functions for sizing the iFrame
         //
@@ -111,13 +178,11 @@
             };
 
             //get activity_id bookmark if it exists
-            var stateResult = tincan.getState("bookmarking-data");
-            if (stateResult.err === null && stateResult.state !== null && stateResult.state.contents !== "") {
+            var bookmark = bookmarkingData.get();
+            if (bookmark !== null) {
                 if (confirm("Would you like to resume from where you previously left off? Click cancel to start a afresh.")) {
-                    currentPage = parseInt(stateResult.state.contents.location, 10);
-                    startAttemptDuration = stateResult.state.contents.attemptDuration;
-                    attemptComplete = stateResult.state.contents.attemptComplete;
-                    if (!attemptComplete) {
+                    bookmarkingData.initFromBookmark(bookmark);
+                    if (!bookmarkingData.getCompletion()) {
                         var resumedStatement = {
                             verb: {
                                 id: "http://adlnet.gov/expapi/verbs/resumed",
@@ -127,24 +192,23 @@
                             },
                             context: GolfExample.getContext(),
                             result: {
-                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(startAttemptDuration)
+                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(bookmark.attemptDuration)
                             }
                         }
                         statements.push(resumedStatement);
                     }
                 }
                 else {
-                    currentPage = 0;
-                    startAttemptDuration = 0;
-                    attemptComplete = false;
+                    bookmarkingData.reset();
+
                     //start new attempt
                     statements.push(attemptedStatement);
-                    saveBookmarking();
+                    bookmarkingData.save();
                 }
             }
             else {
                 // if there isn't a stored bookmark, start the user at the first page
-                currentPage = 0;
+                bookmarkingData.setPage(0);
                 statements.push(attemptedStatement);
             }
             tincan.sendStatements(statements);
@@ -157,17 +221,17 @@
                 nextButton = document.getElementById("butNext");
 
             //pass the TC arguments to the iframe
-            var tc_argStr = (pageArray[currentPage].indexOf("?") != -1) ? "&" + location.search.slice(1) : location.search;
+            var tc_argStr = (pageArray[bookmarkingData.getPage()].indexOf("?") != -1) ? "&" + location.search.slice(1) : location.search;
 
             //navigate the iFrame to the content
-            theIframe.src = pageArray[currentPage] + tc_argStr;
+            theIframe.src = pageArray[bookmarkingData.getPage()] + tc_argStr;
 
             //disable the prev/next buttons if we are on the first or last page.
-            if (currentPage === 0){
+            if (bookmarkingData.getPage() === 0){
                 nextButton.disabled = false;
                 prevButton.disabled = true;
             }
-            else if (currentPage === (pageArray.length - 1)){
+            else if (bookmarkingData.getPage() === (pageArray.length - 1)){
                 nextButton.disabled = true;
                 prevButton.disabled = false;
             }
@@ -176,30 +240,30 @@
                 prevButton.disabled = false;
             }
 
-            saveBookmarking();
+            bookmarkingData.save();
         }
 
         function doPrevious(){
-            if (currentPage > 0){
-                currentPage--;
+            if (bookmarkingData.getPage() > 0){
+                bookmarkingData.decrementPage();
             }
             goToPage();
         }
 
         function doNext(){
-            if (currentPage < (pageArray.length - 1)){
-                currentPage++;
+            if (bookmarkingData.getPage() < (pageArray.length - 1)){
+                bookmarkingData.incrementPage();
             }
             goToPage();
         }
         
         function doExit(){
             document.getElementById("exitButton").setAttribute("value","Saving...");
-            saveBookmarking(function(){
+            bookmarkingData.save(function(){
                 document.getElementById("exitButton").setAttribute("value","Save & Exit");
                 if (confirm("Are you sure you want to Exit?")) {
                     var statements = [];
-                    if (!attemptComplete){
+                    if (!bookmarkingData.getCompletion()){
                         statements.push({
                             verb: {
                                 id: "http://adlnet.gov/expapi/verbs/suspended",
@@ -209,7 +273,7 @@
                             },
                             context: GolfExample.getContext(),
                             result: {
-                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(getAttemptDuration())
+                                duration: TinCan.Utils.convertMillisecondsToISO8601Duration(bookmarkingData.getAttemptDuration())
                             }
                         });
                     }
@@ -222,7 +286,7 @@
                         },
                         context: GolfExample.getContext(),
                         result: {
-                            duration: TinCan.Utils.convertMillisecondsToISO8601Duration(getSessionDuration())
+                            duration: TinCan.Utils.convertMillisecondsToISO8601Duration(bookmarkingData.getSessionDuration())
                         }
                     });
                     tincan.sendStatements(statements, function (){
@@ -240,26 +304,7 @@
 
             return newValue;
         }
-        
-        function saveBookmarking(callback){
-            var bookmarking = {
-                location: currentPage,
-                attemptDuration: getAttemptDuration(),
-                attemptComplete: attemptComplete
-            }
-            tincan.setState("bookmarking-data", bookmarking, {
-                contentType: "application/json",
-                callback: callback
-            });
-        }
-        
-        function getAttemptDuration(){
-            return startAttemptDuration + getSessionDuration();
-        }
-        
-        function getSessionDuration(){
-            return Math.abs ((new Date()) - startTimeStamp);
-        }
+
     </script>
 </head>
 
