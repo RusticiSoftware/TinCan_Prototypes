@@ -145,8 +145,7 @@
                                 {
                                     id: "http://id.tincanapi.com/activity/tincan-prototypes",
                                 }
-                            ]
-                            ,
+                            ],
                             category: [
                                  {
                                     id: "http://id.tincanapi.com/recipe/tincan-prototypes/launcher/1",
@@ -253,7 +252,7 @@
 
                     html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
                     html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
-                    if (Placemarks[itm].website != undefined && Placemarks[itm].website !== "") {
+                    if (Placemarks[itm].website !== undefined && Placemarks[itm].website !== "") {
                         html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
                     }
                     html += "</div>";

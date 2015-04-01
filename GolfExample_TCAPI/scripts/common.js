@@ -21,7 +21,7 @@ GolfExample.getContext = function(parentActivityId, isAssessment) {
                 {
                     id: GolfExample.CourseActivity.id
                 },
-    			{
+                {
                     id: "http://id.tincanapi.com/activity/tincan-prototypes"
                 }
             ],
