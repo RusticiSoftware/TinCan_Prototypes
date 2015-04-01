@@ -39,14 +39,14 @@
                 }
             );
 
-        var BOOKMARKINGTRACKING = function(){
+        var BookmarkingTracking = function(){
             this.currentPage = 0;
             this.startTimeStamp = new Date();
             this.startAttemptDuration = 0;
             this.attemptComplete = false;
         };
 
-        BOOKMARKINGTRACKING.prototype = {
+        BookmarkingTracking.prototype = {
             initFromBookmark: function(bookmark){
                 this.setPage(parseInt(bookmark.location, 10));
                 this.setStartDuration(bookmark.attemptDuration);
@@ -106,7 +106,7 @@
             }
         };
 
-        var bookmarkingData = new BOOKMARKINGTRACKING();
+        var bookmarkingData = new BookmarkingTracking();
 
         //
         // functions for sizing the iFrame
