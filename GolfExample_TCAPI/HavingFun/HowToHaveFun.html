@@ -4,24 +4,25 @@
     <meta charset="utf-8">
     <title>How to Have Fun</title>
     <style type="text/css" media="screen">
-		@import url( ../css/style.css );
-	</style>
-	<script src="../scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
-	<script src="../scripts/common.js" type="text/javascript"></script>
-	<script src="../scripts/contentfunctions.js" type="text/javascript"></script>
-	<script type="text/javascript">
+        @import url( ../css/style.css );
+    </style>
+    <script src="../scripts/TinCanJS/build/tincan-min.js" type="text/javascript"></script>
+    <script src="../scripts/common.js" type="text/javascript"></script>
+    <script src="../scripts/contentfunctions.js" type="text/javascript"></script>
+    <script type="text/javascript">
         var tincan = new TinCan (
             {
                 url: window.location.href,
                 activity: {
-                    id: GolfExample.CourseActivity.id + "/HavingFun/HowToHaveFun.html",
+                    id: GolfExample.CourseActivity.id + "/HavingFun/HowToHaveFun",
                     definition: {
                         name: {
                             "en-US": "How to Have Fun"
                         },
                         description: {
                             "en-US": "An overview of how to have fun playing golf."
-                        }
+                        }, 
+                        type: "http://activitystrea.ms/schema/1.0/page"
                     }
                 }
             }
@@ -29,14 +30,19 @@
 
         tincan.sendStatement(
             {
-                verb: "experienced",
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/experienced",
+                    display: {
+                        "en-US" : "experienced"
+                    }
+                },
                 context: GolfExample.getContext(
                     GolfExample.CourseActivity.id
                 )
             },
             function () {}
         );
-	</script>
+    </script>
 </head>
 <body>
 <h1>How to Have Fun Golfing</h1>

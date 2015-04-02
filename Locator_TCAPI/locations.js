@@ -2,13 +2,13 @@
 // config holds locations to visit
 //
 var COURSE_NAME = "Nashville Museums Tour";
-var COURSE_ID = "http://tincanapi.com/Course/NashvilleMuseumsTour";
+var COURSE_ID = "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour";
 var COURSE_DESC = "An exploration of museums in the greater Nashville TN area.";
 
 var config = {
-	CurrentLocationTitle : "My Current Location",
-	CurrentLocationIcon : "http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
-	Placemarks : [
+    CurrentLocationTitle : "My Current Location",
+    CurrentLocationIcon : "http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+    Placemarks : [
         {
             name : "Parthenon",
             icon : "img/notvisited.png",
@@ -18,7 +18,7 @@ var config = {
             lng: "-86.812935",
             visited: false,
             visitrange: .25,
-            tc_id: "http://tincanapi.com/Course/NashvilleMuseums/Parthenon"
+            tc_id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/parthenon"
         },
         {
             name : "Country Music Hall of Fame and Museum",
@@ -29,7 +29,7 @@ var config = {
             lng: "-86.776505",
             visited: false,
             visitrange: .25,
-            tc_id: "http://tincanapi.com/Course/NashvilleMuseums/CountryMusicHallofFame"
+            tc_id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/country-music-hall-of-fame"
         },
         {
             name : "Frist Center For The Visual Arts",
@@ -40,7 +40,7 @@ var config = {
             lng: "-86.783924",
             visited: false,
             visitrange: .25,
-            tc_id: "http://tincanapi.com/Course/NashvilleMuseums/TheFrist"
+            tc_id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/the-frist"
         },
         {
             name : "Adventure Science Center",
@@ -51,7 +51,7 @@ var config = {
             lng: "-86.775620",
             visited: false,
             visitrange: .25,
-            tc_id: "http://tincanapi.com/Course/NashvilleMuseums/AdventureScienceCenter"
+            tc_id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/adventure-science-center"
         },
         {
             name : "Cheekwood-Botanical Garden & Museum of Art",
@@ -62,9 +62,9 @@ var config = {
             lng: "-86.874014",
             visited: false,
             visitrange: .25,
-            tc_id: "http://tincanapi.com/Course/NashvilleMuseums/Cheekwood"
+            tc_id: "http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/cheekwood"
         }
-	]
+    ]
 };
 
 Scavenger.config = config;

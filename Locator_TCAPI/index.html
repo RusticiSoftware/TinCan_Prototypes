@@ -56,7 +56,7 @@
                 activity: {
                     id: COURSE_ID,
                     definition: {
-                        type: "http://adlnet.gov/expapi/activities/course",
+                        type: "http://adlnet.gov/expapi/activities/performance",
                         name: {
                             "en-US": COURSE_NAME
                         },
@@ -118,11 +118,16 @@
                 var pmrk = Scavenger.currentPlacemark;
 
                 var stmt = {
-                    verb: "experienced",
+                    verb: {
+                        id: "http://activitystrea.ms/schema/1.0/at",
+                        display: {
+                            "en-US": "was at"
+                        }
+                    },
                     object: {
                         id: pmrk.tc_id,
                         definition: {
-                            type: "http://adlnet.gov/expapi/activities/objective",
+                            type: "http://id.tincanapi.com/activitytype/place",
                             name: {
                                 "en-US": pmrk.name
                             },
@@ -133,15 +138,37 @@
                     },
                     context: {
                         contextActivities: {
-                            grouping: {
-                                id: COURSE_ID
-                            }
+                            grouping: [
+                                {
+                                    id: COURSE_ID
+                                }, 
+                                {
+                                    id: "http://id.tincanapi.com/activity/tincan-prototypes",
+                                }
+                            ],
+                            category: [
+                                 {
+                                    id: "http://id.tincanapi.com/recipe/tincan-prototypes/launcher/1",
+                                    definition: {
+                                        type: "http://id.tincanapi.com/activitytype/recipe"
+                                    }
+                                },
+                                {
+                                    //locator is used rather than nashville-museums-tour as this category of prototype can be shared with other locator examples
+                                    id: "http://id.tincanapi.com/activity/tincan-prototypes/locator",
+                                    definition: {
+                                        type: "http://id.tincanapi.com/activitytype/source"
+                                    }
+                                }
+                            ]
                         },
                         extensions: {}
                     }
                 };
-                stmt.context.extensions[COURSE_ID + "/latitude"] = position.coords.latitude;
-                stmt.context.extensions[COURSE_ID + "/longitude"] = position.coords.longitude;
+                //Note: we could also use these as activity definition extensions if we know the location of the activity.
+                //In the context we're recording the location of the learner. 
+                stmt.context.extensions["http://id.tincanapi.com/extension/latitude"] = position.coords.latitude;
+                stmt.context.extensions["http://id.tincanapi.com/extension/longitude"] = position.coords.longitude;
 
                 tincan.sendStatement(stmt, function () {});
 
@@ -150,7 +177,7 @@
 
                 $('.loc[name="' + pmrk.name + '"]').addClass('visited');
 
-                CheckForAllVisited();
+                CheckForAllVisited(false);
 
                 if (Scavenger.useLocationCheat){
                     Scavenger.showLocation(position);
@@ -158,7 +185,7 @@
             }
         }
 
-        function CheckForAllVisited() {
+        function CheckForAllVisited(alreadyCompleted) {
             var pmrk,
                 // default to true and change to false if a placemark is not visited
                 allVisited = true,
@@ -170,11 +197,18 @@
                 }
             }
             if (allVisited) {
-                tincan.sendStatement(
-                    {
-                        verb: "completed"
-                    }
-                );
+                if (!alreadyCompleted){
+                    tincan.sendStatement(
+                        {
+                            verb: {
+                                id: "http://adlnet.gov/expapi/verbs/completed",
+                                display: {
+                                    "en-US": "completed"
+                                }
+                            }
+                        }
+                    );
+                }
 
                 $(".exerciseComplete").show();
             }
@@ -199,7 +233,7 @@
                         sendActor: true,
                         params: {
                             verb: {
-                                id: "http://adlnet.gov/expapi/verbs/experienced"
+                                id: "http://activitystrea.ms/schema/1.0/at",
                             },
                             activity: new TinCan.Activity (
                                 {
@@ -218,7 +252,7 @@
 
                     html = "<div class='loc " + visited + "' name='" + Placemarks[itm].name + "'><button class='btnSaveLocationToLRS'>Save Location</button>"+ idx + " " + Placemarks[itm].name;
                     html += " <span class='desc'>" + Placemarks[itm].description + "</span>";
-                    if (Placemarks[itm].website != undefined && Placemarks[itm].website !== "") {
+                    if (Placemarks[itm].website !== undefined && Placemarks[itm].website !== "") {
                         html += " <a target='_blank' href='" + Placemarks[itm].website + "'>Visit their site</a>";
                     }
                     html += "</div>";
@@ -229,13 +263,21 @@
                 $("#locationListings").append(html);
             }
 
-            CheckForAllVisited();
+            CheckForAllVisited(true);
         }
 
         function SendCourseInit() {
             tincan.sendStatement(
                 {
-                    verb: "attempted"
+                    verb: {
+                        id: "http://adlnet.gov/expapi/verbs/attempted",
+                        display: {
+                            "en-US": "attempted"
+                        }
+                    },
+                    result :{
+                        duration: "PT0S"
+                    }
                 }
             );
         }
