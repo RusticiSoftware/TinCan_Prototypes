@@ -279,24 +279,15 @@
             document.getElementById("test").innerHTML = resultsSummary;
 
             var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration( Math.abs((new Date()) - assessmentStartTimestamp) ),
-                attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.getAttemptDuration());
+                attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.bookmarkingData.getAttemptDuration());
             answerStatements.push(GetRecordTestStatement(score, activityId, GolfExample.CourseActivity.id, assessmentAttemptDuration, true));
             answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, null, attemptDuration, false));
 
             // send question answers
             tincan.sendStatements(answerStatements);
 
-            parent.attemptComplete = true;
-            tincan.setState(
-                "bookmarking-data",
-                {
-                    attemptComplete: true
-                },
-                {
-                    contentType: "application/json",
-                    overwriteJSON: false
-                }
-            );
+            parent.bookmarkingData.setCompletion(true);
+            parent.bookmarkingData.save();
         }
 
         function RenderTest(test){

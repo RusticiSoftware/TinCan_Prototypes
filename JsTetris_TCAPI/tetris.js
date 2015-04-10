@@ -142,7 +142,7 @@ function Tetris()
 	{
 		if (self.puzzle && !confirm('Are you sure you want to start a new game ?')) return;
 		
-		tc_sendStatment_StartNewGame();
+		tc_sendStatement_StartNewGame();
 		
 		self.reset();
 		self.stats.start();
@@ -217,7 +217,7 @@ function Tetris()
 		self.stats.stop();
 		self.puzzle.stop();
 		
-		tc_sendStatment_EndGame(this.stats.getLevel(),this.stats.time,this.stats.apm,this.stats.getLines(),this.stats.getScore());
+		tc_sendStatement_EndGame(this.stats.getLevel(),this.stats.time,this.stats.apm,this.stats.getLines(),this.stats.getScore());
 		
 		document.getElementById("tetris-nextpuzzle").style.display = "none";
 		document.getElementById("tetris-gameover").style.display = "block";
@@ -951,7 +951,7 @@ function Tetris()
 			this.tetris.stats.setPuzzles(this.tetris.stats.getPuzzles() + 1);
 			if (this.tetris.stats.getPuzzles() >= (10 + this.tetris.stats.getLevel() * 2)) {
 				
-				tc_sendStatment_FinishLevel(this.tetris.stats.getLevel(),this.tetris.stats.time,this.tetris.stats.apm,this.tetris.stats.getLines(),this.tetris.stats.getScore());
+				tc_sendStatement_FinishLevel(this.tetris.stats.getLevel(),this.tetris.stats.time,this.tetris.stats.apm,this.tetris.stats.getLines(),this.tetris.stats.getScore());
 				
 				this.tetris.stats.setLevel(this.tetris.stats.getLevel() + 1);
 				this.tetris.stats.setPuzzles(0);
