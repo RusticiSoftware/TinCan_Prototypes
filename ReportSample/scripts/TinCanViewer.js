@@ -593,7 +593,12 @@ function RenderGolfQuestions (err, result) {
                 numIncorrect: 0
             };
             if (stmt.target.definition.correctResponsesPattern !== null) {
-                resultsByQuestion[questionId].correctAnswer = stmt.target.definition.correctResponsesPattern[0];
+                if (stmt.target.definition.interactionType == "numeric"){
+                    resultsByQuestion[questionId].correctAnswer = stmt.target.definition.correctResponsesPattern[0].split("[:]")[0];
+                } 
+                else {
+                    resultsByQuestion[questionId].correctAnswer = stmt.target.definition.correctResponsesPattern[0];
+                }
             }
         }
         if (stmt.result.success === true) {

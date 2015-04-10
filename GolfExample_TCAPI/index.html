@@ -65,6 +65,7 @@
                 };
                 tincan.setState("bookmarking-data", bookmarking, {
                     contentType: "application/json",
+                    overwriteJSON: false,
                     callback: callback
                 });
             },
@@ -290,6 +291,7 @@
                     });
                     tincan.sendStatements(statements, function (){
                         close();
+                        document.write("Course exited and progress saved. You may now close this window.");
                     });
                 }
             });  
