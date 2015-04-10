@@ -513,7 +513,7 @@ http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour
 
 http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/parthenon
 {
-    "type": "http://id.tincanapi.com/activitytype/place",
+    "type": "http://activitystrea.ms/schema/1.0/place",
     "name": {
         "en-US": "Parthenon"
     },
@@ -530,7 +530,7 @@ http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/countr
     "description": {
         "en-US": "The mission of the Country Music Hall of Fame and Museum is to identify and preserve the evolving history and traditions of country music and to educate its audiences. Functioning as a local history museum and as an international arts organization, the Country Music Hall of Fame and Museum serves visiting and non-visiting audiences including fans, students, scholars, members of the music industry."
     },
-    "type": "http://id.tincanapi.com/activitytype/place"
+    "type": "http://activitystrea.ms/schema/1.0/place"
 }
 
 http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/the-frist
@@ -541,7 +541,7 @@ http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/the-fr
     "description": {
         "en-US": "The Frist Center opened in April 2001, and since that time has hosted a spectacular array of art from the region, the country, and around the world."
     },
-    "type": "http://id.tincanapi.com/activitytype/place"
+    "type": "http://activitystrea.ms/schema/1.0/place"
 }
 
 http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/adventure-science-center
@@ -552,7 +552,7 @@ http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/advent
     "description": {
         "en-US": "Igniting curiosity and inspiring the discovery of science for all ages."
     },
-    "type": "http://id.tincanapi.com/activitytype/place"
+    "type": "http://activitystrea.ms/schema/1.0/place"
 }
 
 http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/cheekwood
@@ -563,6 +563,6 @@ http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/cheekw
     "description": {
         "en-US": "Cheekwood is a 55-acre botanical garden and art museum located on the historic Cheek estate. Cheekwood exists to celebrate and preserve its landscape, buildings, art and botanical collections and, through these unique means, provide an inspiring place for visitors to explore their connections with art, nature and the environment."
     },
-    "type": "http://id.tincanapi.com/activitytype/place"
+    "type": "http://activitystrea.ms/schema/1.0/place"
 }
 

@@ -153,14 +153,14 @@ Games are attempted and then completed. Game levels are completed.
 All statements within an attempt are grouped together by an attempt Id. Note that the
 registration id stored in Context Registration field may include multiple attempts. 
 
-* http://id.tincanapi.com/extension/attemptId
+* http://id.tincanapi.com/extension/attempt-id
 
 ## Result Extensions
 Each completed game and game level records the actions per minute (apm) and number of lines achieved
 by the player. 
 
 * http://id.tincanapi.com/extension/apm
-* http://id.tincanapi.com/extension/lines
+* http://id.tincanapi.com/extension/tetris-lines
 
 # Locator Prototype
 The locator prototype is an example of a learning activity that takes advantage on native features of a mobile device,
@@ -189,7 +189,7 @@ The activity is a 'performance' type as the learner must perform a series of tas
 
 * http://id.tincanapi.com/activitytype/recipe
 * http://id.tincanapi.com/activitytype/source
-* http://id.tincanapi.com/activitytype/place
+* http://activitystrea.ms/schema/1.0/place
 * http://adlnet.gov/expapi/activities/performance
 
 ##Verbs

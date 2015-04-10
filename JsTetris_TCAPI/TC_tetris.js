@@ -128,7 +128,7 @@ function tc_getContext (extensions, parent) {
 
 function tc_getContextExtensions () {
     return {
-        "http://id.tincanapi.com/extension/attemptId": gameId
+        "http://id.tincanapi.com/extension/attempt-id": gameId
     };
 }
 
@@ -231,7 +231,7 @@ function tc_sendStatement_FinishLevel (level, time, apm, lines, score) {
     }
 
     extensions["http://id.tincanapi.com/extension/apm"] = apm;
-    extensions["http://id.tincanapi.com/extension/lines"] = lines;
+    extensions["http://id.tincanapi.com/extension/tetris-lines"] = lines;
 
     tc_sendStatementWithContext(
         {
@@ -276,7 +276,7 @@ function tc_sendStatement_EndGame (level, time, apm, lines, score) {
 
     extensions["http://id.tincanapi.com/extension/level"] = level;
     extensions["http://id.tincanapi.com/extension/apm"] = apm;
-    extensions["http://id.tincanapi.com/extension/lines"] = lines;
+    extensions["http://id.tincanapi.com/extension/tetris-lines"] = lines;
 
     tc_sendStatementWithContext(
         {
