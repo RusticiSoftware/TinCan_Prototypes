@@ -197,7 +197,7 @@
                 var PROTOTYPE_DEFAULT_MBOX = Config.actor.mbox;
                 var PROTOTYPE_ENDPOINT = Config.endpoint;
                 var PROTOTYPE_AUTH = 'Basic ' + Base64.encode(Config.authUser + ':' + Config.authPassword);
-                var PROTOTYPE_REGISTRATION = Config.registration;
+                var PROTOTYPE_REGISTRATION = Config.registration || TinCan.Utils.getUUID();
 
                 $('#tc_nameInput_golf').val(PROTOTYPE_DEFAULT_NAME);
                 $('#tc_emailInput_golf').val(PROTOTYPE_DEFAULT_MBOX.replace('mailto:',''));
@@ -211,7 +211,7 @@
                 });
 
                 $('.resetRegistration').click(function(){
-                    PROTOTYPE_REGISTRATION = Config.registration
+                    PROTOTYPE_REGISTRATION = Config.registration || TinCan.Utils.getUUID();
                     $('#defRegistration').text(PROTOTYPE_REGISTRATION);
                 });
 
@@ -325,7 +325,7 @@
                         <tr><td class="label">Default registration: </td><td><span id="defRegistration"></span></td></tr>
                     </table>
                     <div class="info">
-                        To generate and use a new registration UUID, click <a href="#" class="refreshRegistration">New Registration</a> below.  This will cause all of the prototypes to launch as a new attempt rather than using existign bookmarking data. Click <a href="#" class="resetRegistration">Reset</a> to reset registration to the original configuration value.
+                        To generate and use a new registration UUID, click <a href="#" class="refreshRegistration">New Registration</a> below.  This will cause all of the prototypes to launch as a new attempt rather than using existing State data. Click <a href="#" class="resetRegistration">Reset</a> to reset registration to the original configuration value.
                     </div>
                     <a href="#" class="cssButton refreshRegistration">New Registration</a><a href="#" class="cssButton resetRegistration">Reset</a>
                 </div>
