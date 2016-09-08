@@ -4,6 +4,31 @@
         this.auth = null;
         this.tinCanVersion = "1.0.0";
         this.DEBUG = false;
+        //test statement used to test POST operations.
+        this.testStatementObj = {
+          "actor": {
+            "name": "Test Actor",
+            "mbox": "mailto:test.actor@example.org",
+            "objectType": "Agent" 
+          },
+          "verb": {
+            "id": "http://adlnet.gov/expapi/verbs/passed",
+            "display": { 
+              "en-US": "passed"
+            }
+          },
+          "object": {
+            "id": "https://example.org/test2/zaken…",
+            "definition": { 
+              "name": {
+                "en-US": "Maintenancee test"
+              },
+              "type": "http://adlnet.gov/expapi/activities/assessment"
+            },
+            "objectType": "Activity"
+          }
+        };
+        this.testStatment = JSON.stringify(this.testStatementObj);
     }
     
     OAuthSample.prototype = {
@@ -19,7 +44,9 @@
             register("authorize", function(){ self.authorize(); });
             register("fetchToken", function(){ self.fetchToken(); });
             register("tryToken", function(){ self.tryToken(); });
+            register("tryTokenPost", function(){ self.tryTokenPost(); });
             register("tryNoUserToken", function(){ self.tryNoUserToken(); });
+            register("tryNoUserTokenPost", function(){ self.tryNoUserTokenPost(); });
 
             this._userLog("OAuth sample initialized");
 
@@ -121,6 +148,23 @@
                 }
             });
         },
+        tryTokenPost: function() {
+          var self = this,
+            endpoint = self._getFormVal("endpoint");
+
+          if (this.auth.oauth_verifier == undefined) {
+            this._error("Please authorize and fill in verify code first");
+            return;
+          }
+
+          this._request("POST", endpoint + "statements", null, this.testStatement, this.auth, function(xhr) {
+            if (xhr.status === 200) {
+              self._userLog("Successfully issued POST request on /statements resource with OAuth credentials!");
+            } else {
+              self._error("OAuth signed statements request failed: " + xhr.status + " ; " + xhr.responseText);
+            }
+          })
+        },
 
         tryNoUserToken: function() {
             var noUserAuth,
@@ -147,9 +191,38 @@
                     self._userLog("Successfully issued GET request on " +
                         "/statements resource with (no user) OAuth credentials!");
                 } else {
-                    self._error("OAuth signed statements request failed");
+                    self._error("OAuth statements resource with (no user) request failed");
                 }
             });
+        },
+        tryNoUserTokenPost: function() {
+          var noUserAuth,
+            self = this,
+            endpoint = this._getFormVal("endpoint"),
+            consumerKey = this._getFormVal("consumerKey"),
+            consumerSecret = this._getFormVal("consumerSecret");
+
+          if (endpoint == "" || consumerKey == "" || consumerSecret == "") {
+            self._error("Please fill in the endpoint, consumer key, and consumer secret");
+            return;
+          }
+
+          noUserAuth = {
+            type : "oAuth", 
+            consumerKey : consumerKey,
+            consumerSecret : consumerSecret,
+            oauth_token : "",
+            oauth_token_secret : ""
+          };
+
+          this._request("POST", endpoint + "statements", null, this.testStatement, noUserAuth, function(xhr) {
+            if (xhr.status === 200) {
+              self._userLog("Successfully issued POST request on " +
+                "/statements resource with (no user) OAuth credentials!");
+            } else {
+              self._error("OAuth statements resource with (no user) request failed: " + xhr.status + " ; " + xhr.responseText);
+            }
+          });
         },
 
         _getFormVal: function(name) {
@@ -247,7 +320,7 @@
 
             //Set TCAPI version header
             xhr.setRequestHeader("X-Experience-API-Version", this.tinCanVersion);
-
+            xhr.setRequestHeader("Content-Type", "application/json");
             //Setup callback
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
