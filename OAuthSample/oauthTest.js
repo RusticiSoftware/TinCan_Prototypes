@@ -191,7 +191,7 @@
                     self._userLog("Successfully issued GET request on " +
                         "/statements resource with (no user) OAuth credentials!");
                 } else {
-                    self._error("OAuth statements resource with (no user) request failed");
+                    self._error("OAuth signed statements request failed");
                 }
             });
         },
