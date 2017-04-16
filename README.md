@@ -1,4 +1,4 @@
-###Overview
+### Overview
 
 This repo contains client prototypes for the Tin Can API.
 
@@ -9,7 +9,7 @@ This repo contains client prototypes for the Tin Can API.
 * StatementViewer: statement stream viewer with rudimentary query ability
 * OAuthSample: simple page for testing the OAuth compatibility of a Tin Can endpoint
 
-###Installation
+### Installation
 
 Make sure to fetch all the code dependencies by running ```git submodule update --init --recursive```
 
@@ -20,7 +20,7 @@ Make sure to fetch all the code dependencies by running ```git submodule update 
 	* You should then see: [], or JSON of a statement if statements have already been stored for this LRS.
 * Load `index.html` in a browser
 
-###Contact:
+### Contact:
 
 info@tincanapi.com<br>
 http://tincanapi.com/
