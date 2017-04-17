@@ -6,3 +6,4 @@ config.js
 [O|o]bj/
 .DS_Store
 *.class
+pkgs
