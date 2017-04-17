@@ -22,9 +22,6 @@
 *TinCanJS/node_modules*
 *TinCanJS/build.js
 *TinCanJS/Gruntfile.js
-*TinCanJS/README.md
-*TinCanJS/LICENSE
-*TinCanJS/NOTICE
 
 *test_locations.js*
 *oauthTest.js*
