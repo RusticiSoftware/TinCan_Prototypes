@@ -1,18 +1,18 @@
 [submodule "StatementViewer/resources"]
 	path = StatementViewer/resources
-	url = git://github.com/RusticiSoftware/TinCanStatementViewer.git
+        url = https://github.com/RusticiSoftware/TinCanStatementViewer.git
 [submodule "StatementViewer/TinCanJS"]
 	path = StatementViewer/TinCanJS
-	url = git://github.com/RusticiSoftware/TinCanJS.git
+        url = https://github.com/RusticiSoftware/TinCanJS.git
 [submodule "GolfExample_TCAPI/scripts/TinCanJS"]
 	path = GolfExample_TCAPI/scripts/TinCanJS
-	url = git://github.com/RusticiSoftware/TinCanJS.git
+        url = https://github.com/RusticiSoftware/TinCanJS.git
 [submodule "JsTetris_TCAPI/TinCanJS"]
 	path = JsTetris_TCAPI/TinCanJS
-	url = git://github.com/RusticiSoftware/TinCanJS.git
+        url = https://github.com/RusticiSoftware/TinCanJS.git
 [submodule "Locator_TCAPI/scripts/TinCanJS"]
 	path = Locator_TCAPI/scripts/TinCanJS
-	url = git://github.com/RusticiSoftware/TinCanJS.git
+        url = https://github.com/RusticiSoftware/TinCanJS.git
 [submodule "ReportSample/scripts/TinCanJS"]
 	path = ReportSample/scripts/TinCanJS
-	url = git://github.com/RusticiSoftware/TinCanJS.git
+        url = https://github.com/RusticiSoftware/TinCanJS.git
