@@ -18,7 +18,7 @@ function make_zip() {
 }
 
 echo "Zipping all prototypes"
-make_zip "${ROOT}" "${ROOT}/pkgs/TinCan_Prototypes.zip" .
+make_zip "${ROOT}" "${ROOT}/pkgs/tincan_prototypes_allinone.zip" .
 
 echo "Zipping Golf Example"
 make_zip "${ROOT}/GolfExample_TCAPI" "${ROOT}/pkgs/GolfExample_TCAPI.zip" .
@@ -28,5 +28,10 @@ make_zip "${ROOT}/JsTetris_TCAPI" "${ROOT}/pkgs/JsTetris_TCAPI.zip" .
 
 echo "Zipping Locator"
 make_zip "${ROOT}/Locator_TCAPI" "${ROOT}/pkgs/Locator_TCAPI.zip" .
+
+echo "Zipping all packages"
+cd "${ROOT}/pkgs"
+zip -q "${ROOT}/pkgs/tincan_prototypes_packages.zip" *_TCAPI.zip
+cd -
 
 echo "Done";
