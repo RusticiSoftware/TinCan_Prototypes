@@ -11,8 +11,8 @@ var config = {
 		name : "Rustici Software",
 		icon : "img/notvisited.png",
 		description : "Work the day away...",
-		lat: "35.940735",
-		lng: "-86.827888",
+		lat: "35.951616",
+		lng: "-86.823556",
 		visited: false,
 		visitrange: 1,
 		tc_id: "scorm.com/Location/RusticiSoftware"
