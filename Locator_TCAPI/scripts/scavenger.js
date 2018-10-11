@@ -130,15 +130,6 @@ window.Scavenger = (function () {
         });
     };
 
-    /*scavenger.createMarker = function (results) {
-        var marker = new google.maps.Marker({
-            position: results["geometry"].location,
-            title: results["name"]
-        });
-
-        marker.setMap(map);
-    };*/
-
     scavenger.showMap = function (lat, lng) {
         var latlng = new google.maps.LatLng(lat, lng);
         var myOptions = {
