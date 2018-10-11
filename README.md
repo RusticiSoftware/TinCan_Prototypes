@@ -22,5 +22,5 @@ Make sure to fetch all the code dependencies by running ```git submodule update 
 
 ### Contact:
 
-info@tincanapi.com<br>
-http://tincanapi.com/
+info@xapi.com<br>
+http://xapi.com/
