@@ -21,32 +21,32 @@ categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototype
 * http://id.tincanapi.com/activity/tincan-prototypes/tetris
 * http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour
 
-##Activity Types
+## Activity Types
 The launcher plays the role of an LMS in launching the content. 
 
 * http://id.tincanapi.com/activitytype/recipe
 * http://id.tincanapi.com/activitytype/source
 * http://id.tincanapi.com/activitytype/lms
 
-##Verbs
+## Verbs
 The launcher itself is experienced. It launches the other content. 
 
 * http://adlnet.gov/expapi/verbs/experienced
 * http://adlnet.gov/expapi/verbs/launched
 
-##Extensions
+## Extensions
 None.
 
 # Golf Prototype
 The Golf prototype is an example of a classic slide-slide-quiz e-learning course. This
 recipe is based on emerging best practice for this type of course. 
 
-##Recipe
+## Recipe
 All statements include the Recipe ID in the 'category' context activity list.
 
 * http://id.tincanapi.com/recipe/tincan-prototypes/golf/1
 
-##Activities
+## Activities
 Statements are grouped in the context of ```http://id.tincanapi.com/activity/tincan-prototypes``` and ```http://id.tincanapi.com/activity/tincan-prototypes/golf-example```. They are categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototypes/golf/1``` and ```http://id.tincanapi.com/activity/tincan-prototypes/elearning```.
 
 Activity ids indicate the position of each element within the course structure. 
@@ -86,7 +86,7 @@ Activity ids indicate the position of each element within the course structure.
 * http://id.tincanapi.com/activity/tincan-prototypes/golf-example/GolfAssessment/interactions.fun_3
 
 
-##Activity Types
+## Activity Types
 The course contains pages and an assessment which contains cmi interactions.
 
 * http://id.tincanapi.com/activitytype/recipe
@@ -96,7 +96,7 @@ The course contains pages and an assessment which contains cmi interactions.
 * http://adlnet.gov/expapi/activities/assessment
 * http://adlnet.gov/expapi/activities/cmi.interaction
 
-##Verbs
+## Verbs
 The session is initizalized and terminated. The attempt is attempted, suspended, resumed then passed or failed. 
 Pages are experienced and cmi intereactions are answered. 
 
@@ -110,19 +110,19 @@ Pages are experienced and cmi intereactions are answered.
 * http://adlnet.gov/expapi/verbs/experienced
 * http://adlnet.gov/expapi/verbs/answered
 
-##Extensions
+## Extensions
 None.
 
 # Tetris Prototype
 The Tetris prototype is an example of a game. Concepts from this recipe may be reflected in serious learning games, but
 this recipe as a whole (the 'lines' extension in particular) is only suitable for Tetris style games.
 
-##Recipe
+## Recipe
 All statements include the Recipe ID in the 'category' context activity list.
 
 * http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1
 
-##Activities
+## Activities
 Statements are grouped in the context of ```http://id.tincanapi.com/activity/tincan-prototypes``` and ```http://id.tincanapi.com/activity/tincan-prototypes/tetris```. They are categorized in the context of ```http://id.tincanapi.com/recipe/tincan-prototypes/tetris/1``` and ```http://id.tincanapi.com/activity/tincan-prototypes/tetris```.
 
 The game as a whole has an activity id, and there's a category activity id for games based on this prototype. 
@@ -132,7 +132,7 @@ The game as a whole has an activity id, and there's a category activity id for g
 
 Each level of tetris has an activity id of ```http://id.tincanapi.com/activity/tincan-prototypes/tetris/levels/n``` where ```n``` is the level number. 
 
-##Activity Types
+## Activity Types
 The game has game levels. 
 
 * http://id.tincanapi.com/activitytype/recipe
@@ -140,7 +140,7 @@ The game has game levels.
 * http://activitystrea.ms/schema/1.0/game
 * http://curatr3.com/define/type/level
 
-##Verbs
+## Verbs
 The session is initialized and terminated when the gamer enters the page and when they turn tracking off and on. 
 Games are attempted and then completed. Game levels are completed. 
 
@@ -166,7 +166,7 @@ by the player.
 The locator prototype is an example of a learning activity that takes advantage on native features of a mobile device,
 in this case the GPS. This recipe may be applicable to any location based activity. 
 
-##Recipe
+## Recipe
 All statements include the Recipe ID in the 'category' context activity list.
 
 * http://id.tincanapi.com/recipe/tincan-prototypes/locator/1
@@ -184,7 +184,7 @@ The activity contains a number of places.
 * http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/adventure-science-center
 * http://id.tincanapi.com/activity/tincan-prototypes/nashville-museums-tour/cheekwood
 
-##Activity Types
+## Activity Types
 The activity is a 'performance' type as the learner must perform a series of tasks, i.e. visiting places. 
 
 * http://id.tincanapi.com/activitytype/recipe
@@ -192,14 +192,14 @@ The activity is a 'performance' type as the learner must perform a series of tas
 * http://activitystrea.ms/schema/1.0/place
 * http://adlnet.gov/expapi/activities/performance
 
-##Verbs
+## Verbs
 The learner 'was at' each of the places. They attempt and complete the performance task. 
 
 * http://activitystrea.ms/schema/1.0/at
 * http://adlnet.gov/expapi/verbs/completed
 * http://adlnet.gov/expapi/verbs/attempted
 
-##Context Extensions
+## Context Extensions
 The position of the learner (rather than the place) is recorded in context extensions. This prototype does not use
 these extensions within the activity definition to mark the position of the places, but it could. 
 
