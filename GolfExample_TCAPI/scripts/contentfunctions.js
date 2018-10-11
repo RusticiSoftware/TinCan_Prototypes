@@ -14,5 +14,5 @@ function AddLicenseInfo(contentAttributionSiteName, contentAttributionLink){
 }
 
 function AddTagLine(){
-    document.write('<div class="salespitch"><a target="_blank" href="http://tincanapi.com/"><img src="../img/tincan-300x176.png"/></a></div>');
+    document.write('<div class="salespitch"><a target="_blank" href="http://xapi.com/"><img src="../img/tincan-300x176.png"/></a></div>');
 }
