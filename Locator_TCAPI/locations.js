@@ -7,7 +7,7 @@ var COURSE_DESC = "An exploration of museums in the greater Nashville TN area.";
 
 var config = {
     CurrentLocationTitle : "My Current Location",
-    CurrentLocationIcon : "http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+    CurrentLocationIcon : "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
     Placemarks : [
         {
             name : "Parthenon",

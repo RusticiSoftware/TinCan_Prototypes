@@ -6,7 +6,7 @@ var COURSE_DESC = "A sample course to display the usefulness of Tin Can and a lo
 
 var config = {
 	CurrentLocationTitle : "My Current Location",
-	CurrentLocationIcon : "http:////maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+	CurrentLocationIcon : "https:////maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
 	Placemarks : [{
 		name : "Rustici Software",
 		icon : "img/notvisited.png",
